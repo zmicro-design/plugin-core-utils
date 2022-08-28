@@ -1,13 +1,12 @@
 #!/bin/bash
 
 # CURRENT_PATH=$(get_current_path)
-CURRENT_PATH=$ZMICRO_CORE_PATH/inquirer
+CURRENT_PATH=$ZMICRO_PLUGINS_PATH/core-utils/core/inquirer
 
 which bc >>/dev/null 2>&1
 if [ "$?" != "0" ]; then
   pm install -yqq bc
 fi
-
 
 # echo "TERM: $TERM"
 
@@ -20,9 +19,7 @@ if [ "$TERM" = "" ] || [ "$TERM" = "dumb" ]; then
   export -f tput
 fi
 
-
 . $CURRENT_PATH/inquirer_text
 . $CURRENT_PATH/inquirer_select
 
 . $CURRENT_PATH/inquirer_validation
-

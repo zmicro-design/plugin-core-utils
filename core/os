@@ -641,7 +641,9 @@ os::get_env() {
 }
 
 os::inquirer() {
-  load inquirer
+  # load inquirer
+  . $ZMICRO_PLUGINS_PATH/core-utils/core/inquirer/export
+
   local key=$1
   # 1. text       <args: key "text" question required default>
   # 2. yesno      <args: key "yesno" question required default>

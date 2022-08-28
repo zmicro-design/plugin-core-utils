@@ -16,6 +16,7 @@ jobs:
   on-success:
     needs: test
     runs-on: ubuntu-latest
+    container: whatwewant/zmicro:v1
     if: ${{ always() && needs.test.result == 'success' }}
     steps:
       - name: Notification Feishu
@@ -27,11 +28,12 @@ jobs:
             分支: ${{ github.ref }}
             提交信息: ${{ github.event.head_commit.message }}
             提交人: ${{ github.actor }}
-            状态: 构建成功（https://github.com/${{ github.repository }}/actions/runs/${{ github.run.id }}）
+            状态: 构建成功（https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}）
 
   on-failure:
     needs: test
     runs-on: ubuntu-latest
+    container: whatwewant/zmicro:v1
     if: ${{ always() && needs.test.result == 'failure' }}
     steps:
       - name: Notification Feishu
@@ -43,16 +45,20 @@ jobs:
             分支: ${{ github.ref }}
             提交信息: ${{ github.event.head_commit.message }}
             提交人: ${{ github.actor }}
-            状态: 构建失败（https://github.com/${{ github.repository }}/actions/runs/${{ github.run.id }}）
+            状态: 构建失败（https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}）
 
   test:
     runs-on: ${{ matrix.os }}
+    container: whatwewant/zmicro:v1
     strategy:
       fail-fast: false
       matrix:
         os: [ ubuntu-latest, macOS-latest ]
 
     steps:
+      - name: Update zmicro to latest
+        run: zmicro update
+
       - name: Get Current Date
         id: date
         run: echo "::set-output name=date::$(date +'%Y-%m-%d')"
@@ -61,13 +67,6 @@ jobs:
         with:
           fetch-depth: '0'
 
-      - name: Install GVM
-        run: ./install
+      - name: Run test cases
+        run: zmicro test core/
 
-      - name: Install Go (Stable/LTS)
-        run: zmicro core-utils lts
-
-      - name: Show Go Version
-        run: |
-          export PATH=$(zmicro core-utils bin):$PATH
-          go version

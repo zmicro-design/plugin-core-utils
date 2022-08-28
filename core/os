@@ -237,6 +237,11 @@ os::is_docker() {
     return
   fi
 
+  if [ ! -f "/proc/self/cgroup" ]; then
+    echo "false"
+    return
+  fi
+
   cat /proc/self/cgroup | grep docker >>/dev/null 2>&1
   if [ "$?" = "0" ]; then
     echo "true"

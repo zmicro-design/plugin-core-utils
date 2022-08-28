@@ -23,7 +23,7 @@ jobs:
         uses: whatwewant/action-robot-feishu@v0.0.13
         with:
           url: ${{ secrets.WORKFLOW_FEISHU_BOT_WEBHOOK_URL }}
-          title: '✅ 自动化测试：${{ github.repository }}'
+          title: '✅ 自动化测试 (MacOS)：${{ github.repository }}'
           text: |
             分支: ${{ github.ref }}
             提交信息: ${{ github.event.head_commit.message }}
@@ -40,7 +40,7 @@ jobs:
         uses: whatwewant/action-robot-feishu@v0.0.13
         with:
           url: ${{ secrets.WORKFLOW_FEISHU_BOT_WEBHOOK_URL }}
-          title: '❌ 自动化测试：${{ github.repository }}'
+          title: '❌ 自动化测试 (MacOS)：${{ github.repository }}'
           text: |
             分支: ${{ github.ref }}
             提交信息: ${{ github.event.head_commit.message }}
@@ -48,10 +48,16 @@ jobs:
             状态: 构建失败（https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}）
 
   test:
-    runs-on: ubuntu-latest
-    container: whatwewant/zmicro:v1
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ macOS-latest ]
 
     steps:
+      - name: Install Zmicro
+        run: curl -o- https://raw.githubusercontent.com/zcorky/zmicro/master/install | bash
+
       - name: Update zmicro to latest
         run: zmicro update
 

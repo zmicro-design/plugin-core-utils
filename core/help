@@ -24,7 +24,9 @@ help() {
 
     if [ "$commands" != "-h" ] && [ "$commands" != "--help" ]; then
       for command in $commands; do
-        help_commands_path="$help_commands_path/$command"
+        if [ "$command" != "-h" ] && [ "$command" != "--help" ]; then
+          help_commands_path="$help_commands_path/$command"
+        fi
       done
     fi
   fi
@@ -72,8 +74,6 @@ help::list() {
     log::debug "[$(timestamp)][help::list] path is required"
     return
   fi
-
-
 
   echo "Usage:"
   echo ""

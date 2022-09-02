@@ -1,0 +1,215 @@
+#!/bin/bash
+
+function test_semver::is_valid() {
+  testing::expect \
+    "${FUNCNAME[0]} - ok" \
+    "to_equal" \
+    "true" \
+    "$(semver::is_valid v1.2.3)"
+
+  testing::expect \
+    "${FUNCNAME[0]} - ok" \
+    "to_equal" \
+    "true" \
+    "$(semver::is_valid v100.200.300)"
+
+  testing::expect \
+    "${FUNCNAME[0]} - empty" \
+    "to_equal" \
+    "false" \
+    "$(semver::is_valid)"
+
+  testing::expect \
+    "${FUNCNAME[0]} - not prefix v" \
+    "to_equal" \
+    "false" \
+    "$(semver::is_valid 1.2.3)"
+
+  testing::expect \
+    "${FUNCNAME[0]} - not three 1" \
+    "to_equal" \
+    "false" \
+    "$(semver::is_valid v1)"
+
+  testing::expect \
+    "${FUNCNAME[0]} - not three 2" \
+    "to_equal" \
+    "false" \
+    "$(semver::is_valid v1.2)"
+}
+
+function test_semver::compare_gt() {
+  testing::expect \
+    "${FUNCNAME[0]} - v1.2.5 > v1.2.4" \
+    "to_equal" \
+    "true" \
+    "$(semver::compare_gt v1.2.5 v1.2.4)"
+
+  testing::expect \
+    "${FUNCNAME[0]} - v1.2.4 > v1.2.4" \
+    "to_equal" \
+    "false" \
+    "$(semver::compare_gt v1.2.4 v1.2.4)"
+
+  testing::expect \
+    "${FUNCNAME[0]} - v1.2.3 > v1.2.4" \
+    "to_equal" \
+    "false" \
+    "$(semver::compare_gt v1.2.3 v1.2.4)"
+
+  testing::expect \
+    "${FUNCNAME[0]} - v1.1.5 > v1.2.4" \
+    "to_equal" \
+    "false" \
+    "$(semver::compare_gt v1.1.5 v1.2.4)"
+
+  testing::expect \
+    "${FUNCNAME[0]} - v0.3.5 > v1.2.4" \
+    "to_equal" \
+    "false" \
+    "$(semver::compare_gt v0.3.5 v1.2.4)"
+}
+
+function test_semver::compare_gte() {
+  testing::expect \
+    "${FUNCNAME[0]} - v1.2.5 >= v1.2.4" \
+    "to_equal" \
+    "true" \
+    "$(semver::compare_gte v1.2.5 v1.2.4)"
+
+  testing::expect \
+    "${FUNCNAME[0]} - v1.2.4 >= v1.2.4" \
+    "to_equal" \
+    "true" \
+    "$(semver::compare_gte v1.2.4 v1.2.4)"
+
+  testing::expect \
+    "${FUNCNAME[0]} - v1.2.3 >= v1.2.4" \
+    "to_equal" \
+    "false" \
+    "$(semver::compare_gte v1.2.3 v1.2.4)"
+
+  testing::expect \
+    "${FUNCNAME[0]} - v1.1.5 >= v1.2.4" \
+    "to_equal" \
+    "false" \
+    "$(semver::compare_gte v1.1.5 v1.2.4)"
+
+  testing::expect \
+    "${FUNCNAME[0]} - v0.3.5 >= v1.2.4" \
+    "to_equal" \
+    "false" \
+    "$(semver::compare_gte v0.3.5 v1.2.4)"
+}
+
+function test_semver::compare_lt() {
+  testing::expect \
+    "${FUNCNAME[0]} - v1.2.5 < v1.2.4" \
+    "to_equal" \
+    "false" \
+    "$(semver::compare_lt v1.2.5 v1.2.4)"
+
+  testing::expect \
+    "${FUNCNAME[0]} - v1.2.4 < v1.2.4" \
+    "to_equal" \
+    "false" \
+    "$(semver::compare_lt v1.2.4 v1.2.4)"
+
+  testing::expect \
+    "${FUNCNAME[0]} - v1.2.3 < v1.2.4" \
+    "to_equal" \
+    "true" \
+    "$(semver::compare_lt v1.2.3 v1.2.4)"
+
+  testing::expect \
+    "${FUNCNAME[0]} - v1.1.5 < v1.2.4" \
+    "to_equal" \
+    "true" \
+    "$(semver::compare_lt v1.1.5 v1.2.4)"
+
+  testing::expect \
+    "${FUNCNAME[0]} - v0.3.5 < v1.2.4" \
+    "to_equal" \
+    "true" \
+    "$(semver::compare_lt v0.3.5 v1.2.4)"
+}
+
+function test_semver::compare_lte() {
+  testing::expect \
+    "${FUNCNAME[0]} - v1.2.5 <= v1.2.4" \
+    "to_equal" \
+    "false" \
+    "$(semver::compare_lte v1.2.5 v1.2.4)"
+
+  testing::expect \
+    "${FUNCNAME[0]} - v1.2.4 <= v1.2.4" \
+    "to_equal" \
+    "true" \
+    "$(semver::compare_lte v1.2.4 v1.2.4)"
+
+  testing::expect \
+    "${FUNCNAME[0]} - v1.2.3 <= v1.2.4" \
+    "to_equal" \
+    "true" \
+    "$(semver::compare_lte v1.2.3 v1.2.4)"
+
+  testing::expect \
+    "${FUNCNAME[0]} - v1.1.5 <= v1.2.4" \
+    "to_equal" \
+    "true" \
+    "$(semver::compare_lte v1.1.5 v1.2.4)"
+
+  testing::expect \
+    "${FUNCNAME[0]} - v0.3.5 <= v1.2.4" \
+    "to_equal" \
+    "true" \
+    "$(semver::compare_lte v0.3.5 v1.2.4)"
+}
+
+function test_semver::next() {
+  testing::expect \
+    "${FUNCNAME[0]} - v1.2.5 => v1.2.6" \
+    "to_equal" \
+    "v1.2.6" \
+    "$(semver::next v1.2.5)"
+}
+
+function test_semver_without_prefix() {
+  testing::expect \
+    "${FUNCNAME[0]} - major(v1.2.5) => v1" \
+    "to_equal" \
+    "v1" \
+    "$(semver::get_major v1.2.5)"
+
+  testing::expect \
+    "${FUNCNAME[0]} - minor(v1.2.5) => v1.2" \
+    "to_equal" \
+    "v1.2" \
+    "$(semver::get_minor v1.2.5)"
+
+  testing::expect \
+    "${FUNCNAME[0]} - patch(v1.2.5) => v1.2.5" \
+    "to_equal" \
+    "v1.2.5" \
+    "$(semver::get_patch v1.2.5)"
+}
+
+function test_semver_with_prefix() {
+  testing::expect \
+    "${FUNCNAME[0]} - major(v1.2.5, vvv) => vvv1" \
+    "to_equal" \
+    "vvv1" \
+    "$(semver::get_major v1.2.5 vvv)"
+
+  testing::expect \
+    "${FUNCNAME[0]} - minor(v1.2.5, vvv) => vvv1.2" \
+    "to_equal" \
+    "vvv1.2" \
+    "$(semver::get_minor v1.2.5 vvv)"
+
+  testing::expect \
+    "${FUNCNAME[0]} - patch(v1.2.5, vvv) => vvv1.2.5" \
+    "to_equal" \
+    "vvv1.2.5" \
+    "$(semver::get_patch v1.2.5 vvv)"
+}

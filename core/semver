@@ -1,0 +1,171 @@
+#!/bin/bash
+
+semver::is_valid() {
+  local version=$1
+  if [ -z "$version" ]; then
+    echo "false"
+    return
+  fi
+
+  if [[ $version =~ ^v[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
+    echo "true"
+  else
+    echo "false"
+  fi
+}
+
+semver::compare_equals() {
+  local v1=$1
+  local v2=$2
+
+  if [ "$v1" == "$v2" ]; then
+    echo "true"
+  else
+    echo "false"
+  fi
+}
+
+semver::compare_gt() {
+  local v1=$1
+  local v2=$2
+
+  # v6.7.8
+  # v11=6 v12=7 v13=8
+  local v11=$(echo ${v1#v} | awk -F '.' '{print $1}' | awk -F 'v' '{print $1}')
+  local v12=$(echo ${v1#v} | awk -F '.' '{print $2}')
+  local v13=$(echo ${v1#v} | awk -F '.' '{print $3}')
+
+  local v21=$(echo ${v2#v} | awk -F '.' '{print $1}' | awk -F 'v' '{print $1}')
+  local v22=$(echo ${v2#v} | awk -F '.' '{print $2}')
+  local v23=$(echo ${v2#v} | awk -F '.' '{print $3}')
+
+  if (($v11 < $v21)); then
+    echo "false"
+    return
+  elif (($v11 > $v21)); then
+    echo "true"
+    return
+  fi
+
+  if (($v12 < $v22)); then
+    echo "false"
+    return
+  elif (($v12 > $v22)); then
+    echo "true"
+    return
+  fi
+
+  if (($v13 <= $v23)); then
+    echo "false"
+    return
+  fi
+
+  echo "true"
+}
+
+semver::compare_gte() {
+  local v1=$1
+  local v2=$2
+
+  if [ "$(semver::compare_gt $v1 $v2)" == "true" ]; then
+    echo "true"
+    return
+  fi
+
+  if [ "$(semver::compare_equals $v1 $v2)" == "true" ]; then
+    echo "true"
+    return
+  fi
+
+  echo "false"
+}
+
+semver::compare_lt() {
+  local v1=$1
+  local v2=$2
+
+  semver::compare_gt $v2 $v1
+}
+
+semver::compare_lte() {
+  local v1=$1
+  local v2=$2
+
+  if [ "$(semver::compare_lt $v1 $v2)" == "true" ]; then
+    echo "true"
+    return
+  fi
+
+  if [ "$(semver::compare_equals $v1 $v2)" == "true" ]; then
+    echo "true"
+    return
+  fi
+
+  echo "false"
+}
+
+semver::next() {
+  local v1=$1
+
+  local v11=$(echo ${v1#v} | awk -F '.' '{print $1}' | awk -F 'v' '{print $1}')
+  local v12=$(echo ${v1#v} | awk -F '.' '{print $2}')
+  local v13=$(echo ${v1#v} | awk -F '.' '{print $3}')
+
+  local v131=$((v13 + 1))
+
+  echo "v$v11.$v12.$v131"
+}
+
+semver::get_major() {
+  local v1=$1
+  local prefix=$2
+
+  if [ -z "$prefix" ]; then
+    prefix="v"
+  fi
+
+  local v11=$(echo ${v1#v} | awk -F '.' '{print $1}' | awk -F 'v' '{print $1}')
+  echo "${prefix}${v11}"
+}
+
+semver::get_minor() {
+  local v1=$1
+  local prefix=$2
+
+  if [ -z "$prefix" ]; then
+    prefix="v"
+  fi
+
+  local v11=$(echo ${v1#v} | awk -F '.' '{print $1}' | awk -F 'v' '{print $1}')
+  local v12=$(echo ${v1#v} | awk -F '.' '{print $2}')
+  echo "${prefix}${v11}.${v12}"
+}
+
+semver::get_patch() {
+  local v1=$1
+  local prefix=$2
+
+  if [ -z "$prefix" ]; then
+    prefix="v"
+  fi
+
+  local v11=$(echo ${v1#v} | awk -F '.' '{print $1}' | awk -F 'v' '{print $1}')
+  local v12=$(echo ${v1#v} | awk -F '.' '{print $2}')
+  local v13=$(echo ${v1#v} | awk -F '.' '{print $3}')
+
+  echo "${prefix}$v11.$v12.$v13"
+}
+
+export -f semver::is_valid
+
+export -f semver::compare_equals
+export -f semver::compare_gt
+export -f semver::compare_gte
+export -f semver::compare_lt
+export -f semver::compare_lte
+
+export -f semver::next
+
+export -f semver::get_major
+export -f semver::get_minor
+export -f semver::get_patch

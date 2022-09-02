@@ -81,6 +81,16 @@ os::platform() {
 }
 
 os::release() {
+  if [ "$(os::is_macos)" = "true" ]; then
+    which sw_vers > /dev/null 2>&1
+    if [ $? -eq 0 ]; then
+      echo "$(sw_vers -productName) $(sw_vers -productVersion)"
+    else
+      echo "macOS unknown version"
+    fi
+    return
+  fi
+
   local issue=""
 
   # Red Hat
@@ -298,9 +308,19 @@ os::is_ip() {
 }
 
 os::device_config() {
-  local cpus=$(cat /proc/cpuinfo | grep processor | wc -l)
-  local memory=$(((($(cat /proc/meminfo | grep MemTotal | awk '{print $2}') / 1024 / 1024)) + 1))
-  local disk=$(os::disk_usage total)
+  local cpus="?"
+  local memory="?"
+  local disk="?"
+
+  if [ "$(os::is_macos)" = "true" ]; then
+    local cpus=$(sysctl -n hw.ncpu)
+    local memory=$(hostinfo | grep memory | awk -F " " '{print $4}' | awk -F '.' '{print $1}')
+    # local disk=$(os::disk_usage total)
+  else
+    local cpus=$(cat /proc/cpuinfo | grep processor | wc -l)
+    local memory=$(((($(cat /proc/meminfo | grep MemTotal | awk '{print $2}') / 1024 / 1024)) + 1))
+    local disk=$(os::disk_usage total)
+  fi
 
   echo "${cpus}C${memory}G - ${disk}G"
 }
@@ -788,6 +808,16 @@ os::fix_permissions() {
 }
 
 os::distribution() {
+  if [ "$(os::is_macos)" = "true" ]; then
+    which sw_vers > /dev/null 2>&1
+    if [ $? -eq 0 ]; then
+      echo "$(sw_vers -productName) $(sw_vers -productVersion)"
+    else
+      echo "macOS unknown version"
+    fi
+    return
+  fi
+
   local name="unknown"
   if [ "$(os::is_linux)" = "true" ]; then
     if [ -f /etc/redhat-release ]; then

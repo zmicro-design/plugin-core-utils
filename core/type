@@ -361,7 +361,13 @@ array::find_by_index() {
   local elements_array_find_by_index=${@:2}
   local element_array_find_by_index=""
 
+  local ok=false
+
   each() {
+    if [ "$ok" = "true" ]; then
+      return
+    fi
+
     if [ -n "$element_array_find_by_index" ]; then
       return
     fi
@@ -371,6 +377,7 @@ array::find_by_index() {
 
     if [ $index -eq $nth ]; then
       element_array_find_by_index=$item
+      ok=true
     fi
   }
 

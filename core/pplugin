@@ -1,0 +1,445 @@
+#!/bin/bash
+
+# pplugin - plugin system for zmicro plugins
+#   enable zmicro plugin has its own plugin system
+
+# pplugin::get_bins_dir - get the plugins bin directory
+#   it usually at plugin_dir/commands/_internal
+pplugin::get_bins_dir() {
+  if [ -z "$ZMICRO_PPLUGIN_DIR" ]; then
+    echo "$ZMICRO_PLUGINS_PATH/$ZMICRO_PPLUGIN_NAME/commands/_internal"
+    return
+  fi
+
+  echo "$ZMICRO_PPLUGIN_DIR/commands/_internal"
+}
+
+# pplugin::get_plugins_dir - get the plugins directory
+#   it usually at plugin_dir/plugins
+pplugin::get_plugins_dir() {
+  if [ -z "$ZMICRO_PPLUGIN_DIR" ]; then
+    echo "$ZMICRO_PLUGINS_PATH/$ZMICRO_PPLUGIN_NAME/plugins"
+    return
+  fi
+
+  echo "$ZMICRO_PPLUGIN_DIR/plugins"
+}
+
+# pplugin::get_dir - get the plugin name directory
+pplugin::get_dir() {
+  local name="$1"
+  if [ -z "$name" ]; then
+    log::error "[pplugin::get_dir] name is required"
+    return 1
+  fi
+
+  echo "$(pplugin::get_plugins_dir)/$name"
+}
+
+# pplugin::get_repo - get the plugin name repository
+pplugin::get_repo() {
+  local name="$1"
+  if [ -z "$name" ]; then
+    log::error "[pplugin::get_repo] name is required"
+    return 1
+  fi
+
+  if [ -z "$ZMICRO_PPLUGIN_NAME" ]; then
+    log::error "[pplugin::get_bin] env ZMICRO_PPLUGIN_NAME is required"
+    return 1
+  fi
+
+  echo "https://github.com/zmicro-design/$ZMICRO_PPLUGIN_NAME-$name"
+}
+
+# pplugin::get_mod - get the plugin mod path
+pplugin::get_mod() {
+  local name="$1"
+  if [ -z "$name" ]; then
+    log::error "[pplugin::get_mod] name is required"
+    return 1
+  fi
+
+  echo "$(pplugin::get_dir $name)/mod"
+}
+
+# pplugin::get_core - get the plugin core path
+pplugin::get_core() {
+  local name="$1"
+  if [ -z "$name" ]; then
+    log::error "[pplugin::get_core] name is required"
+    return 1
+  fi
+
+  echo "$(pplugin::get_dir $name)/core"
+}
+
+# pplugin::get_config - get the plugin name config path
+pplugin::get_config() {
+  local name="$1"
+  if [ -z "$name" ]; then
+    log::error "[pplugin::get_config] name is required"
+    return 1
+  fi
+
+  echo "$(pplugin::get_dir $name)/config"
+}
+
+# pplugin::has - check if the plugin name exists
+pplugin::has() {
+  local name="$1"
+  if [ -z "$name" ]; then
+    log::error "[pplugin::has] name is required"
+    echo "false"
+    return
+  fi
+
+  local dir=$(pplugin::get_dir "$name")
+  if [ ! -d "$dir" ]; then
+    echo "false"
+    return
+  fi
+
+  echo "true"
+}
+
+# pplugin::register - register a plugin commands as a sub command of zmicro
+pplugin::register() {
+  local name="$1"
+  if [ -z "$name" ]; then
+    log::error "[pplugin::get_bin] name is required"
+    return 1
+  fi
+
+  if [ -z "$ZMICRO_PPLUGIN_NAME" ]; then
+    log::error "[pplugin::get_bin] env ZMICRO_PPLUGIN_NAME is required"
+    return 1
+  fi
+
+  local command_dir=$(pplugin::get_dir "$name")/commands
+  local bins_dir=$(pplugin::get_bins_dir)
+  # check or create
+  if [ ! -d "$bins_dir" ]; then
+    sudo mkdir -p $bins_dir
+    sudo chown -R $(os::username) $bins_dir
+  elif [ ! -w "$bins_dir" ]; then
+    sudo chown -R $(os::username) $bins_dir
+  fi
+
+  log::info "[pplugin::register] register plugin $(color::green $name) for $(color::green $ZMICRO_PPLUGIN_NAME)"
+  # echo "ln -sf $command_dir $bins_dir/$name"
+  # @TODO ln -sf will create diretory recursively
+  # ln -sf "$command_dir" "$bins_dir/$name"
+
+  if [ -L "$bins_dir/$name" ]; then
+    if [ "$(readlink $bins_dir/$name)" = "$command_dir" ]; then
+      # log::info "[pplugin::register] $(color::green $name) is already registered"
+      return
+    fi
+
+    rm -f "$bins_dir/$name"
+  fi
+
+  ln -sf "$command_dir" "$bins_dir/$name"
+}
+
+# pplugin::install - install a plugin
+pplugin::install() {
+  local name=$1
+  local url=$2
+  local version=master
+
+  if [ -z "$name" ]; then
+    log::error "[pplugin::install] name is required"
+    return 1
+  fi
+
+  # @FEAT support: install $plugin_name@$plugin_version
+  if [ "$(version::at $name)" = "true" ]; then
+    version=$(version::at_version $name)
+    name=$(version::at_name $name)
+  fi
+
+  if [ -z "$url" ]; then
+    url=$(pplugin::get_repo "$name")
+  fi
+
+  if [ "$(pplugin::has $name)" = "true" ]; then
+    log::success "[pplugin::install] plugin $name already installed before, skip"
+    return 1
+  fi
+
+  local plugins_dir=$(pplugin::get_plugins_dir)
+  # check or create
+  if [ ! -d "$plugins_dir" ]; then
+    sudo mkdir -p $plugins_dir
+    sudo chown -R $(os::username) $plugins_dir
+  elif [ ! -w "$plugins_dir" ]; then
+    sudo chown -R $(os::username) $plugins_dir
+  fi
+
+  local plugin_dir=$(pplugin::get_dir "$name")
+  # log::info "[pplugin::install] installing plugin $(color::green $name)@$(color::green $version) in $plugin_dir from $(color::green $url)"
+  if [ "$version" != "master" ]; then
+    log::info "[pplugin::install] installing plugin $(color::green $name)@$(color::green $version) ..."
+  else
+    log::info "[pplugin::install] installing plugin $(color::green $name) ..."
+  fi
+
+  # log::info "[pplugin::install] git clone $url -b $version $plugin_dir ..."
+
+  git clone $url -b $version $plugin_dir >>$ZMICRO_LOG_COMMON_PATH # 2>>$ZMICRO_LOG_ERROR_PATH # 2>&1
+  if [ $? -ne 0 ]; then
+    log::error "[pplugin::install] failed to install plugin $name"
+    return 1
+  fi
+
+  pplugin::register "$name"
+
+  log::success "[pplugin::install] succeed to install plugin $name"
+}
+
+# pplugin::uninstall - uninstall a plugin
+pplugin::uninstall() {
+  local name=$1
+  if [ -z "$name" ]; then
+    log::error "[pplugin::uninstall] name is required"
+    return 1
+  fi
+
+  if [ "$(pplugin::has $name)" = "false" ]; then
+    log::success "[pplugin::uninstall] plugin $name not installed before, skip"
+    return 1
+  fi
+
+  log::info "[pplugin::uninstall] uninstalling plugin $(color::green $name)"
+
+  local plugin_dir=$(pplugin::get_dir "$name")
+  sudo rm -rf $plugin_dir
+  if [ $? -ne 0 ]; then
+    log::error "[pplugin::uninstall] failed to uninstall plugin $name"
+    return 1
+  fi
+
+  log::success "[pplugin::uninstall] succeed to uninstall plugin $name"
+}
+
+# pplugin::update - update a plugin
+pplugin::update() {
+  local name=$1
+  local version=master
+
+  if [ -z "$name" ]; then
+    log::error "[pplugin::update] name is required"
+    return 1
+  fi
+
+  # @FEAT support: update $plugin_name@$plugin_version
+  if [ "$(version::at $name)" = "true" ]; then
+    version=$(version::at_version $name)
+    name=$(version::at_name $name)
+  fi
+
+  if [ "$(pplugin::has $name)" = "false" ]; then
+    log::error "[pplugin::update] plugin $name not installed before, skip"
+    return 1
+  fi
+
+  # log::info "[pplugin::update] upgrading plugin $(color::green $name)@$(color::green $version) from $(color::green $url)"
+  if [ "$version" = "master" ]; then
+    log::info "[pplugin::update] updating plugin $(color::green $name) ..."
+  else
+    log::info "[pplugin::update] updating plugin $(color::green $name)@$(color::green $version) ..."
+  fi
+
+  local plugin_dir=$(pplugin::get_dir "$name")
+  if [ ! -w "$plugin_dir" ]; then
+    sudo chown -R $(os::username) $plugin_dir
+  fi
+
+  git -C $plugin_dir pull origin $version >>$ZMICRO_LOG_COMMON_PATH # 2>>$ZMICRO_LOG_ERROR_PATH # 2>&1
+  if [ $? -ne 0 ]; then
+    log::error "[pplugin::update] failed to update plugin $name"
+    return 1
+  fi
+
+  log::success "[pplugin::update] succeed to update plugin $name"
+}
+
+# pplugin::release - release a plugin
+pplugin::release() {
+  local name=$1
+
+  if [ -z "$name" ]; then
+    log::error "[pplugin::update] name is required"
+    return 1
+  fi
+
+  if [ "$(pplugin::has $name)" = "false" ]; then
+    log::error "[pplugin::update] plugin $name not installed before, skip"
+    return 1
+  fi
+
+  local plugin_dir=$(pplugin::get_dir "$name")
+  if [ ! -w "$plugin_dir" ]; then
+    sudo chown -R $(os::username) $plugin_dir
+  fi
+
+  local dir_path=$(pplugin::get_dir $name)
+  # check permission
+  if [ ! -w "$dir_path" ]; then
+    sudo chown -R $(os::username) $dir_path
+  fi
+
+  cd $dir_path
+
+  local mod_path=$(pplugin::get_mod $name)
+  local origin_version=$(config::get VERSION $mod_path)
+  local default_new_version=$(version::next $origin_version)
+
+  # echo "origin_version: $origin_version - $mod_path"
+
+  local is_valid="false"
+  while [ "$is_valid" = "false" ]; do
+    # inquirer::text "input new version(origin: ${origin_version}):" new_version "" "version is required" required
+    os::inquirer new_version "text" "input new version(origin: ${origin_version}):" "$default_new_version"
+    is_valid=$(version::is_valid $new_version)
+
+    if [ "$is_valid" = "false" ]; then
+      log::error "${new_version} is not valid version, should be x.y.z"
+    fi
+
+    if [ "$(version::compare_gt $new_version $origin_version)" = "false" ]; then
+      log::error "${new_version} is not greater than ${origin_version}"
+      is_valid="false"
+    fi
+  done
+
+  echo "fff: ${origin_version} => $new_version"
+
+  local mod_path_tmp=${mod_path}.tmp
+  cp $mod_path $mod_path_tmp
+  cat $mod_path_tmp | sed "s%${origin_version}%$new_version%" >$mod_path
+  rm $mod_path_tmp
+
+  git add mod
+  git commit -m "chore(release): bumped version to ${new_version}"
+  git tag ${new_version}
+  git push origin ${new_version}
+  git push origin master
+
+  log::success "[pplugin::release] ${name} bumped version from $(color::red ${origin_version}) to $(color::green ${new_version}) ..."
+
+  log::success "[pplugin::release] succeed to release plugin $name"
+}
+
+# pplugin::version - show a plugin version
+pplugin::version() {
+  local name=$1
+
+  if [ -z "$name" ]; then
+    log::error "[pplugin::update] name is required"
+    return 1
+  fi
+
+  if [ "$(pplugin::has $name)" = "false" ]; then
+    log::error "[pplugin::update] plugin $name not installed before, skip"
+    return 1
+  fi
+
+  local mod_path=$(pplugin::get_mod $name)
+  config::get VERSION $mod_path
+}
+
+pplugin::usage() {
+  echo "Usage:  $ZMICRO_PPLUGIN_NAME plugin <action> [ARG...]"
+  echo ""
+  echo "Action:"
+  echo "  install <plugin_name>[@<plugin_version>] [plugin_url] - Install a plugin"
+  echo "  update <plugin_name>                                  - Upgrade a plugin"
+  echo "  remove <plugin_name>                                  - Remove a plugin"
+  echo "  version <plugin_name>                                 - Show version of the plugin"
+  echo "  ls                                                    - List all plugins"
+  echo "  has <plugin_name>                                     - Check if a plugin is installed"
+  echo "  dependencies <plugin_name>                            - List dependencies of a plugin"
+  echo "  register <plugin_name>                                - Register a plugin"
+  echo "  release <plugin_name> [plugin_child_name | .]         - Release a plugin"
+  echo "  run <plugin_name> <plugin_command> <args...>          - Run a plugin"
+  echo "  fn <plugin_name> <fn_name> <fn_args...>               - Run a plugin function"
+  echo "  help                                                  - Show help"
+}
+
+pplugin::help() {
+  pplugin::usage
+}
+
+pplugin::load_mod() {
+  local name=$1
+
+  if [ -z "$name" ]; then
+    log::error "[pplugin::load_mod] name is required"
+    return 1
+  fi
+
+  # echo "load pplugin mod: $pplugin_name - $(pplugin::get_mod $pplugin_name)"
+  config::load_file $(pplugin::get_mod $pplugin_name)
+
+  local name_upper=$(echo "${name}" | tr '[a-z]' '[A-Z]') #$(string::upper $name)
+
+  # echo "${name_upper}_NAME"
+  export "${name_upper}_NAME"=$NAME
+  export "${name_upper}_VERSION"=$VERSION
+  export "${name_upper}_DESCRIPTION"=$DESCRIPTION
+}
+
+pplugin::load_config() {
+  local name=$1
+
+  if [ -z "$name" ]; then
+    log::error "[pplugin::load_config] name is required"
+    return 1
+  fi
+
+  # echo "load pplugin config: $pplugin_name - $(pplugin::get_config $pplugin_name)"
+  config::load_dir $(pplugin::get_config $pplugin_name)
+}
+
+pplugin::load_core() {
+  local name=$1
+
+  if [ -z "$name" ]; then
+    log::error "[pplugin::load_core] name is required"
+    return 1
+  fi
+
+  # echo "load pplugin core: $pplugin_name - $(pplugin::get_core $pplugin_name)"
+  config::load_dir $(pplugin::get_core $pplugin_name)
+}
+
+export -f pplugin::get_bins_dir
+export -f pplugin::get_plugins_dir
+
+export -f pplugin::get_dir
+export -f pplugin::get_repo
+
+export -f pplugin::get_mod
+export -f pplugin::get_core
+export -f pplugin::get_config
+
+export -f pplugin::has
+
+export -f pplugin::register
+
+export -f pplugin::install
+export -f pplugin::uninstall
+export -f pplugin::update
+
+export -f pplugin::release
+export -f pplugin::version
+
+export -f pplugin::usage
+export -f pplugin::help
+
+export -f pplugin::load_mod
+export -f pplugin::load_config
+export -f pplugin::load_core

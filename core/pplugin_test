@@ -1,0 +1,128 @@
+#!/bin/bash
+
+function test_pplugin::get_bins_dir() {
+  export ZMICRO_PPLUGIN_DIR=/path/to
+
+  testing::expect \
+    "${FUNCNAME[0]}" \
+    "to_equal" \
+    "${ZMICRO_PPLUGIN_DIR}/commands/_internal" \
+    "$(pplugin::get_bins_dir)"
+}
+
+function test_pplugin::get_plugins_dir() {
+  export ZMICRO_PPLUGIN_DIR=/path/to
+
+  testing::expect \
+    "${FUNCNAME[0]}" \
+    "to_equal" \
+    "${ZMICRO_PPLUGIN_DIR}/plugins" \
+    "$(pplugin::get_plugins_dir)"
+}
+
+function test_pplugin::get_dir() {
+  export ZMICRO_PPLUGIN_DIR=/path/to
+
+  testing::expect \
+    "${FUNCNAME[0]}" \
+    "to_equal" \
+    "${ZMICRO_PPLUGIN_DIR}/plugins/zzz" \
+    "$(pplugin::get_dir zzz)"
+}
+
+function test_pplugin::get_repo() {
+  export ZMICRO_PPLUGIN_NAME=zzz
+  local name=yyy
+
+  testing::expect \
+    "${FUNCNAME[0]}" \
+    "to_equal" \
+    "https://github.com/zmicro-design/$ZMICRO_PPLUGIN_NAME-$name" \
+    "$(pplugin::get_repo $name)"
+}
+
+function test_pplugin::get_mod() {
+  export ZMICRO_PPLUGIN_DIR=/path/to/zzz
+  export ZMICRO_PPLUGIN_NAME=zzz
+  local name=yyy
+
+  testing::expect \
+    "${FUNCNAME[0]}" \
+    "to_equal" \
+    "$ZMICRO_PPLUGIN_DIR/plugins/$name/mod" \
+    "$(pplugin::get_mod $name)"
+}
+
+function test_pplugin::get_core() {
+  export ZMICRO_PPLUGIN_DIR=/path/to/zzz
+  export ZMICRO_PPLUGIN_NAME=zzz
+  local name=yyy
+
+  testing::expect \
+    "${FUNCNAME[0]}" \
+    "to_equal" \
+    "$ZMICRO_PPLUGIN_DIR/plugins/$name/core" \
+    "$(pplugin::get_core $name)"
+}
+
+function test_pplugin::get_config() {
+  export ZMICRO_PPLUGIN_DIR=/path/to/zzz
+  export ZMICRO_PPLUGIN_NAME=zzz
+  local name=yyy
+
+  testing::expect \
+    "${FUNCNAME[0]}" \
+    "to_equal" \
+    "$ZMICRO_PPLUGIN_DIR/plugins/$name/config" \
+    "$(pplugin::get_config $name)"
+}
+
+function test_pplugin::has() {
+  export ZMICRO_PPLUGIN_DIR=/tmp
+  local name=zzz
+  local tmp_path=$ZMICRO_PPLUGIN_DIR/plugins/$name
+
+  rm -rf $tmp_path
+
+  testing::expect \
+    "${FUNCNAME[0]} - $tmp_path not exists" \
+    "to_equal" \
+    "false" \
+    "$(pplugin::has $name)"
+
+  mkdir -p $tmp_path
+
+  testing::expect \
+    "${FUNCNAME[0]} - $tmp_path exists" \
+    "to_equal" \
+    "true" \
+    "$(pplugin::has $name)"
+
+  rm -rf $tmp_path
+}
+
+function test_pplugin::register() {
+  export ZMICRO_PPLUGIN_DIR=/tmp/the_zmicro_plugin
+  export ZMICRO_PPLUGIN_NAME=the_zmicro_plugin
+
+  local name=zzz
+  local tmp_path=$ZMICRO_PPLUGIN_DIR/plugins/$name
+
+  rm -rf $tmp_path
+
+  pplugin::register $name
+
+  # check is a link
+  local res="false"
+  if [ -L "$ZMICRO_PPLUGIN_DIR/commands/_internal/$name" ] && [ "$(readlink $ZMICRO_PPLUGIN_DIR/commands/_internal/$name)" = "$tmp_path/commands" ]; then
+    res="true"
+  fi
+
+  testing::expect \
+    "${FUNCNAME[0]}" \
+    "to_equal" \
+    "true" \
+    "$res"
+
+  rm -rf $tmp_path
+}

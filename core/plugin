@@ -491,12 +491,53 @@ plugin::run() {
     plugin::load_core $plugin_name
 
     zmicro plugin fn $plugin_name ${plugin_command:2}
+  elif [ "$(array::first_element $plugin_command)" = "plugin" ]; then
+    export ZMICRO_PPLUGIN_NAME=$plugin_name
+
+    local pplugin_command=$(array::find_by_index 1 $plugin_command)
+    local pplugin_args=$(array::slice 2 30 $plugin_command)
+    if [ -z "$pplugin_command" ] || [ "$pplugin_command" = "--help" ] || [ "$pplugin_command" = "-h" ] || [ "$pplugin_command" = "help" ]; then
+      pplugin::help
+      return
+    fi
+
+    # echo "pplugin_command: $pplugin_command"
+    # echo "pplugin_args: $pplugin_args"
+    local pplugin_fn="pplugin::$pplugin_command"
+    if [ "$(os::has_command $pplugin_fn)" = "true" ]; then
+      $pplugin_fn $pplugin_args
+    else
+      log::error "[$(timestamp)][plugin::run] pplugin command not found: $pplugin_command"
+      return 1
+    fi
   else
     # load plugin core(utils)
     plugin::load_core $plugin_name
 
     local plugin_commands_path=$(plugin::get_commands_path $plugin_name)
     # echo "plugin_commands_path:: $plugin_commands_path"
+
+    # try to load pplugin mod/config/core
+    if [ "$plugin_command" != "" ]; then
+      local pplugin_name=$(echo $plugin_command | awk -F ' ' '{print $1}')
+      export ZMICRO_PPLUGIN_NAME=$plugin_name
+      # echo "pplugin_name: $pplugin_name - $(pplugin::has $pplugin_name)"
+
+      # try to load mod plugin config
+      if [ "$(pplugin::has $pplugin_name)" = "true" ]; then
+        # load pplugin mod
+        pplugin::load_mod $pplugin_name
+        # load pplugin config
+        pplugin::load_config $pplugin_name
+        # load pplugin core
+        pplugin::load_core $pplugin_name
+      fi
+
+      # echo "EUNOMIA_NAME: $EUNOMIA_NAME"
+      # echo "EUNOMIA_VERSION: $EUNOMIA_VERSION"
+      # echo "EUNOMIA_DESCRIPTION: $EUNOMIA_DESCRIPTION"
+    fi
+
     run $plugin_commands_path "-" $plugin_command
   fi
 }

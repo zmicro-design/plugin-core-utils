@@ -469,23 +469,33 @@ plugin::run() {
     plugin_command="--help"
   fi
 
+  local plugin_command_real=$(array::first_element $plugin_command)
+  local plugin_command_args_real=$(array::slice 1 30 $plugin_command)
+
   # internal commands
-  if [ "$plugin_command" = "version" ] || [ "$plugin_command" = "-v" ]; then
+  if [ "$plugin_command_real" = "version" ] || [ "$plugin_command_real" = "-v" ]; then
     zmicro plugin version $plugin_name
-  elif [ "$plugin_command" = "description" ]; then
+  elif [ "$plugin_command_real" = "description" ]; then
     zmicro plugin description $plugin_name
-  elif [ "$plugin_command" = "dependencies" ]; then
+  elif [ "$plugin_command_real" = "dependencies" ]; then
     zmicro plugin dependencies $plugin_name
-  elif [ "$plugin_command" = "update" ]; then
-    zmicro plugin update $plugin_name
-  elif [ "$plugin_command" = "release" ]; then
+  elif [ "$plugin_command_real" = "update" ]; then
+    # @TODO
+    local option=$(echo $plugin_command_args_real | awk '{print $1}')
+    if [ "$option" = "-f" ] || [ "$option" = "--force" ]; then
+      sudo rm -rf /tmp/zmicro.${plugin_name}.lock.*
+      zmicro plugin update $plugin_name
+    else
+      zmicro plugin update $plugin_name
+    fi
+  elif [ "$plugin_command_real" = "release" ]; then
     zmicro plugin release $plugin_name
-  elif [ "$plugin_command" = "go" ]; then
+  elif [ "$plugin_command_real" = "go" ]; then
     zmicro go plugin $plugin_name
-  elif [ "$plugin_command" = "code" ]; then
+  elif [ "$plugin_command_real" = "code" ]; then
     zmicro code plugin $plugin_name
-  elif [ "$(array::first_element $plugin_command)" = "test" ]; then
-    local script_path=$(array::find_by_index 1 $plugin_command)
+  elif [ "$plugin_command_real" = "test" ]; then
+    local script_path=$plugin_command_args_real
     if [ -z "$scipt_path" ]; then
       script_path="core"
     fi

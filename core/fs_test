@@ -1,0 +1,61 @@
+#!/bin/bash
+#!/bin/bash
+
+function test_fs::remove_line_has_str() {
+  local tmp_file=/tmp/zmicro_core_utils_test_fs_remove_line_has_str
+  echo "zero=" >$tmp_file
+  echo "zzzero" >>$tmp_file
+  echo "Zero" >>$tmp_file
+  echo "omg" >>$tmp_file
+
+  # simple
+  fs::remove_line_has_str $tmp_file "zero"
+
+  testing::expect \
+    "${FUNCNAME[0]} - ok" \
+    "to_equal" \
+    "0" \
+    "$(cat $tmp_file | grep "zero" | wc -l)"
+
+  testing::expect \
+    "${FUNCNAME[0]} - ok" \
+    "to_equal" \
+    "1" \
+    "$(cat $tmp_file | grep "Zero" | wc -l)"
+
+  fs::remove_line_has_str $tmp_file "Zero"
+
+  testing::expect \
+    "${FUNCNAME[0]} - ok" \
+    "to_equal" \
+    "0" \
+    "$(cat $tmp_file | grep "Zero" | wc -l)"
+
+  # include slash /
+  echo "config=/opt/xxx" >>$tmp_file
+  echo "config2=/opt/xxx2" >>$tmp_file
+  echo "config3=/opt/xxx/yyy" >>$tmp_file
+  echo "config4=/opt/yyy" >>$tmp_file
+
+  testing::expect \
+    "${FUNCNAME[0]} - ok" \
+    "to_equal" \
+    "3" \
+    "$(cat $tmp_file | grep "/opt/xxx" | wc -l)"
+
+  fs::remove_line_has_str $tmp_file "/opt/xxx"
+
+  testing::expect \
+    "${FUNCNAME[0]} - ok" \
+    "to_equal" \
+    "0" \
+    "$(cat $tmp_file | grep "/opt/xxx" | wc -l)"
+
+  testing::expect \
+    "${FUNCNAME[0]} - ok" \
+    "to_equal" \
+    "1" \
+    "$(cat $tmp_file | grep "/opt/yyy" | wc -l)"
+
+  rm -f $tmp_file
+}

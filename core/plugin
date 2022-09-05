@@ -533,6 +533,8 @@ plugin::run() {
         pplugin::load_config $pplugin_name
         # load pplugin core
         pplugin::load_core $pplugin_name
+        # ensure register command
+        pplugin::ensure_register $pplugin_name
       fi
 
       # echo "EUNOMIA_NAME: $EUNOMIA_NAME"

@@ -107,12 +107,12 @@ pplugin::has() {
 pplugin::register() {
   local name="$1"
   if [ -z "$name" ]; then
-    log::error "[pplugin::get_bin] name is required"
+    log::error "[pplugin::register] name is required"
     return 1
   fi
 
   if [ -z "$ZMICRO_PPLUGIN_NAME" ]; then
-    log::error "[pplugin::get_bin] env ZMICRO_PPLUGIN_NAME is required"
+    log::error "[pplugin::register] env ZMICRO_PPLUGIN_NAME is required"
     return 1
   fi
 
@@ -141,6 +141,22 @@ pplugin::register() {
   fi
 
   ln -sf "$command_dir" "$bins_dir/$name"
+}
+
+pplugin::ensure_register() {
+  local name="$1"
+  if [ -z "$name" ]; then
+    log::error "[pplugin::ensure_register] name is required"
+    return 1
+  fi
+
+  local bins_dir=$(pplugin::get_bins_dir)
+  local plugin_bin_path="$bins_dir/$name"
+  if [ -L "$plugin_bin_path" ]; then
+    return 0
+  fi
+
+  pplugin::register "$name" >>/dev/null
 }
 
 # pplugin::install - install a plugin
@@ -465,6 +481,7 @@ export -f pplugin::get_config
 export -f pplugin::has
 
 export -f pplugin::register
+export -f pplugin::ensure_register
 
 export -f pplugin::install
 export -f pplugin::uninstall

@@ -32,6 +32,13 @@ help() {
   fi
 
   if [ ! -d $help_commands_path ]; then
+    local command=$(echo $commands | cut -d " " -f 1)
+    # compitable pplugin
+    if [ "$(pplugin::has $command)" = "true" ]; then
+      pplugin::help $command
+      return 0
+    fi
+
     log::debug "Cannot found command path: $help_commands_path"
     return
   fi

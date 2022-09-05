@@ -370,7 +370,43 @@ pplugin::usage() {
 }
 
 pplugin::help() {
-  pplugin::usage
+  local name=$1
+
+  if [ -z "$name" ]; then
+    pplugin::usage
+    return 0
+  fi
+
+  local plugin_dir=$(pplugin::get_dir "$name")
+  local commands_dir=$plugin_dir/commands
+  if [ ! -d "$commands_dir" ]; then
+    log::error "[pplugin::help] plugin $name not installed before"
+    return 1
+  fi
+
+  local commands=$(ls $commands_dir)
+  if [ "${#commands}" = "0" ]; then
+    log::error "[pplugin::help] plugin $name has no commands"
+    return 1
+  fi
+
+  log::info "Available commands for plugin $(color::green $name):"
+
+  local index=1
+  for command in $commands; do
+    local command_path=$commands_dir/$command
+    if [ -f "$command_path" ]; then
+      # local command_name=$(basename $command_path)
+      # local command_help=$(cat $command_path | grep "^# help:" | sed "s/# help: //g")
+      # echo "  $command_name - $command_help"
+      if [ "$command" = "help" ] || [ "$command" = "_init" ]; then
+        continue
+      fi
+
+      echo "  ${index}. $(color::green $command)"
+      index=$((index + 1))
+    fi
+  done
 }
 
 pplugin::load_mod() {

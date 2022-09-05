@@ -484,6 +484,9 @@ plugin::run() {
     zmicro go plugin $plugin_name
   elif [ "$plugin_command" = "code" ]; then
     zmicro code plugin $plugin_name
+  elif [ "$(array::first_element $plugin_command)" = "test" ]; then
+    local script_path=$(array::find_by_index 1 $plugin_command)
+    zmicro test $script_path
   elif [ "$(array::first_element $plugin_command)" = "fn" ]; then
     # Examples:
     #   1. zmicro plugin run daemon fn daemon_list => zmicro plugin fn daemon daemon_list

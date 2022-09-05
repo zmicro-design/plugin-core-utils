@@ -1,0 +1,44 @@
+#!/bin/bash
+#!/bin/bash
+
+function test_config::get() {
+  local tmp_file=/tmp/zmicro_core_utils_test_config_get
+  echo "" >$tmp_file
+
+  testing::expect \
+    "${FUNCNAME[0]} - ok" \
+    "to_equal" \
+    "" \
+    "$(config::get CUSTOM_KEY $tmp_file)"
+
+  echo "CUSTOM_KEY=zero" >>$tmp_file
+
+  testing::expect \
+    "${FUNCNAME[0]} - ok" \
+    "to_equal" \
+    "zero" \
+    "$(config::get CUSTOM_KEY $tmp_file)"
+
+  rm $tmp_file
+}
+
+function test_config::set() {
+  local tmp_file=/tmp/zmicro_core_utils_test_config_get
+  echo "" >$tmp_file
+
+  testing::expect \
+    "${FUNCNAME[0]} - ok" \
+    "to_equal" \
+    "" \
+    "$(config::get CUSTOM_KEY $tmp_file)"
+
+  config::set CUSTOM_KEY zero $tmp_file
+
+  testing::expect \
+    "${FUNCNAME[0]} - ok" \
+    "to_equal" \
+    "zero" \
+    "$(config::get CUSTOM_KEY $tmp_file)"
+
+  rm $tmp_file
+}

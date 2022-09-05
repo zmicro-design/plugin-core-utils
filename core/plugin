@@ -486,6 +486,10 @@ plugin::run() {
     zmicro code plugin $plugin_name
   elif [ "$(array::first_element $plugin_command)" = "test" ]; then
     local script_path=$(array::find_by_index 1 $plugin_command)
+    if [ -z "$scipt_path" ]; then
+      script_path="core"
+    fi
+
     zmicro test $script_path
   elif [ "$(array::first_element $plugin_command)" = "fn" ]; then
     # Examples:

@@ -103,7 +103,13 @@ config::get() {
     exit 1
   fi
 
-  local value=$(cat $filepath | grep "${key}=" | awk -F '=' '{print $2}')
+  local list=$(cat $filepath | sed -e "/^[ \t]*#/d" | grep "${key}=")
+
+  local value=""
+  for item in ${list[@]}; do
+    value=$(echo $item | awk -F '=' '{print $2}' | awk -F '#' '{print $1}' | sed -e "s/^[ \t]*//")
+  done
+
   if [ -z "$value" ]; then
     value=$default_value
   fi

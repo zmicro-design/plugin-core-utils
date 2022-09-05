@@ -19,6 +19,26 @@ function test_config::get() {
     "zero" \
     "$(config::get CUSTOM_KEY $tmp_file)"
 
+  echo "#CUSTOM_KEY=zero" >$tmp_file
+
+  testing::expect \
+    "${FUNCNAME[0]} - ok" \
+    "to_equal" \
+    "" \
+    "$(config::get CUSTOM_KEY $tmp_file)"
+
+  echo "CUSTOM_KEY=zero#xxx" >$tmp_file
+  echo "CUSTOM_KEY=zero2 # xxx" >>$tmp_file
+  echo "# CUSTOM_KEY=zero3" >>$tmp_file
+  echo " # CUSTOM_KEY=zero4" >>$tmp_file
+  echo "CUSTOM_KEY=zero5 " >>$tmp_file
+
+  testing::expect \
+    "${FUNCNAME[0]} - ok" \
+    "to_equal" \
+    "zero5" \
+    "$(config::get CUSTOM_KEY $tmp_file)"
+
   rm $tmp_file
 }
 

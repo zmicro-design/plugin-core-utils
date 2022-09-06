@@ -12,6 +12,10 @@ git::commit_hash() {
   git rev-parse --short=9 HEAD
 }
 
+git::commit_hash_full() {
+  git rev-parse HEAD
+}
+
 git::commit_author() {
   git show -s --format='%ae'
 }
@@ -77,6 +81,7 @@ git::branch() {
 export -f git::commit_message
 export -f git::commit_message_full
 export -f git::commit_hash
+export -f git::commit_hash_full
 export -f git::commit_author
 export -f git::commit_timestamp
 export -f git::commit_timestamp_date

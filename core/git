@@ -1,11 +1,19 @@
 #!/bin/bash
 
 git::commit_message() {
+  git log -1 --pretty=%B -n 1
+}
+
+git::commit_message_full() {
   git log -1 --pretty=%B
 }
 
 git::commit_hash() {
   git rev-parse --short=9 HEAD
+}
+
+git::commit_author() {
+  git show -s --format='%ae'
 }
 
 git::commit_timestamp() {
@@ -19,16 +27,67 @@ git::commit_timestamp() {
   fi
 }
 
+git::commit_timestamp_date() {
+  local gitMainVersion=$(git --version | awk '{print $3}' | awk -F '.' '{print $1}')
+  local gitSubVersion=$(git --version | awk '{print $3}' | awk -F '.' '{print $2}')
+
+  if [ "$gitMainVersion" -ge "2" ] && [ "$gitSubVersion" -ge "7" ]; then
+    git show -s --format=%cd --date="format:%Y-%m-%d"
+  else
+    git show -s --format=%cd --date=local
+  fi
+}
+
+git::commit_timestamp_ms() {
+  git show -s --format=%cd --date="format:%s"
+}
+
+git::commit_timestamp_human() {
+  git show -s --format=%cd
+}
+
 git::fix_permissions() {
   # fix unsafe repository
-  git config --global -l | grep "safe.directory=\*" >> /dev/null 2>&1
+  git config --global -l | grep "safe.directory=\*" >>/dev/null 2>&1
   if [ "$?" != "0" ]; then
     git config --global --add safe.directory "*"
   fi
 }
 
+git::origin_url() {
+  git config --get remote.origin.url
+}
+
+git::namespace() {
+  git::origin_url | awk -F '/' '{print $4}'
+}
+
+git::basename() {
+  git::origin_url | awk -F '/' '{print $5}' | awk -F '.git' '{print $1}'
+}
+
+git::repo_name() {
+  echo "$(git::namespace)/$(git::basename)"
+}
+
+git::branch() {
+  git rev-parse --abbrev-ref HEAD
+}
+
 export -f git::commit_message
+export -f git::commit_message_full
 export -f git::commit_hash
+export -f git::commit_author
 export -f git::commit_timestamp
+export -f git::commit_timestamp_date
+export -f git::commit_timestamp_ms
+export -f git::commit_timestamp_human
 
 export -f git::fix_permissions
+
+export -f git::origin_url
+export -f git::namespace
+export -f git::basename
+export -f git::repo_name
+
+export -f git::branch

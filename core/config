@@ -107,7 +107,7 @@ config::get() {
 
   local value=""
   for item in ${list[@]}; do
-    value=$(echo $item | awk -F '=' '{print $2}' | awk -F '#' '{print $1}' | sed -e "s/^[ \t]*//")
+    value=$(echo $item | awk -F '=' '{print $2}' | awk -F '#' '{print $1}' | sed -e "s/\s+//g")
   done
 
   if [ -z "$value" ]; then
@@ -132,6 +132,7 @@ config::set() {
   local line=""
   # If not found, return empty string
   if [ -f $filepath ]; then
+    # @TODO
     set +e
     line=$(cat $filepath | grep "${key}=")
     set -e

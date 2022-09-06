@@ -175,7 +175,12 @@ config::remove() {
 }
 
 config::list() {
-  less $ZMICRO_RC
+  local config_path=$1
+  if [ -z "$config_path" ]; then
+    config_path=$ZMICRO_RC
+  fi
+
+  less $config_path
 }
 
 config::check_or_set() {

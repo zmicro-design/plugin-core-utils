@@ -986,6 +986,23 @@ os::open() {
   fi
 }
 
+os::encode_uri_component() {
+  local string="${1}"
+  local strlen=${#string}
+  local encoded=""
+  local pos c o
+
+  for (( pos=0 ; pos<strlen ; pos++ )); do
+     c=${string:$pos:1}
+     case "$c" in
+        [-_.~a-zA-Z0-9] ) o="${c}" ;;
+        * )               printf -v o '%%%02x' "'$c"
+     esac
+     encoded+="${o}"
+  done
+  echo "${encoded}"
+}
+
 export -f os::arch
 export -f os::platform
 export -f os::release
@@ -1087,3 +1104,5 @@ export -f os::healthcheck
 export -f os::get_options
 
 export -f os::open
+
+export -f os::encode_uri_component

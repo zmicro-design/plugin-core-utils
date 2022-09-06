@@ -5,7 +5,7 @@ function test_os_home() {
     "${FUNCNAME[0]}" \
     "to_equal" \
     "$HOME" \
-    "$(os::homedir)" 
+    "$(os::homedir)"
 }
 
 function test_os_username() {
@@ -23,9 +23,17 @@ function test_os::support_method() {
     "true" \
     "$(os::support_method os::homedir)"
 
-   testing::expect \
+  testing::expect \
     "${FUNCNAME[0]}" \
     "to_equal" \
     "false" \
     "$(os::support_method unkown_method_or_not_system_function)"
+}
+
+function test_os::encode_uri_component() {
+  testing::expect \
+    "${FUNCNAME[0]}" \
+    "to_equal" \
+    "https%3a%2f%2fstackoverflow.com%2fquestions%2f296536%2fhow-to-urlencode-data-for-curl-command" \
+    "$(os::encode_uri_component https://stackoverflow.com/questions/296536/how-to-urlencode-data-for-curl-command)"
 }

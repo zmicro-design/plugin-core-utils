@@ -39,6 +39,14 @@ function test_config::get() {
     "zero5" \
     "$(config::get CUSTOM_KEY $tmp_file)"
 
+  echo "ENABLE=true" >$tmp_file
+
+  testing::expect \
+    "${FUNCNAME[0]} - ok" \
+    "to_equal" \
+    "true" \
+    "$(config::get ENABLE $tmp_file)"
+
   rm $tmp_file
 }
 

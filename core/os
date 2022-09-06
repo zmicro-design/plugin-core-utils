@@ -969,6 +969,23 @@ os::get_options() {
   done
 }
 
+os::open() {
+  local url=$1
+  if [ -z "$url" ]; then
+    log::error "[os::open] url is required"
+    return 1
+  fi
+
+  if [ "$(os::is_macos)" = "true" ]; then
+    open $url
+  elif [ "$(os::is_linux)" = "true" ]; then
+    xdg-open $url
+  else
+    log::error "[os::open] unsupported os"
+    return 1
+  fi
+}
+
 export -f os::arch
 export -f os::platform
 export -f os::release
@@ -1068,3 +1085,5 @@ export -f os::support_method
 export -f os::healthcheck
 
 export -f os::get_options
+
+export -f os::open

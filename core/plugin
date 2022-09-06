@@ -234,6 +234,59 @@ plugin::has() {
   plugin::exist $@
 }
 
+plugin::has_command() {
+  local plugin_name=$1
+  local command=$2
+
+  if [ -f $(plugin::get_commands_path $plugin_name)/$command ]; then
+    echo "true"
+  else
+    echo "false"
+  fi
+}
+
+plugin::get_command() {
+  local plugin_name=$1
+  local command=$2
+
+  echo $(plugin::get_commands_path $plugin_name)/$command
+}
+
+plugin::run_command() {
+  local plugin_name=$1
+  local command=$2
+  local args=${@:3}
+
+  if [ -z "$plugin_name" ] || [ -z "$command" ]; then
+    log::error "[$(timestamp)][plugin][run_command] plugin name and command are required"
+    return 1
+  fi
+
+  local command_path=$(plugin::get_command $plugin_name $command)
+  if [ -x "$command_path" ]; then
+    log::debug "[$(timestamp)][plugin][run_command] run command: $command_path $args"
+    $command_path $args
+  else
+    log::debug "[$(timestamp)][plugin][run_command] run command: $command_path $args"
+    bash $command_path $args
+  fi
+}
+
+plugin::try_to_run_command() {
+  local plugin_name=$1
+  local command=$2
+  local args=${@:3}
+  if [ -z "$plugin_name" ] || [ -z "$command" ]; then
+    return
+  fi
+
+  if [ "$(plugin::has_command $plugin_name $command)" = "false" ]; then
+    return
+  fi
+
+  plugin::run_command $plugin_name $command $args
+}
+
 plugin::bin_exist() {
   if [ -d $(plugin::get_bin_path $1) ]; then
     echo "true"
@@ -488,6 +541,8 @@ plugin::run() {
     else
       zmicro plugin update $plugin_name
     fi
+
+    plugin::try_to_run_command $plugin_name $plugin_command_real $plugin_command_args_real
   elif [ "$plugin_command_real" = "release" ]; then
     zmicro plugin release $plugin_name
   elif [ "$plugin_command_real" = "go" ]; then
@@ -688,6 +743,11 @@ export -f plugin::get_app_configs_path
 export -f plugin::exist
 export -f plugin::bin_exist
 export -f plugin::has
+
+export -f plugin::has_command
+export -f plugin::get_command
+export -f plugin::run_command
+export -f plugin::try_to_run_command
 
 export -f plugin::load_configs
 

@@ -53,3 +53,11 @@ function test_os::base64_decode() {
     "test" \
     "$(os::base64_decode dGVzdA==)"
 }
+
+function test_os::md5() {
+  testing::expect \
+    "${FUNCNAME[0]}" \
+    "to_equal" \
+    "098f6bcd4621d373cade4e832627b4f6" \
+    "$(os::md5 test)"
+}

@@ -1025,6 +1025,21 @@ os::base64_decode() {
   echo "$decoded"
 }
 
+os::md5() {
+  local string="${1}"
+  if [ -z "$string" ]; then
+    log::error "[os::md5] string is required"
+    return 1
+  fi
+  
+  which md5sum >>/dev/null 2>&1
+  if [ "$?" = "0" ]; then
+    echo -n "$string" | md5sum | awk '{print $1}'
+  else
+  echo -n "$string" | openssl md5
+  fi
+}
+
 export -f os::arch
 export -f os::platform
 export -f os::release
@@ -1131,3 +1146,5 @@ export -f os::encode_uri_component
 
 export -f os::base64_encode
 export -f os::base64_decode
+
+export -f os::md5

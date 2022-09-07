@@ -44,6 +44,11 @@ config::load_file() {
   fi
 
   if [ -f $CONFIG_FILE ]; then
+    # ignore suffix with _test, which is test cases
+    if [[ $CONFIG_FILE == *_test ]]; then
+      continue
+    fi
+
     log::debug "[$(timestamp)][config::load_file]: $CONFIG_FILE"
 
     # \. $CONFIG_FILE

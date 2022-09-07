@@ -987,7 +987,7 @@ os::open() {
 }
 
 os::encode_uri_component() {
-  local string="${1}"
+  local string="$1"
   local strlen=${#string}
   local encoded=""
   local pos c o
@@ -1004,7 +1004,7 @@ os::encode_uri_component() {
 }
 
 os::base64_encode() {
-  local string="${1}"
+  local string="$1"
   if [ -z "$string" ]; then
     log::error "[os::base64_encode] string is required"
     return 1
@@ -1015,7 +1015,7 @@ os::base64_encode() {
 }
 
 os::base64_decode() {
-  local string="${1}"
+  local string="$1"
   if [ -z "$string" ]; then
     log::error "[os::base64_decode] string is required"
     return 1
@@ -1026,7 +1026,7 @@ os::base64_decode() {
 }
 
 os::md5() {
-  local string="${1}"
+  local string="$1"
   if [ -z "$string" ]; then
     log::error "[os::md5] string is required"
     return 1
@@ -1036,7 +1036,7 @@ os::md5() {
   if [ "$?" = "0" ]; then
     echo -n "$string" | md5sum | awk '{print $1}'
   else
-  echo -n "$string" | openssl md5
+    echo -n "$string" | openssl md5
   fi
 }
 

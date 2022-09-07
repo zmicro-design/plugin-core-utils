@@ -37,3 +37,19 @@ function test_os::encode_uri_component() {
     "https%3a%2f%2fstackoverflow.com%2fquestions%2f296536%2fhow-to-urlencode-data-for-curl-command" \
     "$(os::encode_uri_component https://stackoverflow.com/questions/296536/how-to-urlencode-data-for-curl-command)"
 }
+
+function test_os::base64_encode() {
+  testing::expect \
+    "${FUNCNAME[0]}" \
+    "to_equal" \
+    "dGVzdA==" \
+    "$(os::base64_encode test)"
+}
+
+function test_os::base64_decode() {
+  testing::expect \
+    "${FUNCNAME[0]}" \
+    "to_equal" \
+    "test" \
+    "$(os::base64_decode dGVzdA==)"
+}

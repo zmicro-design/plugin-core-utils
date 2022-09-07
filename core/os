@@ -1003,6 +1003,28 @@ os::encode_uri_component() {
   echo "${encoded}"
 }
 
+os::base64_encode() {
+  local string="${1}"
+  if [ -z "$string" ]; then
+    log::error "[os::base64_encode] string is required"
+    return 1
+  fi
+
+  local encoded=$(echo -n "$string" | base64)
+  echo "$encoded"
+}
+
+os::base64_decode() {
+  local string="${1}"
+  if [ -z "$string" ]; then
+    log::error "[os::base64_decode] string is required"
+    return 1
+  fi
+
+  local decoded=$(echo -n "$string" | base64 -d)
+  echo "$decoded"
+}
+
 export -f os::arch
 export -f os::platform
 export -f os::release
@@ -1106,3 +1128,6 @@ export -f os::get_options
 export -f os::open
 
 export -f os::encode_uri_component
+
+export -f os::base64_encode
+export -f os::base64_decode

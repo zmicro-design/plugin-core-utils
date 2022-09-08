@@ -541,8 +541,9 @@ plugin::run() {
     else
       zmicro plugin update $plugin_name
     fi
-
-    plugin::try_to_run_command $plugin_name $plugin_command_real $plugin_command_args_real
+    if [ "$?" = "0" ]; then
+      plugin::try_to_run_command $plugin_name $plugin_command_real $plugin_command_args_real
+    fi
   elif [ "$plugin_command_real" = "release" ]; then
     zmicro plugin release $plugin_name
   elif [ "$plugin_command_real" = "go" ]; then
@@ -676,15 +677,21 @@ plugin::update() {
       sudo chown -R $USER $plugin_path
     fi
 
-    # Update @TODO
-    cd $plugin_path
-    git pull origin master >>$ZMICRO_LOG_COMMON_PATH 2>>$ZMICRO_LOG_ERROR_PATH # 2>&1
+    local tmp_update_log=$(os::tmp_file) # $ZMICRO_LOG_ERROR_PATH
+    git pull origin master >>$tmp_update_log 2>&1
     if [ "$?" != "0" ]; then
       log::error "[$(timestamp)][plugin: $plugin_name] update error $plugin_name ..."
       log::update plugin $plugin_name ERROR
-      tail -n 50 $ZMICRO_LOG_ERROR_PATH
-      return 1
+      cat $tmp_update_log >>$ZMICRO_LOG_ERROR_PATH
+
+      # echo "Update ZMicro Error, see $ZMICRO_LOG_UPDATE_PATH"
+      # tail -n 50 $tmp_update_log
+      cat $tmp_update_log
+      exit -1
+    else
+      cat $tmp_update_log >>$ZMICRO_LOG_UPDATE_PATH
     fi
+
     # cd - >>/dev/null 2>&1
 
     # install depdendencies

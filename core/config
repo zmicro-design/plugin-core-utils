@@ -45,8 +45,11 @@ config::load_file() {
 
   if [ -f $CONFIG_FILE ]; then
     # ignore suffix with _test, which is test cases
-    # if [[ $CONFIG_FILE == *_test ]]; then
-    #   continue
+    if [[ $CONFIG_FILE == *_test ]]; then
+      return
+    fi
+    # if [ "$(string::ends_with $CONFIG_FILE _test)" = "true" ]; then
+    #   return
     # fi
 
     log::debug "[$(timestamp)][config::load_file]: $CONFIG_FILE"

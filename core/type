@@ -219,6 +219,23 @@ string::starts_with() {
   fi
 }
 
+string::ends_with() {
+  local str=$1
+  local char=$2
+  if [[ $str == *${char} ]]; then
+    echo "true"
+    return
+  fi
+
+  # echo $str | grep -q "${char}"
+  # if [ "$?" = "0" ]; then
+  #   echo "true"
+  #   return
+  # fi
+
+  echo "false"
+}
+
 number::increase() {
   local base=$1
   local _step=$2
@@ -444,6 +461,7 @@ export -f strings::equals # compatible
 export -f string::equals
 export -f string::first_char
 export -f string::starts_with
+export -f string::ends_with
 
 export -f number::increase
 export -f number::step

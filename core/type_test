@@ -148,3 +148,17 @@ function test_string::first_char() {
     "$" \
     "$(string::first_char \$abc)"
 }
+
+function test_string::ends_with() {
+  testing::expect \
+    "${FUNCNAME[0]}" \
+    "to_equal" \
+    "true" \
+    "$(string::ends_with /abc/aaa_test _test)"
+
+  # testing::expect \
+  #   "${FUNCNAME[0]}" \
+  #   "to_equal" \
+  #   "false" \
+  #   "$(string::ends_with /abc/aaa_tes _test)"
+}

@@ -204,10 +204,15 @@ pplugin::install() {
 
   # log::info "[pplugin::install] git clone $url -b $version $plugin_dir ..."
 
-  git clone $url -b $version $plugin_dir >>$ZMICRO_LOG_COMMON_PATH # 2>>$ZMICRO_LOG_ERROR_PATH # 2>&1
+  local tmp_install_log=$(os::tmp_file) # $ZMICRO_LOG_ERROR_PATH
+  git clone $url -b $version $plugin_dir >>$tmp_install_log 2>&1
   if [ $? -ne 0 ]; then
     log::error "[pplugin::install] failed to install plugin $name"
+    cat $tmp_install_log >>$ZMICRO_LOG_ERROR_PATH
+    cat $tmp_install_log
     return 1
+  else
+    cat $tmp_install_log >>$ZMICRO_LOG_COMMON_PATH
   fi
 
   pplugin::register "$name"

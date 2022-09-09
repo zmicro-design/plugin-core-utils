@@ -1040,6 +1040,24 @@ os::md5() {
   fi
 }
 
+os::wget() {
+  which wget >>/dev/null 2>&1
+  if [ "$?" != "0" ]; then
+    pm install -y wget
+  fi
+
+  wget "$@"
+}
+
+os::curl() {
+  which curl >>/dev/null 2>&1
+  if [ "$?" != "0" ]; then
+    pm install -y curl
+  fi
+
+  curl "$@"
+}
+
 export -f os::arch
 export -f os::platform
 export -f os::release
@@ -1148,3 +1166,6 @@ export -f os::base64_encode
 export -f os::base64_decode
 
 export -f os::md5
+
+export -f os::wget
+export -f os::curl

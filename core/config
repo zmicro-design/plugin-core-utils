@@ -36,37 +36,39 @@ load_config() {
 }
 
 config::load_file() {
-  local CONFIG_FILE=$1
+  local config_file=$1
 
-  if [ -z "$CONFIG_FILE" ]; then
+  if [ -z "$config_file" ]; then
     log::error "[config::load_file] config file path is required"
     exit 1
   fi
 
-  if [ -f $CONFIG_FILE ]; then
+  if [ -f $config_file ]; then
     # ignore suffix with _test, which is test cases
-    if [[ $CONFIG_FILE == *_test ]]; then
+    if [[ $config_file == *_test ]]; then
       return
     fi
-    # if [ "$(string::ends_with $CONFIG_FILE _test)" = "true" ]; then
+    # if [ "$(string::ends_with $config_file _test)" = "true" ]; then
     #   return
     # fi
 
-    log::debug "[$(timestamp)][config::load_file]: $CONFIG_FILE"
+    log::debug "[$(timestamp)][config::load_file]: $config_file"
 
-    # \. $CONFIG_FILE
-    . $CONFIG_FILE
+    # \. $config_file
+    . $config_file
   fi
 }
 
 config::load_dir() {
-  CONFIG_DIR=$1
-  CONFIG_FILES=$(ls $CONFIG_DIR)
+  local config_dir=$1
+  local config_files=$(ls $config_dir)
 
-  for CONFIG_FILE in $CONFIG_FILES; do
+  # echo "load dir: $config_dir"
+
+  for config_file in $config_files; do
     # echo "load config: $CONFIG_FILE"
 
-    config::load_file $CONFIG_DIR/$CONFIG_FILE
+    config::load_file $config_dir/$config_file
   done
 }
 

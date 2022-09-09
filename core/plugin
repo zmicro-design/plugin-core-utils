@@ -677,6 +677,7 @@ plugin::update() {
       sudo chown -R $USER $plugin_path
     fi
 
+    cd $plugin_path
     local tmp_update_log=$(os::tmp_file) # $ZMICRO_LOG_ERROR_PATH
     git pull origin master >>$tmp_update_log 2>&1
     if [ "$?" != "0" ]; then

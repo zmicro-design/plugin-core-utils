@@ -313,16 +313,28 @@ os::device_config() {
   local disk="?"
 
   if [ "$(os::is_macos)" = "true" ]; then
-    local cpus=$(sysctl -n hw.ncpu)
-    local memory=$(hostinfo | grep memory | awk -F " " '{print $4}' | awk -F '.' '{print $1}')
-    # local disk=$(os::disk_usage total)
+    cpus=$(sysctl -n hw.ncpu)
+    memory=$(hostinfo | grep memory | awk -F " " '{print $4}' | awk -F '.' '{print $1}')
+    # disk=$(os::disk_usage total)
+
+    which diskutil >> /dev/null 2>&1
+    if [ "$?" = "0" ]; then
+      local disk_name=disk0
+      diskutil info $disk_name >> /dev/null 2>&1
+      if [ "$?" = "0" ]; then
+        local disk_device=$(diskutil info $disk_name | grep "Disk Size")
+        local disk_size=$(echo $disk_device | awk -F ' ' '{print $3}')
+        local disk_unit=$(echo $disk_device | awk -F ' ' '{print $4}')
+        disk="${disk_size}${disk_unit}"
+      fi
+    fi
   else
-    local cpus=$(cat /proc/cpuinfo | grep processor | wc -l)
-    local memory=$(((($(cat /proc/meminfo | grep MemTotal | awk '{print $2}') / 1024 / 1024)) + 1))
-    local disk=$(os::disk_usage total)
+    cpus=$(cat /proc/cpuinfo | grep processor | wc -l)
+    memory=$(((($(cat /proc/meminfo | grep MemTotal | awk '{print $2}') / 1024 / 1024)) + 1))
+    disk="$(os::disk_usage total)G"
   fi
 
-  echo "${cpus}C${memory}G - ${disk}G"
+  echo "${cpus}C${memory}G - ${disk}"
 }
 
 os::cpu_usage() {

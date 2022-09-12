@@ -17,78 +17,81 @@
 #   os::ensure_logs_permission
 # fi
 
-# load() {
-#   # ensure_permission() {
-#   #   local path=$1
-#   #   if [ -f $path ] && [ ! -w $path ]; then
-#   #     sudo chown -R $(os::username) $path
-#   #   fi
-#   # }
+load() {
+  # ensure_permission() {
+  #   local path=$1
+  #   if [ -f $path ] && [ ! -w $path ]; then
+  #     sudo chown -R $(os::username) $path
+  #   fi
+  # }
 
-#   # ensure_permission $ZMICRO_LOG_DEBUG_PATH
-#   if [ "$NO_LOG" != "true" ]; then
-#     echo -e "$(date "+%Y-%m-%d %H:%M:%S")[CORE] load $1" | tee -a $ZMICRO_LOG_DEBUG_PATH >>/dev/null
-#   fi
+  # # ensure_permission $ZMICRO_LOG_DEBUG_PATH
+  # if [ "$NO_LOG" != "true" ]; then
+  #   echo -e "$(date "+%Y-%m-%d %H:%M:%S")[CORE] load $1" | tee -a $ZMICRO_LOG_DEBUG_PATH >>/dev/null
+  # fi
 
-#   local FN_PATH=$ZMICRO_PLUGINS_PATH/core-utils/core/$1
+  # local FN_PATH=$ZMICRO_PLUGINS_PATH/core-utils/core/$1
 
-#   if [ -f $FN_PATH ]; then
-#     . $FN_PATH
-#   elif [ -d $FN_PATH ]; then
-#     . $FN_PATH/export
-#   fi
-# }
+  # if [ -f $FN_PATH ]; then
+  #   . $FN_PATH
+  # elif [ -d $FN_PATH ]; then
+  #   . $FN_PATH/export
+  # fi
 
-# # load require
-# # load lock
-# # load type
-# # load unit
-# # load os
-# # load user
-# # load fs
-# # load net
-# # load color
-# # load path
-# # load timestamp
-# # load delay
-# # load uuid
-# # load permission
-# # load help
-# # load version
-# # load log
-# # load config
-# # load commander
-# # load plugin
-# # load pm
-# # load service
-# # load login
+  # @TODO
+  echo "remove load" >>/dev/null
+}
 
-# # load notify
+# load require
+# load lock
+# load type
+# load unit
+# load os
+# load user
+# load fs
+# load net
+# load color
+# load path
+# load timestamp
+# load delay
+# load uuid
+# load permission
+# load help
+# load version
+# load log
+# load config
+# load commander
+# load plugin
+# load pm
+# load service
+# load login
 
-# # load repl
+# load notify
 
-# # load testing
+# load repl
 
-# # load assert
+# load testing
 
-# # load git
+# load assert
 
-# # load support
+# load git
 
-# # load tag
+# load support
 
-# # load dotenv
+# load tag
 
-# # load task_queue
+# load dotenv
 
-# # load clean
+# load task_queue
 
-# # # Cause Bug
-# # #   1. tput: No value for $TERM and no -T specified
-# # #   2. tput: terminal attributes: No such device or address
-# # #   3. terminal is not a tty
-# # # load inquirer
+# load clean
 
-# # load run
+# # Cause Bug
+# #   1. tput: No value for $TERM and no -T specified
+# #   2. tput: terminal attributes: No such device or address
+# #   3. terminal is not a tty
+# # load inquirer
 
-# export -f load
+# load run
+
+export -f load

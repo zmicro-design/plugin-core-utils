@@ -88,6 +88,10 @@ git::is_added_before_commit() {
   fi
 }
 
+git::is_ready_to_commit() {
+  git::is_added_before_commit
+}
+
 export -f git::commit_message
 export -f git::commit_message_full
 export -f git::commit_hash
@@ -108,3 +112,4 @@ export -f git::repo_name
 export -f git::branch
 
 export -f git::is_added_before_commit
+export -f git::is_ready_to_commit

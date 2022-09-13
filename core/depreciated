@@ -1,0 +1,11 @@
+#!/bin/bash
+
+inquirer::select() {
+  . $ZMICRO_PLUGINS_PATH/core-utils/core/inquirer/export
+
+  inquirer::select "$@"
+}
+
+export -f inquirer::select
+
+# . $ZMICRO_PLUGINS_PATH/core-utils/core/inquirer/export

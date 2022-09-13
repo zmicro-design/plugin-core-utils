@@ -22,5 +22,31 @@ testing::expect::to_equal() {
   fi
 }
 
+testing::jest() {
+  local runtime_dir=$PWD
+  export ZMICRO_JEST_RUNTIME_DIR=$runtime_dir
+  local jest_config=$ZMICRO_PLUGINS_PATH/core-utils/config/others/jest.config.mjs
+
+  #   local tmp_dir=$(os::tmp_dir)
+  #   local jest_config=$tmp_dir/jest.config.mjs
+
+  #   mkdir -p $tmp_dir
+  #   # cd $tmp_dir
+  #   local text=$(
+  #     cat <<-END
+  # export default {
+  #   rootDir: '$runtime_dir',
+  #   testMatch: ['<rootDir>/core/**/*_test.(js|mjs)'],
+  # }
+  # END
+  #   )
+
+  #   echo "$text" | fs::write $jest_config
+
+  NODE_OPTIONS=--experimental-vm-modules npx jest -c $jest_config $runtime_dir
+}
+
 export -f testing::expect
 export -f testing::expect::to_equal
+
+export -f testing::jest

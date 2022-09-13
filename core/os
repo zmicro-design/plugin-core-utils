@@ -885,6 +885,20 @@ os::is_nodejs_installed() {
   fi
 }
 
+os::is_zx_installed() {
+  # ZMICRO_NVM
+  export NODE_HOME=/usr/local/node
+  export NODE_USER_HOME=$HOME/.node
+  export PATH=$NODE_HOME/bin:$NODE_USER_HOME/bin:$PATH
+
+  which zx >>/dev/null 2>&1
+  if [ "$?" = "0" ]; then
+    echo "true"
+  else
+    echo "false"
+  fi
+}
+
 os::is_go_installed() {
   # ZMICRO_GVM
   export GOHOME=/usr/local/go
@@ -1158,6 +1172,7 @@ export -f os::fix_permissions
 export -f os::assert
 
 export -f os::is_nodejs_installed
+export -f os::is_zx_installed
 export -f os::is_go_installed
 export -f os::is_deno_installed
 export -f os::is_rust_installed

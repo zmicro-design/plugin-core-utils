@@ -554,7 +554,7 @@ plugin::run() {
     zmicro code plugin $plugin_name
   elif [ "$plugin_command_real" = "test" ]; then
     local script_path=$plugin_command_args_real
-    if [ -z "$scipt_path" ]; then
+    if [ -z "$script_path" ]; then
       script_path="core"
     fi
 

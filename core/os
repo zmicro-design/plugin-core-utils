@@ -592,24 +592,23 @@ os::info() {
   local user=$(os::username)
   local homedir=$(os::homedir)
   local shell=$(os::shell)
-  local id=$(os::machine_id)
+  local id=$(os::device_id)
   local uptime=$(uptime)
   local hostname=$(os::hostname)
   local kernel=$(os::kernel)
-  local release="-"
-  local distribution="-"
+  local release=$(os::release)
+  local distribution=$(os::distribution)
   local architecture=$(os::arch)
   local is_docker=false
-  local device_config="-"
-  local load="-"
+  local device=$(os::device)
+  local load=$(os::usage)
   local timestamp=$(os::timestamp)
 
   if [ "$(os::is_macos)" != "true" ]; then
     # release=$(os::release)
-    distribution=$(os::distribution)
+    # distribution=$(os::distribution)
     is_docker=$(os::is_docker)
-    device_config=$(os::device_config)
-    load="$(os::usage)"
+    # load="$(os::usage)"
   fi
 
   local info="\
@@ -639,7 +638,7 @@ $(users::doing)\n\
 \n\
 ## Device\n\
 * id: $id\n\
-* device_config: $device_config\n\
+* device: $device\n\
 \n\
 ## Load\n\
 * load: $load\n\
@@ -1084,6 +1083,14 @@ os::curl() {
   curl "$@"
 }
 
+os::device() {
+  os::device_config
+}
+
+os::device_id() {
+  os::machine_id
+}
+
 export -f os::arch
 export -f os::platform
 export -f os::release
@@ -1196,3 +1203,6 @@ export -f os::md5
 
 export -f os::wget
 export -f os::curl
+
+export -f os::device
+export -f os::device_id

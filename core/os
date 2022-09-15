@@ -442,7 +442,8 @@ os::disk_usage() {
     local value=0
     local lines=$(df -h | grep "^/dev/" | awk '{print $3}' | grep "G" | awk -F 'G' '{print $1}')
     for line in ${lines[@]}; do
-      value=$(($value + $line))
+      # value=$(($value + $line))
+      value=$(echo "$value + $line" | bc)
     done
 
     echo $value
@@ -452,28 +453,40 @@ os::disk_usage() {
     local value=0
     local lines=$(df -h | grep "^/dev/" | awk '{print $2}' | grep "G" | awk -F 'G' '{print $1}')
     for line in ${lines[@]}; do
-      value=$(($value + $line))
+      # value=$(($value + $line))
+      value=$(echo "$value + $line" | bc)
     done
 
     echo $value
   }
 
+  local usage=0
+
   case $type in
   used)
-    get_used
+    usage=$(get_used)
     ;;
   total)
-    get_total
+    usage=$(get_total)
     ;;
   percent)
     local used=$(get_used)
     local total=$(get_total)
-    echo $(expr $used \* 100 / $total)
+    # usage=$(expr $used \* 100 / $total)
+    # usage=$(( $used * 100 / $total ))
+    # fix "Invalid Arithmetic Operator" when doing floating-point math in bash
+    #   stackoverflow: https://stackoverflow.com/questions/35634255/invalid-arithmetic-operator-when-doing-floating-point-math-in-bash
+    usage=$(echo "$used * 100 / $total" | bc)
+    if [ "$?" != "0" ]; then
+      usage=0
+    fi
     ;;
   *)
-    echo $lines | awk '{printf "%s - %d %d GB (%s)\n", $1, $3,$2,$5}'
+    usage=$(echo $lines | awk '{printf "%s - %d %d GB (%s)\n", $1, $3,$2,$5}')
     ;;
   esac
+
+  echo $usage
 }
 
 os::system_usage() {
@@ -725,7 +738,7 @@ os::info_json() {
   local is_macos=false
   local is_linux=$(os::is_linux)
   local device=$(os::device)
-  local load=$(os::usage)
+  # local load=$(os::usage)
   local timestamp=$(os::timestamp)
 
   local cpu_cores=$(os::cpu_cores)

@@ -753,6 +753,11 @@ os::info_json() {
   local zmicro_version=$(version::zmicro)
   local zmicro_version_detail=$(version::zmicro_detail)
 
+  local is_ci=$(os::is_ci)
+  local is_github_action=$(os::is_github_action)
+  local is_gitlab_ci=$(os::is_gitlab_ci)
+  local is_eunomia_ci=$(os::is_eunomia_ci)
+
   local is_unchanged=false
   if [ "$zmicro_version_origin" = "$zmicro_version" ]; then
     is_unchanged=true
@@ -786,6 +791,10 @@ os::info_json() {
   "zmicro_version": "$zmicro_version",
   "zmicro_version_detail": "$zmicro_version_detail",
   "is_unchanged": $is_unchanged,
+  "is_ci": $is_ci,
+  "is_github_action": $is_github_action,
+  "is_gitlab_ci": $is_gitlab_ci,
+  "is_eunomia_ci": $is_eunomia_ci,
   "system_timestamp": "$timestamp"
 }
 END
@@ -1236,6 +1245,38 @@ os::device_id() {
   os::machine_id
 }
 
+os::is_ci() {
+  if [ -n "$CI" ]; then
+    echo "true"
+  else
+    echo "false"
+  fi
+}
+
+os::is_github_action() {
+  if [ -n "$GITHUB_ACTIONS" ]; then
+    echo "true"
+  else
+    echo "false"
+  fi
+}
+
+os::is_gitlab_ci() {
+  if [ -n "$GITLAB_CI" ]; then
+    echo "true"
+  else
+    echo "false"
+  fi
+}
+
+os::is_eunomia_ci() {
+  if [ -n "$EUNOMIA_CI" ]; then
+    echo "true"
+  else
+    echo "false"
+  fi
+}
+
 export -f os::arch
 export -f os::platform
 export -f os::release
@@ -1356,3 +1397,8 @@ export -f os::device_id
 export -f os::cpu_cores
 export -f os::memory_total
 export -f os::disk_total
+
+export -f os::is_ci
+export -f os::is_github_action
+export -f os::is_gitlab_ci
+export -f os::is_eunomia_ci

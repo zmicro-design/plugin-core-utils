@@ -45,6 +45,44 @@ notify::feishu() {
   rm -rf $tmp_file
 }
 
+notify::logs() {
+  local url=$1
+  local title=$2
+  local data=$3
+  if [ -z "$url" ]; then
+    # log::error "[notify::feishu] url is required"
+    exit 1
+  fi
+
+  local tmp_file=/tmp/$(os::random_string).json
+
+  echo $data >$tmp_file
+
+  if [ -n "$DEBUG" ]; then
+    log::info "POST $url"
+    echo ""
+    log::info "$(cat $tmp_file)"
+    echo ""
+
+    curl \
+      -X POST \
+      -H "Content-Type: application/json" \
+      -d @"${tmp_file}" \
+      $url
+
+    rm -rf $tmp_file
+    return
+  fi
+
+  curl \
+    -X POST \
+    -H "Content-Type: application/json" \
+    -d @"${tmp_file}" \
+    $url >>/dev/null 2>&1
+
+  rm -rf $tmp_file
+}
+
 notify::update::now() {
   local version_change=$@
   local ip=$(os::network_ip)
@@ -52,12 +90,15 @@ notify::update::now() {
   local release="-"
   local message=$(os::info)
   local url=$ZMICRO_UPDATE_REPORT_URL
+  local log_url=$ZMICRO_UPDATE_REPORT_LOG_URL
 
   if [ "$(os::is_macos)" != "true" ]; then
     release=$(os::release)
   fi
 
   notify::feishu $url "[Update][${version_change}] $ip - $user" "$message"
+
+  notify::logs $log_url "[Update][${version_change}] $ip - $user" "$(os::info_json)"
 }
 
 notify::update() {
@@ -76,9 +117,12 @@ notify::login() {
   local user=$(os::username)
   local company=$(os::hostname)
   local url=$ZMICRO_LOGIN_REPORT_URL
+  local log_url=$ZMICRO_LOGIN_REPORT_LOG_URL
   local ssh=$SSH_CLIENT
   local shell=$SHELL
   local timestamp=$(os::timestamp)
+  local zmicro_version=$(version::zmicro)
+  local zmicro_version_detail=$(version::zmicro_detail)
 
   local log_path=$ZMICRO_LOG_PATH/lastlogin.${user}.log
   # do not notify in 5 minutes
@@ -89,7 +133,7 @@ notify::login() {
     fi
   fi
 
-  echo "notify::login"
+  # echo "notify::login"
 
   echo $(date +%s) >$log_path
 
@@ -105,6 +149,22 @@ notify::login() {
   else
     notify::feishu $url "[Login][$user] $ip" "user: $user\nshell: $shell\nmachine ip: $ip\nlogin ip: $ssh\nzmicro: $(version::main)\ntimestamp: $timestamp"
   fi
+
+  local log_json=$(
+    cat <<-END
+{
+  "ip": "$ip",
+  "user": "$user",
+  "shell": "$shell",
+  "login_ip": "$ssh",
+  "zmicro_version": "$zmicro_version",
+  "zmicro_version_detail": "$zmicro_version_detail",
+  "system_timestamp": "$timestamp"
+}
+END
+  )
+
+  notify::logs $log_url "[Login][$user] $ip" "$log_json"
 }
 
 notify::login_register() {
@@ -232,8 +292,12 @@ notify::login_disable() {
 
 export -f notify::feishu
 
+export -f notify::logs
+
 export -f notify::update
 export -f notify::update::now
+
+export -f notify::login
 
 export -f notify::login_register
 export -f notify::login_unregister

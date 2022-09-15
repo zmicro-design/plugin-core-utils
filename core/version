@@ -59,6 +59,15 @@ version::zmicro_num() {
   version::get $ZMICRO_HOME | awk -F 'v' '{print $2}'
 }
 
+version::zmicro_detail() {
+  local path=$ZMICRO_HOME
+  local version=$(version::get $path)
+  local git_hash=$(version::git_hash $path)
+  local timestamp=$(version::timestamp $path)
+
+  echo "$version (${git_hash} ${timestamp})"
+}
+
 version::main() {
   version::echo $ZMICRO_HOME
 }
@@ -196,6 +205,7 @@ export -f version::timestamp
 
 export -f version::zmicro
 export -f version::zmicro_num
+export -f version::zmicro_detail
 
 export -f version::echo
 

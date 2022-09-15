@@ -307,6 +307,55 @@ os::is_ip() {
   fi
 }
 
+os::cpu_cores() {
+  local cpus=0
+
+  if [ "$(os::is_macos)" = "true" ]; then
+    cpus=$(sysctl -n hw.ncpu)
+  else
+    cpus=$(cat /proc/cpuinfo | grep processor | wc -l)
+  fi
+
+  echo $cpus
+}
+
+os::memory_total() {
+  local memory=0
+  if [ "$(os::is_macos)" = "true" ]; then
+    memory=$(hostinfo | grep memory | awk -F " " '{print $4}' | awk -F '.' '{print $1}')
+  else
+    memory=$(((($(cat /proc/meminfo | grep MemTotal | awk '{print $2}') / 1024 / 1024)) + 1))
+  fi
+
+  echo ${memory}
+}
+
+os::disk_total() {
+  local disk=0
+
+  if [ "$(os::is_macos)" = "true" ]; then
+    which diskutil >> /dev/null 2>&1
+    if [ "$?" = "0" ]; then
+      local disk_name=disk0
+      diskutil info $disk_name >> /dev/null 2>&1
+      if [ "$?" = "0" ]; then
+        local disk_device=$(diskutil info $disk_name | grep "Disk Size")
+        local disk_size=$(echo $disk_device | awk -F ' ' '{print $3}')
+        local disk_unit=$(echo $disk_device | awk -F ' ' '{print $4}')
+        disk="${disk_size}"
+        if [ "$disk_unit" = "TB" ]; then
+          disk=$(echo "$disk_size * 1024" | bc)
+        fi
+      fi
+    fi
+  else
+    disk="$(os::disk_usage total)"
+  fi
+
+  echo "${disk}"
+}
+
+
 os::device_config() {
   local cpus="?"
   local memory="?"
@@ -338,12 +387,23 @@ os::device_config() {
 }
 
 os::cpu_usage() {
+  if [ "$(os::is_macos)" = "true" ]; then
+    top -l 1 | grep -E "^CPU" | grep -Eo '[^[:space:]]+%' | head -1 | awk -F '%' '{print $1}'
+    return
+  fi
+
   top -bn1 | grep Cpu | head -n 1 | awk '{printf "%.2f", $2}'
 }
 
 os::memory_usage() {
   # unit: MB
   # used total percent
+
+  # @TODO
+  if [ "$(os::is_macos)" = "true" ]; then
+    echo 0
+    return
+  fi
 
   local type=$1
   local all=$(free -m | awk 'NR==2{printf "%s/%sMB (%.2f%%)", $3,$2,$3*100/$2 }')
@@ -367,6 +427,12 @@ os::memory_usage() {
 os::disk_usage() {
   # unit: GB
   # used total percent
+
+  # @TODO
+  if [ "$(os::is_macos)" = "true" ]; then
+    echo 0
+    return
+  fi
 
   local type=$1
   # @TODO var will broken \n
@@ -576,7 +642,7 @@ os::usage() {
     return
   fi
 
-  echo "cpu: $(os::memory_usage percent)%, memory: $(os::memory_usage percent)%, disk: $(os::disk_usage percent)%"
+  echo "cpu: $(os::cpu_usage percent)%, memory: $(os::memory_usage percent)%, disk: $(os::disk_usage percent)%"
 }
 
 os::info() {
@@ -637,6 +703,88 @@ $(users::doing)\n\
 * uptime: $uptime\n\
 \n\
 * timestamp: $timestamp"
+
+  echo $info
+}
+
+os::info_json() {
+  local ip=$(os::network_ip)
+  local ip_internal=$(os::network_ip_internal)
+  local user=$(os::username)
+  local homedir=$(os::homedir)
+  local shell=$(os::shell)
+  local id=$(os::device_id)
+  local uptime=$(uptime)
+  local hostname=$(os::hostname)
+  local kernel=$(os::kernel)
+  local release=$(os::release)
+  local distribution=$(os::distribution)
+  local architecture=$(os::arch)
+  local is_workspace=$(os::is_workspace)
+  local is_docker=false
+  local is_macos=false
+  local is_linux=$(os::is_linux)
+  local device=$(os::device)
+  local load=$(os::usage)
+  local timestamp=$(os::timestamp)
+
+  local cpu_cores=$(os::cpu_cores)
+  local memory_total=$(os::memory_total)
+  local disk_total=$(os::disk_total)
+
+  local cpu_load=$(os::cpu_usage percent)
+  local memory_load=$(os::memory_usage percent)
+  local disk_usage=$(os::disk_usage percent)
+
+  local zmicro_version_origin=${ZMICRO_VERSION}
+  local zmicro_version=$(version::zmicro)
+  local zmicro_version_detail=$(version::zmicro_detail)
+
+  local is_unchanged=false
+  if [ "$zmicro_version_origin" = "$zmicro_version" ]; then
+    is_unchanged=true
+  fi
+
+  if [ "$(os::is_macos)" != "true" ]; then
+    is_macos=true
+    # release=$(os::release)
+    # distribution=$(os::distribution)
+    is_docker=$(os::is_docker)
+    # load="$(os::usage)"
+  fi
+
+  local info=$(cat <<-END
+{
+  "ip": "$ip",
+  "ip_internal": "$ip_internal",
+  "user": "$user",
+  "users_all": "$(users::all | tr '\n' ',')",
+  "users_online": "$(users::online | tr '\n' ',')",
+  "users_history": "$(users::login::histories | head -5 | tr '\n' ',')",
+  "system_shell": "$shell",
+  "system_hostname": "$hostname",
+  "system_kernel": "$kernel",
+  "system_distribution": "$distribution",
+  "system_arch": "$architecture",
+  "device_id": "$id",
+  "cpu_cores": $cpu_cores,
+  "memory_total": $memory_total,
+  "disk_total": $disk_total,
+  "cpu_load": $cpu_load,
+  "memory_load": $memory_load,
+  "disk_usage": $disk_usage,
+  "is_workspace": $is_workspace,
+  "is_docker": $is_docker,
+  "is_macos": $is_macos,
+  "is_linux": $is_linux,
+  "zmicro_version_origin": "$zmicro_version_origin",
+  "zmicro_version": "$zmicro_version",
+  "zmicro_version_detail": "$zmicro_version_detail",
+  "is_unchanged": $is_unchanged,
+  "system_timestamp": "$timestamp"
+}
+END
+)
 
   echo $info
 }
@@ -1157,6 +1305,7 @@ export -f os::timestamp
 
 export -f os::usage
 export -f os::info
+export -f os::info_json
 
 export -f os::get_env
 
@@ -1198,3 +1347,7 @@ export -f os::curl
 
 export -f os::device
 export -f os::device_id
+
+export -f os::cpu_cores
+export -f os::memory_total
+export -f os::disk_total

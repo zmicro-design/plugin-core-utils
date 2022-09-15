@@ -18,7 +18,7 @@ notify::feishu() {
   # echo "data: $data"
   local tmp_file=/tmp/$(os::random_string).json
 
-  echo $data > $tmp_file
+  echo $data >$tmp_file
 
   if [ -n "$DEBUG" ]; then
     log::info "POST $url"
@@ -91,7 +91,7 @@ notify::login() {
 
   echo "notify::login"
 
-  echo $(date +%s) > $log_path
+  echo $(date +%s) >$log_path
 
   local key=/${user}
 
@@ -156,7 +156,7 @@ notify::check_enable() {
   local full_env_name=NOTIFY_${type}
   if [ "$(config::global:get $full_env_name)" == "false" ]; then
     echo "false"
-  else 
+  else
     echo "true"
   fi
 }
@@ -201,12 +201,10 @@ notify::update_check() {
     exit 1
   fi
 
-  if [ "$(notify::check_enable UPDATE)" == "false" ]; then
-    #echo "NO UPDATE NOTIFY, SKIP $origin_version $new_version"
-    return
-  #else
-    #echo "WILL UPDATE NOTIFY, $origin_version $new_version"
-  fi
+  # # check notify enable
+  # if [ "$(notify::check_enable UPDATE)" == "false" ]; then
+  #   return
+  # fi
 
   # send notification
   if [ "$origin_version" = "$new_version" ]; then

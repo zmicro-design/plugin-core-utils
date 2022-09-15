@@ -417,19 +417,11 @@ disk: $(os::disk_usage)"
 }
 
 os::network_ip() {
-  # dig +short myip.opendns.com @resolver1.opendns.com
-  local ip=$(curl https://ip.zcorky.com 2>/dev/null)
-  echo $ip
+  net::get_ip
 }
 
 os::network_ip_internal() {
-  # reference: https://apple.stackexchange.com/questions/20547/how-do-i-find-my-ip-address-from-the-command-line
-  if [ "$(os::is_macos)" = "true" ]; then
-    ifconfig | grep "inet " | grep -Fv 127.0.0.1 | awk '{print $2}'
-    return
-  fi
-
-  echo $(hostname -I)
+  net::get_ip_internal
 }
 
 os::machine_id() {

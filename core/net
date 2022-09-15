@@ -108,6 +108,22 @@ net::is_port_visitable() {
   fi
 }
 
+net::get_ip() {
+  # dig +short myip.opendns.com @resolver1.opendns.com
+  local ip=$(curl https://ip.zcorky.com 2>/dev/null)
+  echo $ip
+}
+
+net::get_ip_internal() {
+  # reference: https://apple.stackexchange.com/questions/20547/how-do-i-find-my-ip-address-from-the-command-line
+  if [ "$(os::is_macos)" = "true" ]; then
+    ifconfig | grep "inet " | grep -Fv 127.0.0.1 | awk '{print $2}'
+    return
+  fi
+
+  echo $(hostname -I)
+}
+
 export -f net::is_in_china
 export -f net::is_github_visitable
 export -f net::is_google_visitable
@@ -117,3 +133,6 @@ export -f net::get_domain_ip
 
 export -f net::is_url_visitable
 export -f net::is_port_visitable
+
+export -f net::get_ip
+export -f net::get_ip_internal

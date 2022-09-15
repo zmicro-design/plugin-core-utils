@@ -749,8 +749,8 @@ os::info_json() {
   local memory_load=$(os::memory_usage percent)
   local disk_usage=$(os::disk_usage percent)
 
-  local zmicro_version_origin=${ZMICRO_VERSION}
-  local zmicro_version=$(version::zmicro)
+  local zmicro_version_origin=${ZMICRO_VERSION_ORIGIN}
+  local zmicro_version=${ZMICRO_VERSION_NEW}
   local zmicro_version_detail=$(version::zmicro_detail)
 
   local is_ci=$(os::is_ci)

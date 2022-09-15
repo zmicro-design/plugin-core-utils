@@ -266,6 +266,9 @@ notify::update_check() {
   #   return
   # fi
 
+  export ZMICRO_VERSION_ORIGIN=$origin_version
+  export ZMICRO_VERSION_NEW=$new_version
+
   # send notification
   if [ "$origin_version" = "$new_version" ]; then
     notify::update "no change: $new_version"

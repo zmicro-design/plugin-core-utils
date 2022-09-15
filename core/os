@@ -734,8 +734,8 @@ os::info_json() {
   local distribution=$(os::distribution)
   local architecture=$(os::arch)
   local is_workspace=$(os::is_workspace)
-  local is_docker=false
-  local is_macos=false
+  local is_docker=$(os::is_docker)
+  local is_macos=$(os::is_macos)
   local is_linux=$(os::is_linux)
   local device=$(os::device)
   # local load=$(os::usage)
@@ -756,14 +756,6 @@ os::info_json() {
   local is_unchanged=false
   if [ "$zmicro_version_origin" = "$zmicro_version" ]; then
     is_unchanged=true
-  fi
-
-  if [ "$(os::is_macos)" != "true" ]; then
-    is_macos=true
-    # release=$(os::release)
-    # distribution=$(os::distribution)
-    is_docker=$(os::is_docker)
-    # load="$(os::usage)"
   fi
 
   local info=$(cat <<-END

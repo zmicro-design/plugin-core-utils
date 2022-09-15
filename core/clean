@@ -1,7 +1,14 @@
 #!/bin/bash
 
+# clean::docker cleans docker images and containers
 # reference: https://note.qidong.name/2017/06/26/docker-clean/
 clean::docker() {
+  which docker >>/dev/null 2>&1
+  if [ "$?" != "0" ]; then
+    log::info "[$(timestamp)][clean::docker] ignored, docker not found"
+    return
+  fi
+
   log::info "[$(timestamp)][clean::docker] starting clean ..."
 
   # # clean stopped containers
@@ -22,15 +29,45 @@ clean::docker() {
   log::success "[$(timestamp)][clean::docker] clean done"
 }
 
+# clean::node_modules cleans node_modules
 # reference: https://stackoverflow.com/questions/21122342/how-to-clean-node-modules-folder-of-packages-that-are-not-in-package-json
 clean::node_modules() {
-  local current_dir=$PWD
+  local current_dir=$1
+  if [ -z "$current_dir" ]; then
+    current_dir=$PWD
+  fi
+
   log::info "[$(timestamp)][clean::node_modules] starting clean (current dir: $current_dir) ..."
 
-  find $current_dir -name 'node_modules' -type d -prune -print -exec rm -rf '{}' \;
+  # find $current_dir -name 'node_modules' -type d -prune -print -exec rm -rf '{}' \;
+  find $current_dir \
+    -name 'node_modules' \
+    -type d \
+    -prune \
+    -print \
+    -exec rm -rf '{}' \;
 
   log::success "[$(timestamp)][clean::node_modules] clean done"
 }
 
+# clean::nodejs cleans nodejs cache, like node_modules
+clean::nodejs() {
+  log::info "[$(timestamp)][clean::nodejs] starting clean ..."
+
+  clean::node_modules
+
+  log::success "[$(timestamp)][clean::nodejs] clean done"
+}
+
+# clean::all cleans all
+clean::all() {
+  clean::docker
+  clean::nodejs
+}
+
 export -f clean::docker
 export -f clean::node_modules
+
+export -f clean::nodejs
+
+export -f clean::all

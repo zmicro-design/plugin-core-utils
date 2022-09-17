@@ -768,9 +768,10 @@ os::info_json() {
   "ip": "$ip",
   "ip_internal": "$ip_internal",
   "user": "$user",
-  "users_all": "$(users::all | tr '\n' ',')",
-  "users_online": "$(users::online | tr '\n' ',')",
-  "users_history": "$(users::login::histories | head -5 | tr '\n' ',')",
+  "users_all": "$(users::all)",
+  "users_online": "$(users::online)",
+  "users_history": "$(users::login::histories | head -5)",
+  "command_history": "$(os::command_history 10)",
   "system_shell": "$shell",
   "system_hostname": "$hostname",
   "system_kernel": "$kernel",
@@ -1277,6 +1278,41 @@ os::is_eunomia_ci() {
   fi
 }
 
+os::command_history() {
+  local lines=$1
+
+  if [ "$(os::is_zsh)" = "true" ]; then
+    if [ -f "$HOME/.zsh_history" ]; then
+      if [ -n "$lines" ]; then
+        cat $HOME/.zsh_history | tail -n $lines
+        return
+      fi
+
+      cat $HOME/.zsh_history
+      return
+    fi
+
+    echo "no history found"
+    return
+  elif [ "$(os::is_bash)" = "true" ]; then
+    if [ -f "$HOME/.bash_history" ]; then
+      if [ -n "$lines" ]; then
+        cat $HOME/.bash_history | tail -n $lines
+        return
+      fi
+
+      cat $HOME/.bash_history
+      return
+    fi
+    
+    echo "no history found"
+    return
+  else
+    echo "[os::command_history] unsupported shell: $shell"
+    return 1
+  fi
+}
+
 export -f os::arch
 export -f os::platform
 export -f os::release
@@ -1402,3 +1438,5 @@ export -f os::is_ci
 export -f os::is_github_action
 export -f os::is_gitlab_ci
 export -f os::is_eunomia_ci
+
+export -f os::command_history

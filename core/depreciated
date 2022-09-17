@@ -6,6 +6,13 @@ inquirer::select() {
   inquirer::select "$@"
 }
 
+inquirer::text() {
+  . $ZMICRO_PLUGINS_PATH/core-utils/core/inquirer/export
+
+  inquirer::text "$@"
+}
+
 export -f inquirer::select
+export -f inquirer::text
 
 # . $ZMICRO_PLUGINS_PATH/core-utils/core/inquirer/export

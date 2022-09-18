@@ -2,7 +2,8 @@
 
 users::all() {
   if [ "$(os::is_macos)" = "true" ]; then
-    echo "-"
+    # echo "-"
+    ls /Users/
     return
   fi
 
@@ -25,4 +26,3 @@ export -f users::all
 export -f users::online
 export -f users::login::histories
 export -f users::doing
-

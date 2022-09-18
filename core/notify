@@ -102,6 +102,11 @@ notify::update::now() {
 }
 
 notify::update() {
+  if [ "$(os::is_macos)" = "true" ]; then
+    notify::update::now "$@"
+    return
+  fi
+
   # @TODO avoid too many request at the same time
   local sleep_time=$(os::random_int 600)
   if [ -n "$DEBUG" ]; then

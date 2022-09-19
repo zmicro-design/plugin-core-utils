@@ -92,6 +92,63 @@ git::is_ready_to_commit() {
   git::is_added_before_commit
 }
 
+git::repo_url() {
+  local url=$(git::origin_url)
+  echo "${url%.git}"
+}
+
+git::issue_url() {
+  local url=$(git::repo_url)
+  echo "${url}/issues"
+}
+
+git::pull_request_url() {
+  local url=$(git::repo_url)
+  echo "${url}/pulls"
+}
+
+git::merge_request_url() {
+  local url=$(git::repo_url)
+  echo "${url}/merge_requests"
+}
+
+git::url_ssh_to_http() {
+  local ssh_url=$1
+  local base_url=$2
+
+  if [ -z "$ssh_url" ]; then
+    log::error "[git::url_ssh_to_http] ssh_url is required"
+    return 1
+  fi
+
+  if [ -z "$base_url" ]; then
+    log::error "[git::url_ssh_to_http] base_url is required"
+    return 1
+  fi
+
+  #  ssh://git@example.com:666/zero/example.git => zero/example
+  #  ssh://git@example.com:666/zero/example => zero/example
+  #  ssh://git@example.com/zero/example => zero/example
+  # start with ssh://
+  if [[ $ssh_url =~ ^ssh:// ]]; then
+    local repo_namespace=$(echo "$ssh_url" | awk -F '/' '{print $4}')
+    local repo_name=$(echo "$ssh_url" | awk -F '/' '{print $5}' | awk -F '.git' '{print $1}')
+    echo "$base_url/$repo_namespace/$repo_name"
+    return
+  fi
+
+  # git@github.com:zero/example.git => zero/example
+  if [[ $ssh_url =~ ^git@ ]]; then
+    local repo_namespace=$(echo "$ssh_url" | awk -F ':' '{print $2}' | awk -F '/' '{print $1}')
+    local repo_name=$(echo "$ssh_url" | awk -F ':' '{print $2}' | awk -F '/' '{print $2}' | awk -F '.git' '{print $1}')
+    echo "$base_url/$repo_namespace/$repo_name"
+    return
+  fi
+
+  echo "[git::url_ssh_to_http] unsupported ssh_url: $ssh_url"
+  return 1
+}
+
 export -f git::commit_message
 export -f git::commit_message_full
 export -f git::commit_hash
@@ -113,3 +170,10 @@ export -f git::branch
 
 export -f git::is_added_before_commit
 export -f git::is_ready_to_commit
+
+export -f git::repo_url
+export -f git::issue_url
+export -f git::pull_request_url
+export -f git::merge_request_url
+
+export -f git::url_ssh_to_http

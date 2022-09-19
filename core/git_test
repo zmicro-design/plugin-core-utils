@@ -142,3 +142,21 @@ function test_git::branch() {
     "$expected" \
     "$received"
 }
+
+function test_git::url_ssh_to_http() {
+  local expected="http://zzz.com/zero/example"
+  local received="$(git::url_ssh_to_http ssh://git@example.com:666/zero/example.git http://zzz.com)"
+
+  testing::expect \
+    "${FUNCNAME[0]}" \
+    "to_equal" \
+    "$expected" \
+    "$received"
+
+  received="$(git::url_ssh_to_http git@example.com:zero/example.git http://zzz.com)"
+  testing::expect \
+    "${FUNCNAME[0]}" \
+    "to_equal" \
+    "$expected" \
+    "$received"
+}

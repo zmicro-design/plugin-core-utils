@@ -10,3 +10,36 @@ function test_plugin::get_version() {
     "$expected" \
     "$received"
 }
+
+function test_plugin::get_remote_mod_url() {
+  local expected="https://raw.githubusercontent.com/zmicro-design/plugin-core-utils/master/mod"
+  local received=$(plugin::get_remote_mod_url core-utils)
+
+  testing::expect \
+    "${FUNCNAME[0]}" \
+    "to_equal" \
+    "$expected" \
+    "$received"
+}
+
+function test_plugin::get_remote_url() {
+  local expected="https://github.com/zmicro-design/plugin-core-utils"
+  local received=$(plugin::get_remote_url core-utils)
+
+  testing::expect \
+    "${FUNCNAME[0]}" \
+    "to_equal" \
+    "$expected" \
+    "$received"
+}
+
+function test_plugin::get_remote_version() {
+  local expected=$(curl -s https://raw.githubusercontent.com/zmicro-design/plugin-core-utils/master/mod | grep "PLUGIN_VERSION=" | cut -d "=" -f 2)
+  local received=$(plugin::get_remote_version core-utils)
+
+  testing::expect \
+    "${FUNCNAME[0]}" \
+    "to_equal" \
+    "$expected" \
+    "$received"
+}

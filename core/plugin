@@ -774,7 +774,23 @@ plugin::get_remote_mod_url() {
     exit 1
   fi
 
-  echo "https://raw.githubusercontent.com/zmicro-design/plugin-${name}/master/mod"
+  # echo "https://raw.githubusercontent.com/zmicro-design/plugin-${name}/master/mod"
+
+  local plugin_path=$(plugin::get_path $name)
+  cd $plugin_path
+
+  local repo_name=$(git::repo_name)
+  local repo_url=$(git::repo_url)
+
+  # github
+  echo $repo_url | grep "github.com" >/dev/null 2>&1
+  if [ "$?" = "0" ]; then
+    echo "https://raw.githubusercontent.com/${repo_name}/master/mod"
+  else
+    # gitlab
+    # @TODO not compitable gitlab or other git server
+    echo "$repo_url/raw/master/mod"
+  fi
 }
 
 plugin::get_remote_version() {

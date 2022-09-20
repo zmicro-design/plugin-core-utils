@@ -116,6 +116,15 @@ net::get_ip() {
     return
   fi
 
+  which dig >>/dev/null 2>&1
+  if [ "$?" != "0" ]; then
+    if [ "$(os::is_centos)" = "true" ]; then
+      pm install -yy bind-utils >>/dev/null 2>&1
+    else
+      pm install -yy dig >>/dev/null 2>&1
+    fi
+  fi
+
   # fallback
   dig +short myip.opendns.com @resolver1.opendns.com
 }

@@ -111,7 +111,13 @@ net::is_port_visitable() {
 net::get_ip() {
   # dig +short myip.opendns.com @resolver1.opendns.com
   local ip=$(curl https://ip.zcorky.com 2>/dev/null)
-  echo $ip
+  if [ -n "$ip" ]; then
+    echo $ip
+    return
+  fi
+
+  # fallback
+  dig +short myip.opendns.com @resolver1.opendns.com
 }
 
 net::get_ip_internal() {

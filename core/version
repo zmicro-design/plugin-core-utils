@@ -82,6 +82,17 @@ version::plugin() {
   version::echo $path
 }
 
+version::get_plugin() {
+  local name=$1
+  if [ -z "$name" ]; then
+    log::error "[$(timestamp)][version::plugin] plugin name is required"
+    exit 1
+  fi
+
+  local path=$(plugin::get_path $name)
+  version::get $path
+}
+
 version::package() {
   local name=$1
   if [ -z "$name" ]; then

@@ -1,0 +1,12 @@
+#!/bin/bash
+
+function test_plugin::get_version() {
+  local expected=$(config::get PLUGIN_VERSION $ZMICRO_PLUGINS_PATH/core-utils/mod)
+  local received=$(plugin::get_version core-utils)
+
+  testing::expect \
+    "${FUNCNAME[0]}" \
+    "to_equal" \
+    "$expected" \
+    "$received"
+}

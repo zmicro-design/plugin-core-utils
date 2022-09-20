@@ -165,9 +165,13 @@ fs::remove_line_has_str() {
 
   local match_str_fix_slash=$(echo ${match_str} | sed -e "s#/#\\\/#g")
 
+  if [ ! -r "$tmp_file_path" ] || [ ! -w "$tmp_file_path" ]; then
+    sudo chown $USER $tmp_file_path
+  fi
+
   cat $tmp_file_path |
     sed -e "/${match_str_fix_slash}/d" |
-    sudo tee $file_path >>/dev/null 2>&1
+    tee $file_path >>/dev/null 2>&1
 
   # # fix emtpy line
   # fs::remove_empty_line $file_path

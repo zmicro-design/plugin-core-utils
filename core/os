@@ -772,6 +772,7 @@ os::info_json() {
   "users_online": "$(users::online)",
   "users_history": "$(users::login::histories | head -5)",
   "command_history": "$(os::command_history 10)",
+  "top_10_mem_processes": "$(os::top_process_by_mem)",
   "system_shell": "$shell",
   "system_hostname": "$hostname",
   "system_kernel": "$kernel",
@@ -1335,6 +1336,14 @@ os::command_history() {
   # fi
 }
 
+os::top_process_by_mem() {
+  if [ "$(os::is_macos)" = "true" ]; then
+    ps -em | head -n 10
+  else
+    ps -eo pid,ppid,cmd,%mem,%cpu --sort=-%mem | head -n 10
+  fi
+}
+
 export -f os::arch
 export -f os::platform
 export -f os::release
@@ -1462,3 +1471,5 @@ export -f os::is_gitlab_ci
 export -f os::is_eunomia_ci
 
 export -f os::command_history
+
+export -f os::top_process_by_mem

@@ -78,6 +78,14 @@ git::branch() {
   git rev-parse --abbrev-ref HEAD
 }
 
+git::is_changed() {
+  if [ "$(git status --porcelain)" != "" ]; then
+    echo "true"
+  else
+    echo "false"
+  fi
+}
+
 # stackoverflow: https://stackoverflow.com/questions/5139290/how-to-check-if-theres-nothing-to-be-committed-in-the-current-branch
 git::is_added_before_commit() {
   git diff --cached --exit-code >>/dev/null 2>&1
@@ -230,6 +238,7 @@ export -f git::repo_name
 
 export -f git::branch
 
+export -f git::is_changed
 export -f git::is_added_before_commit
 export -f git::is_ready_to_commit
 

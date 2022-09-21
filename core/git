@@ -165,6 +165,52 @@ git::url_ssh_to_http() {
   return 1
 }
 
+git::has_tag() {
+  local tag=$1
+  if [ -z "$tag" ]; then
+    log::error "[git::has_tag] tag is required"
+    return 1
+  fi
+
+  git ls-remote --exit-code origin refs/tags/$tag >>/dev/null 2>&1
+  if [ "$?" != "0" ]; then
+    echo "false"
+  else
+    echo "true"
+  fi
+}
+
+git::switch_tag() {
+  local tag=$1
+  if [ -z "$tag" ]; then
+    log::error "[git::switch_tag] tag is required"
+    return 1
+  fi
+
+  git fetch origin tag $tag >>/dev/null
+  if [ "$?" != "0" ]; then
+    log::error "[git::switch_tag] failed to fetch tag: $tag"
+    return 1
+  fi
+
+  git checkout $tag >>/dev/null
+}
+
+git::use_version() {
+  local version=$1
+  if [ -z "$version" ]; then
+    log::error "[git::use_version] version is required"
+    return 1
+  fi
+
+  # if [ "$(git::has_tag $version)" != "true" ]; then
+  #   log::error "[git::use_version] version($version) not found"
+  #   return 1
+  # fi
+
+  git::switch_tag $version
+}
+
 export -f git::commit_message
 export -f git::commit_message_full
 export -f git::commit_hash
@@ -193,3 +239,7 @@ export -f git::pull_request_url
 export -f git::merge_request_url
 
 export -f git::url_ssh_to_http
+
+export -f git::has_tag
+export -f git::switch_tag
+export -f git::use_version

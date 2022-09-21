@@ -559,6 +559,8 @@ plugin::run() {
     zmicro plugin register $plugin_name
   elif [ "$plugin_command_real" = "release" ]; then
     zmicro plugin release $plugin_name
+  elif [ "$plugin_command_real" = "use" ]; then
+    zmicro plugin use $plugin_name $plugin_command_args_real
   elif [ "$plugin_command_real" = "go" ]; then
     zmicro go plugin $plugin_name
   elif [ "$plugin_command_real" = "code" ]; then
@@ -811,6 +813,55 @@ plugin::get_remote_version() {
   echo $version
 }
 
+plugin::use() {
+  local name=$1
+  local version=$2
+
+  if [ -z "$name" ]; then
+    log::error "[$(timestamp)][plugin::use] plugin name is required"
+    exit 1
+  fi
+
+  if [ -z "$version" ]; then
+    log::error "[$(timestamp)][plugin::use] plugin version is required"
+    exit 1
+  fi
+
+  local plugin_path=$(plugin::get_path $name)
+  if [ ! -d "$plugin_path" ]; then
+    log::error "[$(timestamp)][plugin::use] plugin $name not found"
+    exit 1
+  fi
+
+  local version_origin=$(plugin::get_version $name)
+  if [ "$version_origin" = "$version" ]; then
+    log::info "[$(timestamp)][plugin::use] plugin $name version already is $version"
+    return 0
+  fi
+
+  # @TODO special version
+  if [ "$version" = "latest" ]; then
+    git checkout master >>/dev/null 2>&1
+    git pull origin master >>/dev/null 2>&1
+    log::success "[$(timestamp)][plugin::use] plugin $name version use $version success"
+    return
+  fi
+
+  if [ "$(git::has_tag $version)" != "true" ]; then
+    log::error "[$(timestamp)][plugin::use] plugin $name version $version not found"
+    exit 1
+  fi
+
+  cd $plugin_path
+  git::use_version $version
+  if [ "$?" != "0" ]; then
+    log::error "[$(timestamp)][plugin::use] plugin $name use version $version error"
+    exit 1
+  fi
+
+  log::success "[$(timestamp)][plugin::use] plugin $name version use $version success"
+}
+
 export -f plugin::register_all
 export -f plugin::register
 export -f plugin::unregister
@@ -867,3 +918,5 @@ export -f plugin::get_remote_url
 export -f plugin::get_remote_version
 
 export -f plugin::get_remote_mod_url
+
+export -f plugin::use

@@ -113,12 +113,21 @@ config::get() {
     exit 1
   fi
 
-  local list=$(cat $filepath | sed -e "/^[ \t]*#/d" | grep "${key}=")
+  local list="$(cat $filepath | sed -e "/^[ \t]*#/d" | grep "${key}=" | tail -n 1)"
 
-  local value=""
-  for item in ${list[@]}; do
-    value=$(echo $item | awk -F '=' '{print $2}' | awk -F '#' '{print $1}' | sed -e "s/\s+//g")
-  done
+  # local value=""
+  # for item in ${list[@]}; do
+  #   value=$(echo $item | awk -F '=' '{print $2}' | awk -F '#' '{print $1}' | sed -e "s/\s+//g")
+  # done
+  local value=$(echo $list | awk -F '=' '{print $2}' | awk -F '#' '{print $1}' | sed -e "s/\s+//g")
+
+  # @TODO remove quote
+  # value=${value#\"}
+  # value=${value%\"}
+  # value=${value#\'}
+  # value=${value%\'}
+  # trim quote
+  value=$(echo $value | sed -e 's/^"//' -e 's/"$//' | sed -e "s/^'//" -e "s/'$//")
 
   if [ -z "$value" ]; then
     value=$default_value

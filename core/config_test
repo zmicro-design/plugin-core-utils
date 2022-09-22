@@ -47,6 +47,13 @@ function test_config::get() {
     "true" \
     "$(config::get ENABLE $tmp_file)"
 
+  echo "BOOTSTRAP_COMMAND=\"yarn install --frozen-lockfile\"" >$tmp_file
+  testing::expect \
+    "${FUNCNAME[0]} - ok" \
+    "to_equal" \
+    "yarn_install_--frozen-lockfile" \
+    "$(config::get BOOTSTRAP_COMMAND $tmp_file | sed 's/ /_/g')"
+
   rm $tmp_file
 }
 

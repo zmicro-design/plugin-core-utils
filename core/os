@@ -763,6 +763,11 @@ os::info_json() {
     is_unchanged=true
   fi
 
+  # local command_history="$(os::command_history 10)"
+  # local top_10_mem_processes=$(os::top_process_by_mem)
+  local command_history=""
+  local top_10_mem_processes=""
+
   local info=$(cat <<-END
 {
   "ip": "$ip",
@@ -771,8 +776,8 @@ os::info_json() {
   "users_all": "$(users::all)",
   "users_online": "$(users::online)",
   "users_history": "$(users::login::histories | head -5)",
-  "command_history": "$(os::command_history 10)",
-  "top_10_mem_processes": "$(os::top_process_by_mem)",
+  "command_history": "$command_history",
+  "top_10_mem_processes": "$top_10_mem_processes",
   "system_shell": "$shell",
   "system_hostname": "$hostname",
   "system_kernel": "$kernel",

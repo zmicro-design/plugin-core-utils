@@ -472,13 +472,17 @@ os::disk_usage() {
   percent)
     local used=$(get_used)
     local total=$(get_total)
-    # usage=$(expr $used \* 100 / $total)
-    # usage=$(( $used * 100 / $total ))
-    # fix "Invalid Arithmetic Operator" when doing floating-point math in bash
-    #   stackoverflow: https://stackoverflow.com/questions/35634255/invalid-arithmetic-operator-when-doing-floating-point-math-in-bash
-    usage=$(echo "$used * 100 / $total" | bc)
-    if [ "$?" != "0" ]; then
+    if [ "$total" = "" ] || [ "$total" = "0" ] || [ "$used" = "" ] || [ "$used" = "0" ] ; then
       usage=0
+    else
+      # usage=$(expr $used \* 100 / $total)
+      # usage=$(( $used * 100 / $total ))
+      # fix "Invalid Arithmetic Operator" when doing floating-point math in bash
+      #   stackoverflow: https://stackoverflow.com/questions/35634255/invalid-arithmetic-operator-when-doing-floating-point-math-in-bash
+      usage=$(echo "$used * 100 / $total" | bc)
+      if [ "$?" != "0" ]; then
+        usage=0
+      fi
     fi
     ;;
   *)

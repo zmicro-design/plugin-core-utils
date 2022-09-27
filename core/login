@@ -97,6 +97,13 @@ login::git() {
   local registry=$1
   local username=$2
   local password=$3
+  local git_credentials_path=$4
+
+  if [ -z "$git_credentials_path" ]; then
+    git_credentials_path=$HOME/.git-credentials
+  fi
+
+  local protocol=https
 
   if [ "$registry" = "" ]; then
     log::error "[core][login::git] registry is required"
@@ -104,6 +111,10 @@ login::git() {
   fi
 
   if [ "$(string::match $registry ^http)" = "true" ]; then
+    if [ "${registry:0:5}" = "http:" ]; then
+      protocol=http
+    fi
+
     registry=$(string::replace $registry "http://" "")
     registry=$(string::replace $registry "https://" "")
   fi
@@ -124,9 +135,18 @@ login::git() {
   # use cache instead of store for safe
   # git config --global credential.helper 'cache --timeout=604800'
 
-  local credential=https://$username:$password@$registry
+  local credential=$protocol://$username:$password@$registry
 
-  echo $credential | fs::append $HOME/.git-credentials
+  if [ -f "$git_credentials_path" ]; then
+    cat $git_credentials_path | grep "$credential" >>/dev/null 2>&1
+    if [ "$?" = "0" ]; then
+      # found credential
+      # log::success "ignore"
+      return
+    fi
+  fi
+
+  echo $credential | fs::append $git_credentials_path
 }
 
 export -f login::docker

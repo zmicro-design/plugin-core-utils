@@ -1,0 +1,60 @@
+#!/bin/bash
+
+function test_login::git() {
+  local registry=https://git.zcorky.com
+  local username=username
+  local password=password
+  local git_credentials_path=/tmp/zmicro_core_utils_test_login_git_credentials
+
+  sudo rm -f $git_credentials_path
+
+  login::git $registry $username $password $git_credentials_path
+
+  testing::expect \
+    "${FUNCNAME[0]} - login::git" \
+    "to_equal" \
+    "https://$username:$password@git.zcorky.com" \
+    "$(cat $git_credentials_path)"
+
+  sudo rm -f $git_credentials_path
+}
+
+function test_login::git_http() {
+  local registry=http://git.zcorky.com
+  local username=username
+  local password=password
+  local git_credentials_path=/tmp/zmicro_core_utils_test_login_git_credentials
+
+  sudo rm -f $git_credentials_path
+
+  login::git $registry $username $password $git_credentials_path
+
+  testing::expect \
+    "${FUNCNAME[0]} - login::git http" \
+    "to_equal" \
+    "http://$username:$password@git.zcorky.com" \
+    "$(cat $git_credentials_path)"
+
+  sudo rm -f $git_credentials_path
+}
+
+function test_login::git_multi_times() {
+  local registry=https://git.zcorky.com
+  local username=username
+  local password=password
+  local git_credentials_path=/tmp/zmicro_core_utils_test_login_git_credentials
+
+  sudo rm -f $git_credentials_path
+
+  login::git $registry $username $password $git_credentials_path
+  login::git $registry $username $password $git_credentials_path
+  login::git $registry $username $password $git_credentials_path
+
+  testing::expect \
+    "${FUNCNAME[0]} - login::git multi_times" \
+    "to_equal" \
+    "https://$username:$password@git.zcorky.com" \
+    "$(cat $git_credentials_path)"
+
+  sudo rm -f $git_credentials_path
+}

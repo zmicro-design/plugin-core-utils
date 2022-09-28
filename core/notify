@@ -119,6 +119,7 @@ notify::update() {
 
 notify::login() {
   local ip=$(os::network_ip)
+  local internal_ip=$(os::network_ip_internal)
   local user=$(os::username)
   local company=$(os::hostname)
   local url=$ZMICRO_LOGIN_REPORT_URL
@@ -150,15 +151,16 @@ notify::login() {
 
   export NO_COLOR=true
   if [ "$(os::is_workspace)" = "true" ]; then
-    notify::feishu $url "[Login][workspace: ${company}][$user] $ip" "user: $user\nshell: $shell\nmachine ip: $ip\nlogin ip: $ssh\nzmicro: $(version::main)\ntimestamp: $timestamp"
+    notify::feishu $url "[Login][workspace: ${company}][$user] $ip" "user: $user\nshell: $shell\nmachine ip: $ip\ninternal ip: $internal_ip\nlogin ip: $ssh\nzmicro: $(version::main)\ntimestamp: $timestamp"
   else
-    notify::feishu $url "[Login][$user] $ip" "user: $user\nshell: $shell\nmachine ip: $ip\nlogin ip: $ssh\nzmicro: $(version::main)\ntimestamp: $timestamp"
+    notify::feishu $url "[Login][$user] $ip" "user: $user\nshell: $shell\nmachine ip: $ip\ninternal ip: $internal_ip\nlogin ip: $ssh\nzmicro: $(version::main)\ntimestamp: $timestamp"
   fi
 
   local log_json=$(
     cat <<-END
 {
   "ip": "$ip",
+  "internal_ip": "$internal_ip",
   "user": "$user",
   "shell": "$shell",
   "login_ip": "$ssh",

@@ -78,6 +78,10 @@ git::branch() {
   git rev-parse --abbrev-ref HEAD
 }
 
+git::tag() {
+  git describe --tags --abbrev=0
+}
+
 git::is_changed() {
   if [ "$(git status --porcelain)" != "" ]; then
     echo "true"
@@ -219,6 +223,54 @@ git::use_version() {
   git::switch_tag $version
 }
 
+# git::checkout checkouts git repository to context dir with specified branch
+git::checkout() {
+  local url=$1
+  local branch=$2
+  local context=$3
+
+  if [ -z "$url" ]; then
+    log::error "[git::checkout] url is required"
+    return 1
+  fi
+
+  if [ -z "$branch" ]; then
+    log::error "[git::checkout] branch is required"
+    return 1
+  fi
+
+  if [ -z "$context" ]; then
+    log::error "[git::checkout] context is required"
+    return 1
+  fi
+
+  # if [ -d "$context" ]; then
+  #   log::error "[git::checkout] context($context) is already exists, please remove it first."
+  #   return 1
+  # fi
+
+  if [ ! -d "$context" ]; then
+    log::info "[git::checkout] check out new repository with branch $branch to $context ..."
+    git clone $url -b $branch $context --depth 1 >>/dev/null 2>&1
+    return
+  fi
+
+  cd $context
+  local repo_url=$(git::repo_url)
+  if [ "$repo_url" != "$url" ]; then
+    log::info "[git::checkout] repo url not match(got: $repo_url, want: $url), create new ..."
+    rm -rf $context
+    git clone $url -b $branch $context --depth 1 >>/dev/null 2>&1
+    return
+  fi
+
+  log::info "[git::checkout] updating remote branch at context($context)..."
+  git fetch origin >>/dev/null # $branch
+
+  log::info "[git::checkout] switch to branch($branch) ..."
+  git checkout $branch >>/dev/null 2>&1
+}
+
 export -f git::commit_message
 export -f git::commit_message_full
 export -f git::commit_hash
@@ -237,6 +289,7 @@ export -f git::basename
 export -f git::repo_name
 
 export -f git::branch
+export -f git::tag
 
 export -f git::is_changed
 export -f git::is_added_before_commit
@@ -252,3 +305,5 @@ export -f git::url_ssh_to_http
 export -f git::has_tag
 export -f git::switch_tag
 export -f git::use_version
+
+export -f git::checkout

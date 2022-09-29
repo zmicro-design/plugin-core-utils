@@ -174,3 +174,47 @@ function test_git::url_ssh_to_http() {
     "$expected" \
     "$received"
 }
+
+function test_git::checkout() {
+  local url="https://github.com/zcorky/zmicro"
+  local branch="v1.21.20"
+  local context="/tmp/zmicro_core_utils_test_git_checkout"
+
+  rm -rf $context
+
+  git::checkout $url $branch $context
+
+  cd $context
+
+  testing::expect \
+    "${FUNCNAME[0]} repo url" \
+    "to_equal" \
+    "$url" \
+    "$(git::repo_url)"
+
+  testing::expect \
+    "${FUNCNAME[0]} branch" \
+    "to_equal" \
+    "$branch" \
+    "$(git::tag)"
+
+  # exist
+  branch="v1.21.20"
+  git::checkout $url $branch $context
+
+  cd $context
+
+  testing::expect \
+    "${FUNCNAME[0]} repo url" \
+    "to_equal" \
+    "$url" \
+    "$(git::repo_url)"
+
+  testing::expect \
+    "${FUNCNAME[0]} branch" \
+    "to_equal" \
+    "$branch" \
+    "$(git::tag)"
+
+  rm -rf $context
+}

@@ -184,37 +184,33 @@ function test_git::checkout() {
 
   git::checkout $url $branch $context
 
-  cd $context
-
   testing::expect \
     "${FUNCNAME[0]} repo url" \
     "to_equal" \
     "$url" \
-    "$(git::repo_url)"
+    "$(git::repo_url $context)"
 
   testing::expect \
     "${FUNCNAME[0]} branch" \
     "to_equal" \
     "$branch" \
-    "$(git::tag)"
+    "$(git::tag $context)"
 
   # exist
   branch="v1.21.20"
   git::checkout $url $branch $context
 
-  cd $context
-
   testing::expect \
     "${FUNCNAME[0]} repo url" \
     "to_equal" \
     "$url" \
-    "$(git::repo_url)"
+    "$(git::repo_url $context)"
 
   testing::expect \
     "${FUNCNAME[0]} branch" \
     "to_equal" \
     "$branch" \
-    "$(git::tag)"
+    "$(git::tag $context)"
 
   rm -rf $context
 }

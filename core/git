@@ -59,26 +59,56 @@ git::fix_permissions() {
 }
 
 git::origin_url() {
+  local context=$1
+  if [ -n "$context" ]; then
+    cd $context
+  fi
+
   git config --get remote.origin.url
 }
 
 git::namespace() {
+  local context=$1
+  if [ -n "$context" ]; then
+    cd $context
+  fi
+
   git::origin_url | awk -F '/' '{print $4}'
 }
 
 git::basename() {
+  local context=$1
+  if [ -n "$context" ]; then
+    cd $context
+  fi
+
   git::origin_url | awk -F '/' '{print $5}' | awk -F '.git' '{print $1}'
 }
 
 git::repo_name() {
+  local context=$1
+  if [ -n "$context" ]; then
+    cd $context
+  fi
+
   echo "$(git::namespace)/$(git::basename)"
 }
 
 git::branch() {
+  local context=$1
+  if [ -n "$context" ]; then
+    cd $context
+  fi
+
   git rev-parse --abbrev-ref HEAD
 }
 
 git::tag() {
+  local context=$1
+  if [ -n "$context" ]; then
+    cd $context
+  fi
+
   git describe --tags --abbrev=0
 }
 
@@ -105,6 +135,11 @@ git::is_ready_to_commit() {
 }
 
 git::repo_url() {
+  local context=$1
+  if [ -n "$context" ]; then
+    cd $context
+  fi
+
   local url=$(git::origin_url)
   echo "${url%.git}"
 }
@@ -256,11 +291,13 @@ git::checkout() {
   fi
 
   cd $context
+
   local repo_url=$(git::repo_url)
   if [ "$repo_url" != "$url" ]; then
     log::info "[git::checkout] repo url not match(got: $repo_url, want: $url), create new ..."
     rm -rf $context
     git clone $url -b $branch $context --depth 1 >>/dev/null 2>&1
+    cd -
     return
   fi
 
@@ -269,6 +306,8 @@ git::checkout() {
 
   log::info "[git::checkout] switch to branch($branch) ..."
   git checkout $branch >>/dev/null 2>&1
+
+  cd - >>/dev/null
 }
 
 export -f git::commit_message

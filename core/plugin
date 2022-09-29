@@ -559,7 +559,7 @@ plugin::run() {
     zmicro plugin register $plugin_name
   elif [ "$plugin_command_real" = "release" ]; then
     zmicro plugin release $plugin_name
-  elif [ "$plugin_command_real" = "use" ]; then
+  elif [ "$plugin_command_real" = "use" ] && [ ! -f "$PLUGIN_DIR/commands/use" ]; then
     zmicro plugin use $plugin_name $plugin_command_args_real
   elif [ "$plugin_command_real" = "go" ] && [ "$plugin_command_args_real" != "-h" ] && [ "$plugin_command_args_real" != "--help" ]; then
     zmicro go plugin $plugin_name $plugin_command_args_real

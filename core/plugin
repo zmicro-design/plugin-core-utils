@@ -752,6 +752,13 @@ plugin::has_update() {
 
   local version=$(plugin::get_version $name)
   local remote_version=$(plugin::get_remote_version $name)
+
+  # @TODO cannot get the remote version cased by timout
+  if [ "$remote_version" = "" ]; then
+    echo "false"
+    return
+  fi
+
   if [ "$version" != "$remote_version" ]; then
     echo "true"
   else
@@ -803,7 +810,12 @@ plugin::get_remote_version() {
   fi
 
   local mod_url=$(plugin::get_remote_mod_url $name)
-  local mod_info=$(curl -s $mod_url 2>/dev/null)
+  local mod_info=$(curl -s $mod_url --connect-timeout 3 2>/dev/null)
+  # @TODO timeout
+  if [ "$?" != "0" ]; then
+    return
+  fi
+
   if [ -z "$mod_info" ]; then
     log::error "[$(timestamp)][plugin::get_remote_version] plugin $name mod info not found"
     exit 1

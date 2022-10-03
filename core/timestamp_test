@@ -1,0 +1,104 @@
+#!/bin/bash
+
+function test_timestamp::in_x_minutes() {
+  local lastlogin=$(timestamp)
+  testing::expect \
+    "${FUNCNAME[0]}" \
+    "to_equal" \
+    "true" \
+    "$(timestamp::in_x_minutes 10 $lastlogin)"
+
+  lastlogin=$(date +%s)
+  testing::expect \
+    "${FUNCNAME[0]}" \
+    "to_equal" \
+    "true" \
+    "$(timestamp::in_x_minutes 10 $lastlogin)"
+
+  lastlogin=$(($lastlogin - 10 * 60 + 1))
+  testing::expect \
+    "${FUNCNAME[0]}" \
+    "to_equal" \
+    "true" \
+    "$(timestamp::in_x_minutes 10 $lastlogin)"
+
+  lastlogin=$(($lastlogin - 1))
+  testing::expect \
+    "${FUNCNAME[0]}" \
+    "to_equal" \
+    "false" \
+    "$(timestamp::in_x_minutes 10 $lastlogin)"
+}
+
+function test_timestamp::recently() {
+  local lastlogin=$(timestamp)
+  testing::expect \
+    "${FUNCNAME[0]}" \
+    "to_equal" \
+    "true" \
+    "$(timestamp::recently $lastlogin)"
+
+  lastlogin=$(date +%s)
+  testing::expect \
+    "${FUNCNAME[0]}" \
+    "to_equal" \
+    "true" \
+    "$(timestamp::recently $lastlogin)"
+
+  lastlogin=$(($lastlogin - 5 * 60 + 1))
+  testing::expect \
+    "${FUNCNAME[0]}" \
+    "to_equal" \
+    "true" \
+    "$(timestamp::recently $lastlogin)"
+
+  lastlogin=$(($lastlogin - 1))
+  testing::expect \
+    "${FUNCNAME[0]}" \
+    "to_equal" \
+    "false" \
+    "$(timestamp::recently $lastlogin)"
+}
+
+function test_timestamp::now() {
+  local lastlogin=$(timestamp)
+  testing::expect \
+    "${FUNCNAME[0]}" \
+    "to_equal" \
+    "$(date +%s)" \
+    "$(timestamp::now)"
+}
+
+function test_timestamp::gt() {
+  local a=$(timestamp::now)
+  local b=$((a + 1))
+
+  testing::expect \
+    "${FUNCNAME[0]}" \
+    "to_equal" \
+    "false" \
+    "$(timestamp::gt $a $a)"
+
+  testing::expect \
+    "${FUNCNAME[0]}" \
+    "to_equal" \
+    "false" \
+    "$(timestamp::gt $a $b)"
+}
+
+function test_timestamp::lt() {
+  local a=$(timestamp::now)
+  local b=$((a + 1))
+
+  testing::expect \
+    "${FUNCNAME[0]}" \
+    "to_equal" \
+    "false" \
+    "$(timestamp::lt $a $a)"
+
+  testing::expect \
+    "${FUNCNAME[0]}" \
+    "to_equal" \
+    "false" \
+    "$(timestamp::lt $b $a)"
+}

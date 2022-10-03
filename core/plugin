@@ -874,41 +874,38 @@ plugin::use() {
   log::success "[$(timestamp)][plugin::use] plugin $name version use $version success"
 }
 
-# plugin::backup backups the plugin data
-plugin::backup() {
+# plugin::auto_backup backups the plugin data
+plugin::auto_backup() {
   local name=$1
   if [ -z "$name" ]; then
-    log::error "[$(timestamp)][plugin::backup] plugin name is required"
+    log::error "[$(timestamp)][plugin::auto_backup] plugin name is required"
     exit 1
   fi
 
   local data_dir=$(plugin::get_app_data_path $name)
   local cron_name=zmicro_plugin_backup_${name}
-  local cron_time="$PLUGIN_CRON_TIME"
-  if [ -z "$cron_time" ]; then
-    cron_time="0 2 1 _/1 _"
-  fi
+  local cron_time="0 2 1 _/1 _"
 
   if [ "$(zmicro cron has $cron_name)" = "true" ]; then
     zmicro cron status "$cron_name" "0 9 _/1 _ _ " >>/dev/null 2>&1
     if [ "$?" != "0" ]; then
       zmicro cron enable $cron_name
 
-      log::success "[plugin::backup] auto backup enabled"
+      log::success "[plugin::auto_backup] auto backup enabled"
       exit 0
     fi
 
-    log::success "[plugin::backup] auto backup is running"
+    log::success "[plugin::auto_backup] auto backup is running"
     return
   fi
 
   # zmicro cron create $cron_name 0 2 1 _/1 _ zmicro backup create $name $data_dir >>/dev/null
   zmicro cron create $cron_name $cron_time zmicro backup create $name $data_dir >>/dev/null
   if [ "$?" != "0" ]; then
-    log::error "[plugin::backup] failed to create auto backup"
+    log::error "[plugin::auto_backup] failed to create auto backup"
     exit 1
   else
-    log::success "[plugin::backup] auto backup ok at 02:00 AM this first day of every month"
+    log::success "[plugin::auto_backup] auto backup ok at 02:00 AM this first day of every month"
   fi
 }
 
@@ -971,4 +968,4 @@ export -f plugin::get_remote_mod_url
 
 export -f plugin::use
 
-export -f plugin::backup
+export -f plugin::auto_backup

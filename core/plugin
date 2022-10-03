@@ -934,7 +934,7 @@ plugin::auto_update() {
     return
   fi
 
-  # zmicro cron create $cron_name 0 11 _/1 _ _ zmicro update create $name $data_dir >>/dev/null
+  # zmicro cron create $cron_name 0 11 _/1 _ _ zmicro update -a >>/dev/null
   zmicro cron create $cron_name $cron_time $name update -a >>/dev/null
   if [ "$?" != "0" ]; then
     log::error "[plugin::auto_update] failed to create auto update"

@@ -561,6 +561,10 @@ plugin::run() {
     zmicro plugin release $plugin_name
   elif [ "$plugin_command_real" = "use" ] && [ ! -f "$PLUGIN_DIR/commands/use" ]; then
     zmicro plugin use $plugin_name $plugin_command_args_real
+  elif [ "$plugin_command_real" = "auto" ] && [ "$plugin_command_args_real" = "update" ] && [ ! -f "$PLUGIN_DIR/commands/auto/update" ]; then
+    plugin::auto_update $plugin_name
+  elif [ "$plugin_command_real" = "auto" ] && [ "$plugin_command_args_real" = "backup" ] && [ ! -f "$PLUGIN_DIR/commands/auto/backup" ]; then
+    plugin::auto_backup $plugin_name
   elif [ "$plugin_command_real" = "go" ] && [ "$plugin_command_args_real" != "-h" ] && [ "$plugin_command_args_real" != "--help" ]; then
     zmicro go plugin $plugin_name $plugin_command_args_real
   elif [ "$plugin_command_real" = "code" ]; then
@@ -874,6 +878,76 @@ plugin::use() {
   log::success "[$(timestamp)][plugin::use] plugin $name version use $version success"
 }
 
+# plugin::auto_backup backups the plugin data
+plugin::auto_backup() {
+  local name=$1
+  if [ -z "$name" ]; then
+    log::error "[$(timestamp)][plugin::auto_backup] plugin name is required"
+    exit 1
+  fi
+
+  local data_dir=$(plugin::get_app_data_path $name)
+  local cron_name=zmicro_plugin_auto_backup_${name}
+  local cron_time="0 2 1 _/1 _"
+
+  if [ "$(zmicro cron has $cron_name)" = "true" ]; then
+    zmicro cron status "$cron_name" "$cron_time" >>/dev/null 2>&1
+    if [ "$?" != "0" ]; then
+      zmicro cron enable $cron_name
+
+      log::success "[plugin::auto_backup] auto backup enabled"
+      exit 0
+    fi
+
+    log::success "[plugin::auto_backup] auto backup is running"
+    return
+  fi
+
+  # zmicro cron create $cron_name 0 2 1 _/1 _ zmicro backup create $name $data_dir >>/dev/null
+  zmicro cron create $cron_name $cron_time zmicro backup create $name $data_dir >>/dev/null
+  if [ "$?" != "0" ]; then
+    log::error "[plugin::auto_backup] failed to create auto backup"
+    exit 1
+  else
+    log::success "[plugin::auto_backup] auto backup ok at 02:00 AM this first day of every month"
+  fi
+}
+
+# plugin::auto_update updates the plugin data
+plugin::auto_update() {
+  local name=$1
+  if [ -z "$name" ]; then
+    log::error "[$(timestamp)][plugin::auto_update] plugin name is required"
+    return 1
+  fi
+
+  local data_dir=$(plugin::get_app_data_path $name)
+  local cron_name=zmicro_plugin_auto_update_${name}
+  local cron_time="0 11 _/1 _ _"
+
+  if [ "$(zmicro cron has $cron_name)" = "true" ]; then
+    zmicro cron status "$cron_name" "$cron_time" >>/dev/null 2>&1
+    if [ "$?" != "0" ]; then
+      zmicro cron enable $cron_name
+
+      log::success "[plugin::auto_update] auto update enabled"
+      return 0
+    fi
+
+    log::success "[plugin::auto_update] auto update is running"
+    return
+  fi
+
+  # zmicro cron create $cron_name 0 11 _/1 _ _ zmicro update -a >>/dev/null
+  zmicro cron create $cron_name $cron_time $name update >>/dev/null
+  if [ "$?" != "0" ]; then
+    log::error "[plugin::auto_update] failed to create auto update"
+    return 1
+  else
+    log::success "[plugin::auto_update] auto update ok at 11:00 AM every day"
+  fi
+}
+
 export -f plugin::register_all
 export -f plugin::register
 export -f plugin::unregister
@@ -932,3 +1006,6 @@ export -f plugin::get_remote_version
 export -f plugin::get_remote_mod_url
 
 export -f plugin::use
+
+export -f plugin::auto_backup
+export -f plugin::auto_update

@@ -1,6 +1,7 @@
 #!/bin/bash
 
 pm() {
+  # MacOS
   if [ "$(os::is_macos)" = "true" ]; then
     which brew >>/dev/null 2>&1
     if [ "$?" != "0" ]; then
@@ -24,27 +25,110 @@ pm() {
     return
   fi
 
+  # CentOS
   which yum >>/dev/null 2>&1
   if [ "$?" = "0" ]; then
     sudo yum $@
     return
   fi
 
+  # Ubuntu/Debian
   which apt >>/dev/null 2>&1
   if [ "$?" = "0" ]; then
     sudo apt $@
     return
   fi
 
+  # Alpine
   which apk >>/dev/null 2>&1
   if [ "$?" = "0" ]; then
     sudo apk $@
     return
   fi
 
+  # Fedora
   which dnf >>/dev/null 2>&1
   if [ "$?" = "0" ]; then
     sudo dnf $@
+    return
+  fi
+
+  # Archlinux
+  which pacman >>/dev/null 2>&1
+  if [ "$?" = "0" ]; then
+    # ignore -yqq in mac
+    local args=""
+    for arg in $@; do
+      case $arg in
+      -yqq) ;;
+      -y) ;;
+      install)
+        args="$args -Syu"
+        ;;
+      *)
+        args="$args $arg"
+        ;;
+      esac
+    done
+
+    sudo pacman $args
+    return
+  fi
+
+  # Flatpak
+  which flatpak >>/dev/null 2>&1
+  if [ "$?" = "0" ]; then
+    # ignore -yqq in mac
+    local args=""
+    for arg in $@; do
+      case $arg in
+      -yqq) ;;
+      -y) ;;
+      *)
+        args="$args $arg"
+        ;;
+      esac
+    done
+
+    sudo flatpak $args
+    return
+  fi
+
+  # Scoop
+  which scoop >>/dev/null 2>&1
+  if [ "$?" = "0" ]; then
+    # ignore -yqq in mac
+    local args=""
+    for arg in $@; do
+      case $arg in
+      -yqq) ;;
+      -y) ;;
+      *)
+        args="$args $arg"
+        ;;
+      esac
+    done
+
+    sudo scoop $args
+    return
+  fi
+
+  # Winget
+  which winget >>/dev/null 2>&1
+  if [ "$?" = "0" ]; then
+    # ignore -yqq in mac
+    local args=""
+    for arg in $@; do
+      case $arg in
+      -yqq) ;;
+      -y) ;;
+      *)
+        args="$args $arg"
+        ;;
+      esac
+    done
+
+    sudo winget $args
     return
   fi
 

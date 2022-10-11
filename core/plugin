@@ -809,20 +809,26 @@ plugin::get_remote_mod_url() {
 plugin::get_remote_version() {
   local name=$1
   if [ -z "$name" ]; then
-    log::error "[$(timestamp)][plugin::get_remote_version] plugin name is required"
+    log::error "[plugin::get_remote_version] plugin name is required"
     exit 1
   fi
 
   local mod_url=$(plugin::get_remote_mod_url $name)
-  local mod_info=$(curl -s $mod_url --connect-timeout 3 2>/dev/null)
-  # @TODO timeout
+  curl -s $mod_url --connect-timeout 3 >>/dev/null 2>&1
   if [ "$?" != "0" ]; then
     return
   fi
 
+  local mod_info=$(curl -s $mod_url --connect-timeout 3 2>/dev/null)
   if [ -z "$mod_info" ]; then
-    log::error "[$(timestamp)][plugin::get_remote_version] plugin $name mod info not found"
-    exit 1
+    return
+  fi
+
+  echo $mod_info | grep "Not Found" >>/dev/null 2>/dev/null
+  if [ "$?" = "0" ]; then
+    # @TODO
+    # log::error "[plugin::get_remote_version] plugin $name mod info not found"
+    return 1
   fi
 
   local version=$(echo -e "$mod_info" | grep "PLUGIN_VERSION=" | cut -d "=" -f 2)

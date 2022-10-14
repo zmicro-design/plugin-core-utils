@@ -1,0 +1,72 @@
+#!/bin/bash
+
+# sync::docker_image syncs docker images
+#   principle:
+#     docker hub => thirdparty docker registry => pull from the docker registry
+#     official => private => pull from private
+#  example:
+#    sync::docker_image whatwewant/zmicro:v1 registry.example.com root@remote
+#    sync::docker_image whatwewant/zmicro:v1 registry.workspace.com workpace_xxx
+sync::docker_image() {
+  local name=$1
+  local registry=$2
+  local remote=$3
+
+  if [ -z "$name" ]; then
+    log::error "[sync::docker_image] image name is required"
+    return 1
+  fi
+
+  if [ -z "$registry" ]; then
+    log::error "[sync::docker_image] image registry is required"
+    return 1
+  fi
+
+  if [ -z "$remote" ]; then
+    log::error "[sync::docker_image] remote server is required"
+    return 1
+  fi
+
+  # log::info "[sync::docker_image][remote] pull from docker hub ..."
+  # ssh $remote docker pull $name
+
+  # log::info "[sync::docker_image][remote] create registry tag ..."
+  # ssh $remote docker tag $name $registry/$name
+
+  # log::info "[sync::docker_image][remote] push to private registry ..."
+  # ssh $remote docker push $registry/$name
+
+  log::info "[sync::docker_image][remote] sync docker hub => private registry ..."
+  ssh $remote <<EOF
+  echo "[sync::docker_image][remote] pull from docker hub ..."
+  docker pull $name
+
+  echo "[sync::docker_image][remote] create registry tag ..."
+  docker tag $name $registry/$name
+
+  echo "[sync::docker_image][remote] push to private registry ..."
+  docker push $registry/$name
+EOF
+  if [ "$?" != "0" ]; then
+    log::error "[sync::docker_image] failed to sync docker hub => private registry."
+    return 1
+  fi
+
+  log::info "[sync::docker_image][remote] sync private registry => local ..."
+
+  log::info "[sync::docker_image][remote] pull from private registry ..."
+  docker pull $registry/$name
+  if [ "$?" != "0" ]; then
+    log::error "[sync::docker_image] failed to pull from private registry."
+    return 1
+  fi
+
+  log::info "[sync::docker_image][remote] reset tag ..."
+  docker tag $registry/$name $name
+  if [ "$?" != "0" ]; then
+    log::error "[sync::docker_image] failed to reset tag."
+    return 1
+  fi
+}
+
+export -f sync::docker_image

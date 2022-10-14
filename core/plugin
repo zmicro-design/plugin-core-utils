@@ -569,7 +569,7 @@ plugin::run() {
     zmicro go plugin $plugin_name $plugin_command_args_real
   elif [ "$plugin_command_real" = "code" ]; then
     zmicro code plugin $plugin_name
-  elif [ "$plugin_command_real" = "test" ]; then
+  elif [ "$plugin_command_real" = "test" ] && [ ! -f "$PLUGIN_DIR/commands/test" ]; then
     local script_path=$plugin_command_args_real
     if [ -z "$script_path" ]; then
       script_path="core"

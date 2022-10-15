@@ -102,10 +102,11 @@ net::is_port_visitable() {
     else
       echo "true"
     fi
-  else
-    # @TODO
-    echo "true"
+    return
   fi
+
+  # @TODO
+  echo "false"
 }
 
 net::get_ip() {
@@ -151,8 +152,7 @@ net::using_smart_proxy() {
       PROXY_PORT="$(zmicro config get PROXY_PORT)"
 
       if [ "$(net::is_ip $PROXY_IP)" = "true" ]; then
-        nc -z -v -n -w 1 $PROXY_IP $PROXY_PORT >>/dev/null 2>&1
-        if [ "$?" != "0" ]; then
+        if [ "$(net::is_port_visitable $PROXY_IP $PROXY_PORT)" != "true" ]; then
           PROXY_IP=""
           PROXY_PORT=""
         fi

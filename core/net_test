@@ -1,6 +1,12 @@
 #!/bin/bash
 
 function test_net::using_smart_proxy() {
+  if [ -n "$HTTPS_PROXY" ]; then
+    export HTTPS_PROXY=""
+    export HTTP_PROXY=""
+    export ALL_PROXY=""
+  fi
+
   local ORIGIN_CONFIG_PROXY_IP=$(config::get PROXY_IP)
   local ORIGIN_CONFIG_PROXY_PORT=$(config::get PROXY_PORT)
 

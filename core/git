@@ -290,6 +290,8 @@ git::checkout() {
   # apply proxy
   net::using_smart_proxy
 
+  log::debug "HTTPS_PROXY: $HTTP_PROXY"
+
   if [ ! -d "$context" ]; then
     log::info "[git::checkout] check out new repository with branch $branch to $context ..."
     git clone $url -b $branch $context --depth 1 >>/dev/null 2>&1

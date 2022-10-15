@@ -166,23 +166,28 @@ net::using_smart_proxy() {
     else
       # ClashZ
       # nc -z -v -n -w 1 127.0.0.1 17890 >>/dev/null 2>&1
-      if [ "$(net::is_port_visitable 127.0.0.1 17890)" = "true" ]; then
+      # if [ "$(net::is_port_visitable 127.0.0.1 17890)" = "true" ]; then
+      #   PROXY_IP="127.0.0.1"
+      #   PROXY_PORT="17890"
+      # else
+      #   # ClashX
+      #   # nc -z -v -n -w 1 127.0.0.1 7890 >>/dev/null 2>&1
+      #   if [ "$(net::is_port_visitable 127.0.0.1 7890)" = "0" ]; then
+      #     PROXY_IP="127.0.0.1"
+      #     PROXY_PORT="7890"
+      #   else
+      #     # ShadowsocksX-NG
+      #     # nc -z -v -n -w 1 127.0.0.1 1087 >>/dev/null 2>&1
+      #     if [ "$(net::is_port_visitable 127.0.0.1 1087)" = "0" ]; then
+      #       PROXY_IP="127.0.0.1"
+      #       PROXY_PORT="1087"
+      #     fi
+      #   fi
+      # fi
+      #
+      PROXY_PORT=$(net::try_to_get_proxy_port)
+      if [ "$PROXY_PORT" != "" ]; then
         PROXY_IP="127.0.0.1"
-        PROXY_PORT="17890"
-      else
-        # ClashX
-        # nc -z -v -n -w 1 127.0.0.1 7890 >>/dev/null 2>&1
-        if [ "$(net::is_port_visitable 127.0.0.1 7890)" = "0" ]; then
-          PROXY_IP="127.0.0.1"
-          PROXY_PORT="7890"
-        else
-          # ShadowsocksX-NG
-          # nc -z -v -n -w 1 127.0.0.1 1087 >>/dev/null 2>&1
-          if [ "$(net::is_port_visitable 127.0.0.1 1087)" = "0" ]; then
-            PROXY_IP="127.0.0.1"
-            PROXY_PORT="1087"
-          fi
-        fi
       fi
     fi
 
@@ -192,6 +197,22 @@ net::using_smart_proxy() {
       export HTTPS_PROXY=http://$PROXY_IP:$PROXY_PORT HTTP_PROXY=http://$PROXY_IP:$PROXY_PORT ALL_PROXY=socks5://$PROXY_IP:$PROXY_PORT
     fi
   fi
+}
+
+net::try_to_get_proxy_port() {
+  local network=${1:-"127.0.0.1"}
+  local ports=(
+    17890 # ClashZ
+    7890  # ClashX
+    1087  # ShadowsocksX-NG
+  )
+
+  for port in ${ports[@]}; do
+    if [ "$(net::is_port_visitable $network $port)" = "true" ]; then
+      echo $port
+      return
+    fi
+  done
 }
 
 export -f net::is_in_china
@@ -208,3 +229,4 @@ export -f net::get_ip
 export -f net::get_ip_internal
 
 export -f net::using_smart_proxy
+export -f net::try_to_get_proxy_port

@@ -204,6 +204,9 @@ pplugin::install() {
 
   # log::info "[pplugin::install] git clone $url -b $version $plugin_dir ..."
 
+  # apply proxy
+  net::using_smart_proxy
+
   local tmp_install_log=$(os::tmp_file) # $ZMICRO_LOG_ERROR_PATH
   git clone $url -b $version $plugin_dir >>$tmp_install_log 2>&1
   if [ $? -ne 0 ]; then
@@ -342,6 +345,9 @@ pplugin::release() {
   cp $mod_path $mod_path_tmp
   cat $mod_path_tmp | sed "s%${origin_version}%$new_version%" >$mod_path
   rm $mod_path_tmp
+
+  # apply proxy
+  net::using_smart_proxy
 
   git add mod
   git commit -m "chore(release): bumped version to ${new_version}"

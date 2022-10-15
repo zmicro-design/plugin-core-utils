@@ -34,7 +34,7 @@ function test_plugin::get_remote_url() {
 }
 
 function test_plugin::get_remote_version() {
-  local expected=$(curl -s https://raw.githubusercontent.com/zmicro-design/plugin-core-utils/master/mod | grep "PLUGIN_VERSION=" | cut -d "=" -f 2)
+  local expected=$(os::curl -s https://raw.githubusercontent.com/zmicro-design/plugin-core-utils/master/mod | grep "PLUGIN_VERSION=" | cut -d "=" -f 2)
   local received=$(plugin::get_remote_version core-utils)
 
   testing::expect \

@@ -234,6 +234,9 @@ git::switch_tag() {
     return 1
   fi
 
+  # apply proxy
+  net::using_smart_proxy
+
   git fetch origin tag $tag >>/dev/null
   if [ "$?" != "0" ]; then
     log::error "[git::switch_tag] failed to fetch tag: $tag"
@@ -283,6 +286,9 @@ git::checkout() {
   #   log::error "[git::checkout] context($context) is already exists, please remove it first."
   #   return 1
   # fi
+
+  # apply proxy
+  net::using_smart_proxy
 
   if [ ! -d "$context" ]; then
     log::info "[git::checkout] check out new repository with branch $branch to $context ..."

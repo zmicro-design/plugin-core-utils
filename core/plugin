@@ -696,6 +696,9 @@ plugin::update() {
       sudo chown -R $USER $plugin_path
     fi
 
+    # apply proxy
+    net::using_smart_proxy
+
     cd $plugin_path
     local tmp_update_log=$(os::tmp_file) # $ZMICRO_LOG_ERROR_PATH
     git pull origin master >>$tmp_update_log 2>&1
@@ -814,12 +817,12 @@ plugin::get_remote_version() {
   fi
 
   local mod_url=$(plugin::get_remote_mod_url $name)
-  curl -s $mod_url --connect-timeout 3 >>/dev/null 2>&1
+  os::curl -s $mod_url --connect-timeout 3 >>/dev/null 2>&1
   if [ "$?" != "0" ]; then
     return
   fi
 
-  local mod_info=$(curl -s $mod_url --connect-timeout 3 2>/dev/null)
+  local mod_info=$(os::curl -s $mod_url --connect-timeout 3 2>/dev/null)
   if [ -z "$mod_info" ]; then
     return
   fi
@@ -860,6 +863,9 @@ plugin::use() {
     log::info "[$(timestamp)][plugin::use] plugin $name version already is $version"
     return 0
   fi
+
+  # apply proxy
+  net::using_smart_proxy
 
   # @TODO special version
   if [ "$version" = "latest" ]; then

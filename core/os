@@ -1240,6 +1240,9 @@ os::wget() {
 }
 
 os::curl() {
+  # apply proxy
+  net::using_smart_proxy
+
   which curl >>/dev/null 2>&1
   if [ "$?" != "0" ]; then
     pm install -y curl

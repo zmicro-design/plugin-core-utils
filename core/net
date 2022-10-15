@@ -193,6 +193,9 @@ net::using_smart_proxy() {
 
     if [ -n "$PROXY_IP" ] && [ -n "$PROXY_PORT" ]; then
       log::debug "[$(timestamp)] using proxy: $PROXY_IP:$PROXY_PORT"
+      export PROXY_IP=$PROXY_IP
+      export PROXY_PORT=$PROXY_PORT
+      #
       export https_proxy=http://$PROXY_IP:$PROXY_PORT http_proxy=http://$PROXY_IP:$PROXY_PORT all_proxy=socks5://$PROXY_IP:$PROXY_PORT
       export HTTPS_PROXY=http://$PROXY_IP:$PROXY_PORT HTTP_PROXY=http://$PROXY_IP:$PROXY_PORT ALL_PROXY=socks5://$PROXY_IP:$PROXY_PORT
     fi

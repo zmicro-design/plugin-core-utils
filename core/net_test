@@ -1,0 +1,23 @@
+#!/bin/bash
+
+function test_net::using_smart_proxy() {
+  config::set PROXY_IP httpbin.zcorky.com
+  config::set PROXY_PORT 80
+
+  testing::expect \
+    "${FUNCNAME[0]}" \
+    "to_equal" \
+    "" \
+    "$HTTPS_PROXY"
+
+  net::using_smart_proxy
+
+  testing::expect \
+    "${FUNCNAME[0]}" \
+    "to_equal" \
+    "http://httpbin.zcorky.com:80" \
+    "$HTTPS_PROXY"
+
+  config::remove $PROXY_IP
+  config::remove $PROXY_PORT
+}

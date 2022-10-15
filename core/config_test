@@ -79,6 +79,8 @@ function test_config::set() {
 }
 
 function test_config::remove() {
+  config::remove CUSTOM_KEY_FOR_REMOVE
+
   testing::expect \
     "${FUNCNAME[0]}" \
     "to_equal" \

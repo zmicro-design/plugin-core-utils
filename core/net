@@ -140,6 +140,8 @@ net::get_ip_internal() {
 }
 
 net::using_smart_proxy() {
+  set +e
+
   # if no proxy is specified, check the proxy settings
   if [ -z "$HTTPS_PROXY" ]; then
     # @TODO auto check proxy and using
@@ -157,7 +159,7 @@ net::using_smart_proxy() {
           PROXY_PORT=""
         fi
       else
-        curl -I http:/$PROXY_IP:$PROXY_PORT --connect-timeout 3 >>/dev/null 2>&1
+        curl -s -I http://$PROXY_IP:$PROXY_PORT --connect-timeout 3 >>/dev/null 2>&1
         if [ "$?" != "0" ]; then
           PROXY_IP=""
           PROXY_PORT=""
@@ -181,6 +183,9 @@ net::using_smart_proxy() {
           if [ "$?" = "0" ]; then
             PROXY_IP="127.0.0.1"
             PROXY_PORT="1087"
+          else
+            PROXY_IP=""
+            PROXY_PORT=""
           fi
         fi
       fi
@@ -192,6 +197,8 @@ net::using_smart_proxy() {
       export HTTPS_PROXY=http://$PROXY_IP:$PROXY_PORT HTTP_PROXY=http://$PROXY_IP:$PROXY_PORT ALL_PROXY=socks5://$PROXY_IP:$PROXY_PORT
     fi
   fi
+
+  set -e
 }
 
 export -f net::is_in_china

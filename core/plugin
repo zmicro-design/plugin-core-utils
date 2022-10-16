@@ -33,8 +33,14 @@ plugin::register() {
   for bin in $bins; do
     local bin_path=$ZMICRO_HOME/bin/$bin
 
-    if [ -d "$plugin_bin_path/$bin" ]; then
+    # ignore not file type
+    if [ ! -f "$plugin_bin_path/$bin" ]; then
       continue
+    fi
+
+    if [ "$bin" = "alias" ]; then
+      log::info "[$(timestamp)][plugin][register] alias => $plugin_name ..."
+      bin_path=$ZMICRO_HOME/bin/$plugin_name
     fi
 
     if [ -f "$bin_path" ] || [ -x "$bin_path" ]; then
@@ -52,13 +58,17 @@ plugin::register() {
     local sub_bins=$(ls $plugin_sub_bin_path)
     for bin in $sub_bins; do
       local bin_path=$ZMICRO_HOME/bin/sub/$bin
+      if [ "$bin" = "alias" ]; then
+        log::info "[$(timestamp)][plugin][register][sub] alias => $plugin_name ..."
+        bin_path=$ZMICRO_HOME/bin/sub/$plugin_name
+      fi
 
       if [ -f "$bin_path" ] || [ -x "$bin_path" ]; then
-        log::debug "[$(timestamp)][plugin][$(color::red "remove")] old sub bin: $bin"
+        log::debug "[$(timestamp)][plugin][sub][$(color::red "remove")] old sub bin: $bin"
         rm $bin_path
       fi
 
-      log::success "[$(timestamp)][plugin][$(color::green "register")] $plugin_name sub bin: $(color::success $bin)"
+      log::success "[$(timestamp)][plugin][sub][$(color::green "register")] $plugin_name sub bin: $(color::success $bin)"
       ln -sf $plugin_sub_bin_path/$bin $bin_path
     done
   fi
@@ -107,6 +117,7 @@ plugin::register_all() {
   fi
 
   local plugins=$(ls $plugin_path)
+  local plugin_name=$(path::basename $plugin_path)
 
   log::debug "\n\n[$(timestamp)][plugin]"
   for plugin in $plugins; do
@@ -121,6 +132,11 @@ plugin::register_all() {
     for bin in $bins; do
       local bin_path=$ZMICRO_HOME/bin/$bin
       local plugin_bin_path=$plugin_path/$plugin/bin/$bin
+
+      if [ "$bin" = "alias" ]; then
+        log::info "[$(timestamp)][plugin][register][sub] alias => $plugin_name ..."
+        bin_path=$ZMICRO_HOME/bin/$plugin_name
+      fi
 
       if [ ! -f "$bin_path" ] && [ ! -x "$bin_path" ]; then
         log::debug "[$(timestamp)][plugin][register] $plugin bin: $bin"

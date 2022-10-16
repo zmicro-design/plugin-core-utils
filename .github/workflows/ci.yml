@@ -57,8 +57,12 @@ jobs:
           - macOS-latest
 
     steps:
+      - uses: actions/checkout@v2
+        with:
+          fetch-depth: "0"
+
       - name: Install Zmicro
         run: curl -o- https://raw.githubusercontent.com/zcorky/zmicro/master/install | bash
 
       - name: Run test cases
-        run: zmicro test core/
+        run: zmicro test core

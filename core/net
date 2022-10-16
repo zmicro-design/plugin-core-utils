@@ -144,8 +144,8 @@ net::using_smart_proxy() {
   # if no proxy is specified, check the proxy settings
   if [ -z "$HTTPS_PROXY" ]; then
     # @TODO auto check proxy and using
-    local PROXY_IP=""
-    local PROXY_PORT=""
+    export PROXY_IP=${PROXY_IP}
+    export PROXY_PORT=${PROXY_PORT}
     # CUSTOM
     if [ "$(zmicro config get PROXY_IP)" != "" ]; then
       PROXY_IP="$(zmicro config get PROXY_IP)"

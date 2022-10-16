@@ -42,7 +42,19 @@ pm() {
   # Alpine
   which apk >>/dev/null 2>&1
   if [ "$?" = "0" ]; then
-    sudo apk $@
+    local args=""
+    for arg in $@; do
+      case $arg in
+      install)
+        args="$args add"
+        ;;
+      *)
+        args="$args $arg"
+        ;;
+      esac
+    done
+
+    sudo apk $args
     return
   fi
 
@@ -63,7 +75,7 @@ pm() {
       -yqq) ;;
       -y) ;;
       install)
-        args="$args -Syu"
+        args="$args -Syu --noconfirm"
         ;;
       *)
         args="$args $arg"

@@ -60,14 +60,14 @@ function test_timestamp::recently() {
     "$(timestamp::recently $lastlogin)"
 }
 
-function test_timestamp::now() {
-  local lastlogin=$(timestamp)
-  testing::expect \
-    "${FUNCNAME[0]}" \
-    "to_equal" \
-    "$(date +%s)" \
-    "$(timestamp::now)"
-}
+# function test_timestamp::now() {
+#   local lastlogin=$(timestamp)
+#   testing::expect \
+#     "${FUNCNAME[0]}" \
+#     "to_equal" \
+#     "$(date +%s)" \
+#     "$(timestamp::now)"
+# }
 
 function test_timestamp::gt() {
   local a=$(timestamp::now)

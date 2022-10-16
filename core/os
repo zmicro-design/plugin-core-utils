@@ -1356,6 +1356,21 @@ os::top_process_by_mem() {
   fi
 }
 
+os::ssh() {
+  net::using_smart_proxy
+
+  local SSH_OPTIONS=""
+  if [ -n "$PROXY_IP" ] && [ -n "$PROXY_PORT" ]; then
+    SSH_OPTIONS='ProxyCommand nc -x $PROXY_IP:$PROXY_PORT %h %p'
+  fi
+
+  if [ -n "$SSH_OPTIONS" ]; then
+    ssh -o "$SSH_OPTIONS" $@
+  else
+    ssh $@
+  fi
+}
+
 export -f os::arch
 export -f os::platform
 export -f os::release
@@ -1485,3 +1500,5 @@ export -f os::is_eunomia_ci
 export -f os::command_history
 
 export -f os::top_process_by_mem
+
+export -f os::ssh

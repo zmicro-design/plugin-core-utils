@@ -1380,8 +1380,7 @@ os::git() {
 os::gzfetch() {
   net::using_smart_proxy
 
-  which gzfetch >>/dev/null 2>&1
-  if [ "$?" != "0" ]; then
+  if [ "$(os::is_command_exist gzfetch)" != "true" ]; then
     zmicro package install gzfetch
   fi
 

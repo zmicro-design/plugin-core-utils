@@ -147,11 +147,12 @@ net::using_smart_proxy() {
     export PROXY_IP=${PROXY_IP}
     export PROXY_PORT=${PROXY_PORT}
     # CUSTOM
-    if [ "$(zmicro config get PROXY_IP)" != "" ]; then
-      PROXY_IP="$(zmicro config get PROXY_IP)"
-      PROXY_PORT="$(zmicro config get PROXY_PORT)"
+    if [ "$(config::get PROXY_IP)" != "" ]; then
+      PROXY_IP="$(config::get PROXY_IP)"
+      PROXY_PORT="$(config::get PROXY_PORT)"
 
       if [ "$(net::is_ip $PROXY_IP)" = "true" ]; then
+        echo "22"
         if [ "$(net::is_port_visitable $PROXY_IP $PROXY_PORT)" != "true" ]; then
           PROXY_IP=""
           PROXY_PORT=""
@@ -164,27 +165,6 @@ net::using_smart_proxy() {
         fi
       fi
     else
-      # ClashZ
-      # nc -z -v -n -w 1 127.0.0.1 17890 >>/dev/null 2>&1
-      # if [ "$(net::is_port_visitable 127.0.0.1 17890)" = "true" ]; then
-      #   PROXY_IP="127.0.0.1"
-      #   PROXY_PORT="17890"
-      # else
-      #   # ClashX
-      #   # nc -z -v -n -w 1 127.0.0.1 7890 >>/dev/null 2>&1
-      #   if [ "$(net::is_port_visitable 127.0.0.1 7890)" = "0" ]; then
-      #     PROXY_IP="127.0.0.1"
-      #     PROXY_PORT="7890"
-      #   else
-      #     # ShadowsocksX-NG
-      #     # nc -z -v -n -w 1 127.0.0.1 1087 >>/dev/null 2>&1
-      #     if [ "$(net::is_port_visitable 127.0.0.1 1087)" = "0" ]; then
-      #       PROXY_IP="127.0.0.1"
-      #       PROXY_PORT="1087"
-      #     fi
-      #   fi
-      # fi
-      #
       PROXY_PORT=$(net::try_to_get_proxy_port)
       if [ "$PROXY_PORT" != "" ]; then
         PROXY_IP="127.0.0.1"

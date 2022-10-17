@@ -1365,10 +1365,16 @@ os::ssh() {
   fi
 
   if [ -n "$SSH_OPTIONS" ]; then
-    ssh -o "$SSH_OPTIONS" $@
+    ssh -o "$SSH_OPTIONS" "$@"
   else
     ssh $@
   fi
+}
+
+os::git() {
+  net::using_smart_proxy
+
+  git "$@"
 }
 
 export -f os::arch
@@ -1502,3 +1508,4 @@ export -f os::command_history
 export -f os::top_process_by_mem
 
 export -f os::ssh
+export -f os::git

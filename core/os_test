@@ -55,11 +55,13 @@ function test_os::base64_decode() {
 }
 
 function test_os::gzfetch() {
+  local received=$(os::gzfetch get https://httpbin.zcorky.com/ | awk '{print $1}')
+
   testing::expect \
     "${FUNCNAME[0]}" \
     "to_equal" \
     "hello," \
-    "$(os::gzfetch get https://httpbin.zcorky.com/) | awk '{print $1}'"
+    "$received"
 }
 
 # @TODO cannot works at GitHub Action(macOS-latest)

@@ -54,6 +54,14 @@ function test_os::base64_decode() {
     "$(os::base64_decode dGVzdA==)"
 }
 
+function test_os::gzfetch() {
+  testing::expect \
+    "${FUNCNAME[0]}" \
+    "to_equal" \
+    "hello," \
+    "$(os::gzfetch get https://httpbin.zcorky.com/) | awk '{print $1}'"
+}
+
 # @TODO cannot works at GitHub Action(macOS-latest)
 #   issue: /usr/local/lib/zmicro/commands/_internal/test: eval: line 10: syntax error near unexpected token `('
 #

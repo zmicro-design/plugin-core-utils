@@ -1377,6 +1377,17 @@ os::git() {
   git "$@"
 }
 
+os::gzfetch() {
+  net::using_smart_proxy
+
+  which gzfetch >>/dev/null 2>&1
+  if [ "$?" != "0" ]; then
+    zmicro package install gzfetch
+  fi
+
+  gzfetch "$@"
+}
+
 export -f os::arch
 export -f os::platform
 export -f os::release
@@ -1509,3 +1520,5 @@ export -f os::top_process_by_mem
 
 export -f os::ssh
 export -f os::git
+
+export -f os::gzfetch

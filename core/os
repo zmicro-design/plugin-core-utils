@@ -1381,7 +1381,7 @@ os::gzfetch() {
   net::using_smart_proxy
 
   if [ "$(os::is_command_exist gzfetch)" != "true" ]; then
-    zmicro package install gzfetch
+    zmicro package install gzfetch >> /dev/null 2>&1
   fi
 
   gzfetch "$@"

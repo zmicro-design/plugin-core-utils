@@ -3,17 +3,24 @@
 testing::expect() {
   local test_name=$1
   local test_func=$2
-  local test_args=${@:3}
+  local test_args="${@:3}"
 
   log::info "  Case: $test_name"
   # log::info "  $test_func $test_args"
-  eval "testing::expect::$test_func $test_args"
+  
+  # eval "testing::expect::$test_func $test_args"
+  local fn_name="testing::expect::$test_func"
+  # $fn_name $test_args
+  $fn_name "$@"
+
   # log::info "  $test_func $test_args"
 }
 
 testing::expect::to_equal() {
-  local expected=$1
-  local received=$2
+  # local expected=$1
+  # local received=$2
+  local expected=$3
+  local received=$4
   if [ "$received" != "$expected" ]; then
     log::error "    [$(timestamp)][expect_to_equal] expect($expected) but receive($received)"
     exit 1

@@ -33,28 +33,28 @@ function test_timestamp::in_x_minutes() {
 function test_timestamp::recently() {
   local lastlogin=$(timestamp)
   testing::expect \
-    "${FUNCNAME[0]}" \
+    "${FUNCNAME[0]} string" \
     "to_equal" \
     "true" \
     "$(timestamp::recently $lastlogin)"
 
   lastlogin=$(date +%s)
   testing::expect \
-    "${FUNCNAME[0]}" \
+    "${FUNCNAME[0]} number" \
     "to_equal" \
     "true" \
     "$(timestamp::recently $lastlogin)"
 
   lastlogin=$(($lastlogin - 5 * 60 + 1))
   testing::expect \
-    "${FUNCNAME[0]}" \
+    "${FUNCNAME[0]} equals" \
     "to_equal" \
     "true" \
     "$(timestamp::recently $lastlogin)"
 
   lastlogin=$(($lastlogin - 1))
   testing::expect \
-    "${FUNCNAME[0]}" \
+    "${FUNCNAME[0]} less than 1 second" \
     "to_equal" \
     "false" \
     "$(timestamp::recently $lastlogin)"
@@ -74,13 +74,13 @@ function test_timestamp::gt() {
   local b=$((a + 1))
 
   testing::expect \
-    "${FUNCNAME[0]}" \
+    "${FUNCNAME[0]} same" \
     "to_equal" \
     "false" \
     "$(timestamp::gt $a $a)"
 
   testing::expect \
-    "${FUNCNAME[0]}" \
+    "${FUNCNAME[0]} > 1s" \
     "to_equal" \
     "false" \
     "$(timestamp::gt $a $b)"
@@ -91,13 +91,13 @@ function test_timestamp::lt() {
   local b=$((a + 1))
 
   testing::expect \
-    "${FUNCNAME[0]}" \
+    "${FUNCNAME[0]} same " \
     "to_equal" \
     "false" \
     "$(timestamp::lt $a $a)"
 
   testing::expect \
-    "${FUNCNAME[0]}" \
+    "${FUNCNAME[0]} < 1s" \
     "to_equal" \
     "false" \
     "$(timestamp::lt $b $a)"

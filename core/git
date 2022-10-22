@@ -318,6 +318,14 @@ git::checkout() {
   cd - >>/dev/null
 }
 
+git::global_user() {
+  git config --global user.name
+}
+
+git::global_email() {
+  git config --global user.email
+}
+
 export -f git::commit_message
 export -f git::commit_message_full
 export -f git::commit_hash
@@ -354,3 +362,6 @@ export -f git::switch_tag
 export -f git::use_version
 
 export -f git::checkout
+
+export -f git::global_user
+export -f git::global_email

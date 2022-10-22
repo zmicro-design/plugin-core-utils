@@ -89,6 +89,33 @@ path::resolve() {
   fi
 }
 
+path::exist() {
+  local file_path=$1
+  if [ -z "$file_path" ]; then
+    log::error "[path:exist] path is required"
+    return 1
+  fi
+
+  # file
+  if [ -f "$file_path" ]; then
+    echo "true"
+    return
+  fi
+
+  # dir
+  if [ -d "$file_path" ]; then
+    echo "true"
+    return
+  fi
+
+  # link
+  if [ -L "$file_path" ]; then
+    echo "true"
+    return
+  fi
+
+  echo "false"
+}
 
 export -f get_current_path
 export -f path::is_file
@@ -101,3 +128,5 @@ export -f path::join
 export -f realpath
 
 export -f path::resolve
+
+export -f path::exist

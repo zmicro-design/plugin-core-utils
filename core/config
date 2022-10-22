@@ -486,6 +486,38 @@ config::unset_ignore_if_exists() {
   export CONFIG_IGNORE_IF_EXISTS=
 }
 
+config::profile_one() {
+  local profile=$1
+  local flag=$2
+  local text=$3
+
+  if [ ! -f $profile ]; then
+    touch $profile
+  fi
+
+  local found=$(fs::has_flag "$profile" "$flag")
+  if [ "$found" != "true" ]; then
+    echo "$text" | fs::write -a $profile
+  fi
+}
+
+config::profile() {
+  local flag=$1
+  local text=$2
+  local base_path=${3:-$HOME}
+  
+  local filenames=(
+    .zshrc
+    .bashrc
+    .bash_profile
+    .profile
+  )
+
+  for f in ${filenames[@]}; do
+    config::profile_one "$base_path/$f" "$flag" "$text"
+  done
+}
+
 export -f config::load_file
 export -f config::load_dir
 
@@ -518,3 +550,6 @@ export -f config::set_ignore_if_exists
 
 export -f config::unset_filepath
 export -f config::unset_ignore_if_exists
+
+export -f config::profile_one
+export -f config::profile

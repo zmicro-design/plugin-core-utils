@@ -103,3 +103,77 @@ function test_config::remove() {
     "" \
     "$(config::get CUSTOM_KEY_FOR_REMOVE)"
 }
+
+function test_config::profile() {
+  local flag="ZMICRO_TEST_PROFILE"
+  local text=$(
+    cat <<-END
+# ZMICRO_TEST_PROFILE
+export ZMICRO_HOME=${ZMICRO_HOME}
+export PATH=\$ZMICRO_HOME/bin:\$PATH 
+END
+  )
+  local base_path=/tmp/test_config_profile
+  rm -rf $base_path
+  mkdir -p $base_path
+
+  config::profile "$flag" "$text" "$base_path"
+
+  testing::expect \
+    "${FUNCNAME[0]} found .zshrc" \
+    "to_equal" \
+    "true" \
+    "$(path::exist $base_path/.zshrc)"
+
+  testing::expect \
+    "${FUNCNAME[0]} found .bashrc" \
+    "to_equal" \
+    "true" \
+    "$(path::exist $base_path/.bashrc)"
+
+  testing::expect \
+    "${FUNCNAME[0]} found .bash_profile" \
+    "to_equal" \
+    "true" \
+    "$(path::exist $base_path/.bash_profile)"
+
+  testing::expect \
+    "${FUNCNAME[0]} found .profile" \
+    "to_equal" \
+    "true" \
+    "$(path::exist $base_path/.profile)"
+
+  local lines=$(cat $base_path/.zshrc | grep $flag | wc -l)
+  testing::expect \
+    "${FUNCNAME[0]} count .zshrc exist flag 1" \
+    "to_equal" \
+    "1" \
+    "$lines"
+
+  lines=$(cat $base_path/.bashrc | grep $flag | wc -l)
+  testing::expect \
+    "${FUNCNAME[0]} count .bashrc exist flag 1" \
+    "to_equal" \
+    "1" \
+    "$lines"
+
+  config::profile "$flag" "$text" "$base_path"
+  config::profile "$flag" "$text" "$base_path"
+  config::profile "$flag" "$text" "$base_path"
+
+  lines=$(cat $base_path/.zshrc | grep $flag | wc -l)
+  testing::expect \
+    "${FUNCNAME[0]} count .zshrc exist flag 1" \
+    "to_equal" \
+    "1" \
+    "$lines"
+
+  lines=$(cat $base_path/.bashrc | grep $flag | wc -l)
+  testing::expect \
+    "${FUNCNAME[0]} count .bashrc exist flag 1" \
+    "to_equal" \
+    "1" \
+    "$lines"
+
+  rm -rf $base_path
+}

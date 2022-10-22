@@ -224,6 +224,35 @@ fs::watch() {
   done
 }
 
+fs::has_flag() {
+  local filepath=$1
+  local flag=$2
+
+  if [ ! -e "$filepath" ]; then
+    log::error "[$(timestamp)][fs::has_flag] filepath($filepath) not found"
+    exit 1
+  fi
+
+  if [ ! -f "$filepath" ]; then
+    log::error "[$(timestamp)][fs::has_flag] filepath($filepath) should be a file, but not"
+    exit 1
+  fi
+
+  if [ -z "$flag" ]; then
+    log::error "[$(timestamp)][fs::has_flag] flag is required"
+    exit 1
+  fi
+
+  set +e 
+
+  cat $filepath | grep -q "$flag" >>/dev/null 2>&1
+  if [ "$?" != "0" ]; then
+    echo "false"
+  else
+    echo "true"
+  fi
+}
+
 export -f fs::write
 export -f fs::read
 
@@ -234,3 +263,5 @@ export -f fs::remove_line_has_str
 export -f fs::remove_empty_line
 
 export -f fs::watch
+
+export -f fs::has_flag

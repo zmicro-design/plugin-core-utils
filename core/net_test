@@ -47,3 +47,31 @@ function test_net::using_smart_proxy() {
     export HTTPS_PROXY= HTTP_PROXY= ALL_PROXY=
   fi
 }
+
+function test_net::status_code() {
+    testing::expect \
+      "${FUNCNAME[0]} 200" \
+      "to_equal" \
+      "200" \
+      "$(net::status_code https://httpbin.zcorky.com/)"
+
+    testing::expect \
+      "${FUNCNAME[0]} 404" \
+      "to_equal" \
+      "404" \
+      "$(net::status_code https://httpbin.zcorky.com/404)"
+}
+
+function test_net::is_not_found() {
+    testing::expect \
+      "${FUNCNAME[0]} found" \
+      "to_equal" \
+      "false" \
+      "$(net::is_not_found https://httpbin.zcorky.com/)"
+
+    testing::expect \
+      "${FUNCNAME[0]} not found" \
+      "to_equal" \
+      "true" \
+      "$(net::is_not_found https://httpbin.zcorky.com/404)"
+}

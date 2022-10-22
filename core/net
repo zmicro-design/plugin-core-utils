@@ -198,6 +198,30 @@ net::try_to_get_proxy_port() {
   done
 }
 
+net::status_code() {
+  local url=$1
+  if [ -z "$url" ]; then
+    log::error "[net::status_code] url is required"
+    return 1
+  fi
+
+  curl -s -o /dev/null -w "%{http_code}" $url
+}
+
+net::is_not_found() {
+  local url=$1
+  if [ -z "$url" ]; then
+    log::error "[net::is_not_found] url is required"
+    return 1
+  fi
+
+  if [ "$(net::status_code $url)" = "404" ]; then
+    echo "true"
+  else
+    echo "false"
+  fi
+}
+
 export -f net::is_in_china
 export -f net::is_github_visitable
 export -f net::is_google_visitable
@@ -213,3 +237,6 @@ export -f net::get_ip_internal
 
 export -f net::using_smart_proxy
 export -f net::try_to_get_proxy_port
+
+export -f net::status_code
+export -f net::is_not_found

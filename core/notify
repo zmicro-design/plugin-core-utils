@@ -101,6 +101,14 @@ notify::update::now() {
   notify::logs $log_url "[Update][${version_change}] $ip - $user" "$(os::info_json)"
 }
 
+notify::install() {
+  local ip=$(os::network_ip)
+  local user=$(os::username)
+  local message=$(os::info)
+
+  notify::feishu $ZMICRO_INSTALL_REPORT_URL "[Install] $ip - $user" "$message"
+}
+
 notify::update() {
   if [ "$(os::is_macos)" = "true" ]; then
     notify::update::now "$@"
@@ -303,6 +311,8 @@ notify::login_disable() {
 export -f notify::feishu
 
 export -f notify::logs
+
+export -f notify::install
 
 export -f notify::update
 export -f notify::update::now

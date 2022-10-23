@@ -326,6 +326,72 @@ git::global_email() {
   git config --global user.email
 }
 
+git::global_setup() {
+  local git_user=$1
+  local git_email=$2
+
+  if [ -z "$git_user" ]; then
+    git_user=$(git::global_user)
+  fi
+
+  if [ -z "$git_email" ]; then
+    git_email=$(git::global_email)
+  fi
+
+  # credential
+  git config --global credential.helper store
+  # git config --global credential.helper 'cache --timeout=604800'
+  # editor
+  git config --global core.editor "vim"
+  # default branch
+  git config --global init.defaultbranch master
+  # pull reabse
+  git config --global pull.rebase false
+
+  # if [ "$git_user" = "" ] || [ "$git_email" = "" ]; then
+  #   log::warn "Config Git: git_user and git_email is required"
+  #   exit 0
+  # fi
+
+  # local origin_name=$(git config --get user.name)
+  if [ "$git_user" != "" ]; then
+    git config --global user.name "${git_user}"
+  else
+    local origin=$(git::global_user)
+    if [ -z "$origin" ]; then
+      # Default
+      git config --global user.name "${DEFAULT_GIT_USERNAME}"
+    fi
+  fi
+
+  if [ "$git_email" != "" ]; then
+    git config --global user.email "${git_email}"
+  else
+    local origin=$(git::global_email)
+    if [ -z "$origin" ]; then
+      git config --global user.email "${DEFAULT_GIT_EMAIL}"
+    fi
+  fi
+
+  # pull strategies
+  #   hint: Pulling without specifying how to reconcile divergent branches is
+  #   hint: discouraged. You can squelch this message by running one of the following
+  #   hint: commands sometime before your next pull:
+  #   hint:
+  #   hint:   git config pull.rebase false  # merge (the default strategy)
+  #   hint:   git config pull.rebase true   # rebase
+  #   hint:   git config pull.ff only       # fast-forward only
+  #   hint:
+  #   hint: You can replace "git config" with "git config --global" to set a default
+  #   hint: preference for all repositories. You can also pass --rebase, --no-rebase,
+  #   hint: or --ff-only on the command line to override the configured default per
+  #   hint: invocation.
+  git config --global pull.rebase false
+
+  # fix git permissions
+  git::fix_permissions
+}
+
 export -f git::commit_message
 export -f git::commit_message_full
 export -f git::commit_hash
@@ -365,3 +431,5 @@ export -f git::checkout
 
 export -f git::global_user
 export -f git::global_email
+
+export -f git::global_setup

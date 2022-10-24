@@ -70,7 +70,7 @@ EOF
   fi
 
   log::info "[sync::docker_image][remote] reset tag ..."
-  docker tag $private_registry/$name $name
+  docker tag $private_registry/$name $base_registry/$name
   if [ "$?" != "0" ]; then
     log::error "[sync::docker_image] failed to reset tag."
     return 1

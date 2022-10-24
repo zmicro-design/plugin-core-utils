@@ -434,6 +434,10 @@ os::disk_usage() {
     return
   fi
 
+  if [ "$(os::has_command bc)" != "true" ]; then
+    pm install -yqq bc
+  fi 
+
   local type=$1
   # @TODO var will broken \n
   # local devices=$(df -h | grep "^/dev/")

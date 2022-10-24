@@ -3,28 +3,28 @@
 function test_timestamp::in_x_minutes() {
   local lastlogin=$(timestamp)
   testing::expect \
-    "${FUNCNAME[0]}" \
+    "${FUNCNAME[0]} 1 - $lastlogin" \
     "to_equal" \
     "true" \
     "$(timestamp::in_x_minutes 10 $lastlogin)"
 
   lastlogin=$(date +%s)
   testing::expect \
-    "${FUNCNAME[0]}" \
+    "${FUNCNAME[0]} 2 - $lastlogin" \
     "to_equal" \
     "true" \
     "$(timestamp::in_x_minutes 10 $lastlogin)"
 
   lastlogin=$(($lastlogin - 10 * 60 + 1))
   testing::expect \
-    "${FUNCNAME[0]}" \
+    "${FUNCNAME[0]} 3 - $lastlogin" \
     "to_equal" \
     "true" \
     "$(timestamp::in_x_minutes 10 $lastlogin)"
 
-  lastlogin=$(($lastlogin - 1))
+  lastlogin=$(($lastlogin - 2))
   testing::expect \
-    "${FUNCNAME[0]}" \
+    "${FUNCNAME[0]} 4 - $lastlogin" \
     "to_equal" \
     "false" \
     "$(timestamp::in_x_minutes 10 $lastlogin)"
@@ -52,9 +52,9 @@ function test_timestamp::recently() {
     "true" \
     "$(timestamp::recently $lastlogin)"
 
-  lastlogin=$(($lastlogin - 1))
+  lastlogin=$(($lastlogin - 2))
   testing::expect \
-    "${FUNCNAME[0]} less than 1 second" \
+    "${FUNCNAME[0]} less than 2 second" \
     "to_equal" \
     "false" \
     "$(timestamp::recently $lastlogin)"

@@ -73,6 +73,11 @@ timestamp::in_x_minutes() {
   local now=$(date +%s)
   local ts_5m_later=$(($ts + $x_seconds))
 
+  if [ "$now" = "$ts_5m_later" ]; then
+    echo "true"
+    return
+  fi
+
   timestamp::lt $now $ts_5m_later
 }
 

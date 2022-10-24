@@ -112,6 +112,15 @@ git::tag() {
   git describe --tags --abbrev=0
 }
 
+git::commit() {
+  local context=$1
+  if [ -n "$context" ]; then
+    cd $context
+  fi
+  
+  git::commit_hash_full
+}
+
 git::is_changed() {
   if [ "$(git status --porcelain)" != "" ]; then
     echo "true"
@@ -264,21 +273,35 @@ git::use_version() {
 # git::checkout checkouts git repository to context dir with specified branch
 git::checkout() {
   local url=$1
-  local branch=$2
-  local context=$3
+  # branch
+  # tag
+  # commit
+  local typ=$2
+  local name=$3
+  local context=$4
 
   if [ -z "$url" ]; then
     log::error "[git::checkout] url is required"
     return 1
   fi
 
-  if [ -z "$branch" ]; then
-    log::error "[git::checkout] branch is required"
+  if [ -z "$typ" ]; then
+    log::error "[git::checkout] typ is required"
+    return 1
+  fi
+
+  if [ -z "$name" ]; then
+    log::error "[git::checkout] name is required"
     return 1
   fi
 
   if [ -z "$context" ]; then
     log::error "[git::checkout] context is required"
+    return 1
+  fi
+
+  if [ "$typ" != "branch" ] && [ "$typ" != "tag" ] && [ "$typ" != "commit" ]; then
+    log::error "[git::checkout] type($typ) is not allowed, only allow branch,tag,commit"
     return 1
   fi
 
@@ -291,31 +314,100 @@ git::checkout() {
   net::using_smart_proxy
 
   log::debug "HTTPS_PROXY: $HTTP_PROXY"
+  local tmp_error_log=$(os::tmp_file)
+  local origin_context=$(pwd)
 
-  if [ ! -d "$context" ]; then
-    log::info "[git::checkout] check out new repository with branch $branch to $context ..."
-    git clone $url -b $branch $context --depth 1 >>/dev/null 2>&1
+  if [ "$typ" = "branch" ] || [ "$typ" = "tag" ]; then
+    git clone --depth=1 -b $name $url $context >>/dev/null 2>$tmp_error_log
+    if [ "$?" != "0" ]; then
+      log::error "[git::checkout] failed to checkout repo with $typ($name) ..."
+      cat $tmp_error_log
+    fi
     return
+  fi
+
+  # if [ ! -d "$context" ]; then
+  #   log::info "[git::checkout] check out new repository with $typ($name) to $context ..."
+  #   git clone --depth=1 $url $context >>/dev/null 2>$tmp_error_log
+  #   if [ "$?" != "0" ]; then
+  #     log::error "[git::checkout] failed to checkout repo with $typ($name) ..."
+  #     cat $tmp_error_log
+  #   fi
+  #   #
+  #   # cd $context
+  #   # git fetch --depth=1 --tags origin $name >>/dev/null 2>$tmp_error_log
+  #   # if [ "$?" != "0" ]; then
+  #   #   log::error "[git::checkout] failed to fetch origin with $typ($name) ..."
+  #   #   cat $tmp_error_log
+  #   # fi
+
+  #   # git checkout $name >>/dev/null 2>$tmp_error_log
+  #   # if [ "$?" != "0" ]; then
+  #   #   log::error "[git::checkout] failed to checkout $typ($name) ..."
+  #   #   cat $tmp_error_log
+  #   # fi
+
+  #   # cd $origin_context
+  #   # return
+  # fi
+
+  # cd $context
+
+  # # local repo_url=$(git::repo_url)
+  # # if [ "$repo_url" != "$url" ]; then
+  # #   log::info "[git::checkout] repo url not match(got: $repo_url, want: $url), create new ..."
+  # #   rm -rf $context
+  # #   git clone --depth=1 $url $context >>/dev/null 2>$tmp_error_log
+  # #   if [ "$?" != "0" ]; then
+  # #     log::error "[git::checkout] failed to checkout repo with $typ($name) ..."
+  # #     cat $tmp_error_log
+  # #   fi
+
+  # #   cd $context
+  # #   git fetch --depth=1 --tags origin $name >>/dev/null 2>$tmp_error_log
+  # #   if [ "$?" != "0" ]; then
+  # #     log::error "[git::checkout] failed to fetch origin with $typ($name) ..."
+  # #     cat $tmp_error_log
+  # #   fi
+
+  # #   git checkout $name >>/dev/null 2>$tmp_error_log
+  # #   if [ "$?" != "0" ]; then
+  # #     log::error "[git::checkout] failed to checkout $typ($name) ..."
+  # #     cat $tmp_error_log
+  # #   fi
+
+  # #   cd $origin_context
+  # #   return
+  # # fi
+
+  log::info "[git::checkout] check out new repository with $typ($name) to $context ..."
+  git clone --depth=1 $url $context >>/dev/null 2>$tmp_error_log
+  if [ "$?" != "0" ]; then
+    log::error "[git::checkout] failed to checkout repo with $typ($name) ..."
+    cat $tmp_error_log
   fi
 
   cd $context
 
-  local repo_url=$(git::repo_url)
-  if [ "$repo_url" != "$url" ]; then
-    log::info "[git::checkout] repo url not match(got: $repo_url, want: $url), create new ..."
-    rm -rf $context
-    git clone $url -b $branch $context --depth 1 >>/dev/null 2>&1
-    cd -
-    return
+  if [ "$typ" = "commit" ]; then
+    log::info "[git::checkout] updating remote name at context($context)..."
+    git fetch --depth=1 origin $name >>/dev/null 2>$tmp_error_log
+    if [ "$?" != "0" ]; then
+      log::error "[git::checkout] failed to fetch origin with $typ($name) ..."
+      cat $tmp_error_log
+    fi
+
+    log::info "[git::checkout] switch to $typ($name) ..."
+    git checkout $name >>/dev/null 2>$tmp_error_log
+    if [ "$?" != "0" ]; then
+      log::error "[git::checkout] failed to checkout $typ($name) ..."
+      cat $tmp_error_log
+    fi
+  else
+    log::error "[git::checkout] unknown type($typ)"
   fi
 
-  log::info "[git::checkout] updating remote branch at context($context)..."
-  git fetch origin >>/dev/null # $branch
-
-  log::info "[git::checkout] switch to branch($branch) ..."
-  git checkout $branch >>/dev/null 2>&1
-
-  cd - >>/dev/null
+  cd $origin_context
 }
 
 git::global_user() {
@@ -411,6 +503,7 @@ export -f git::repo_name
 
 export -f git::branch
 export -f git::tag
+export -f git::commit
 
 export -f git::is_changed
 export -f git::is_added_before_commit

@@ -9,15 +9,17 @@
 #    sync::docker_image whatwewant/zmicro:v1 registry.workspace.com workpace_xxx
 sync::docker_image() {
   local name=$1
-  local registry=$2
+  local private_registry=$2
   local remote=$3
+
+  local base_registry="docker.io"
 
   if [ -z "$name" ]; then
     log::error "[sync::docker_image] image name is required"
     return 1
   fi
 
-  if [ -z "$registry" ]; then
+  if [ -z "$private_registry" ]; then
     log::error "[sync::docker_image] image registry is required"
     return 1
   fi
@@ -27,42 +29,48 @@ sync::docker_image() {
     return 1
   fi
 
+  local parts=$(string::split / $name)
+  if [ "$(array::length $parts)" = "3" ]; then
+    base_registry=$(array::first_element $parts)
+    name=$(echo $name | awk -F "${base_registry}/" '{print $2}')
+  fi
+
   # log::info "[sync::docker_image][remote] pull from docker hub ..."
   # ssh $remote docker pull $name
 
   # log::info "[sync::docker_image][remote] create registry tag ..."
-  # ssh $remote docker tag $name $registry/$name
+  # ssh $remote docker tag $name $private_registry/$name
 
   # log::info "[sync::docker_image][remote] push to private registry ..."
-  # ssh $remote docker push $registry/$name
+  # ssh $remote docker push $private_registry/$name
 
-  log::info "[sync::docker_image][remote] sync docker hub => private registry ..."
+  log::info "[sync::docker_image][remote] sync ${base_registry} => private registry ..."
   ssh $remote <<EOF
   echo "[sync::docker_image][remote] pull from docker hub ..."
-  docker pull $name
+  docker pull $base_registry/$name
 
   echo "[sync::docker_image][remote] create registry tag ..."
-  docker tag $name $registry/$name
+  docker tag $base_registry/$name $private_registry/$name
 
   echo "[sync::docker_image][remote] push to private registry ..."
-  docker push $registry/$name
+  docker push $private_registry/$name
 EOF
   if [ "$?" != "0" ]; then
-    log::error "[sync::docker_image] failed to sync docker hub => private registry."
+    log::error "[sync::docker_image] failed to sync ${base_registry} => private registry ."
     return 1
   fi
 
   log::info "[sync::docker_image][remote] sync private registry => local ..."
 
   log::info "[sync::docker_image][remote] pull from private registry ..."
-  docker pull $registry/$name
+  docker pull $private_registry/$name
   if [ "$?" != "0" ]; then
     log::error "[sync::docker_image] failed to pull from private registry."
     return 1
   fi
 
   log::info "[sync::docker_image][remote] reset tag ..."
-  docker tag $registry/$name $name
+  docker tag $private_registry/$name $name
   if [ "$?" != "0" ]; then
     log::error "[sync::docker_image] failed to reset tag."
     return 1

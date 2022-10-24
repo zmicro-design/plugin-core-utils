@@ -305,17 +305,16 @@ git::checkout() {
     return 1
   fi
 
-  # if [ -d "$context" ]; then
-  #   log::error "[git::checkout] context($context) is already exists, please remove it first."
-  #   return 1
-  # fi
+  if [ -d "$context" ]; then
+    log::error "[git::checkout] context($context) is already exists, please remove it first."
+    return 1
+  fi
 
   # apply proxy
   net::using_smart_proxy
 
   log::debug "HTTPS_PROXY: $HTTP_PROXY"
   local tmp_error_log=$(os::tmp_file)
-  local origin_context=$(pwd)
 
   if [ "$typ" = "branch" ] || [ "$typ" = "tag" ]; then
     git clone --depth=1 -b $name $url $context >>/dev/null 2>$tmp_error_log
@@ -326,85 +325,54 @@ git::checkout() {
     return
   fi
 
-  # if [ ! -d "$context" ]; then
-  #   log::info "[git::checkout] check out new repository with $typ($name) to $context ..."
-  #   git clone --depth=1 $url $context >>/dev/null 2>$tmp_error_log
-  #   if [ "$?" != "0" ]; then
-  #     log::error "[git::checkout] failed to checkout repo with $typ($name) ..."
-  #     cat $tmp_error_log
-  #   fi
-  #   #
-  #   # cd $context
-  #   # git fetch --depth=1 --tags origin $name >>/dev/null 2>$tmp_error_log
-  #   # if [ "$?" != "0" ]; then
-  #   #   log::error "[git::checkout] failed to fetch origin with $typ($name) ..."
-  #   #   cat $tmp_error_log
-  #   # fi
+  local origin_context=$(pwd)
 
-  #   # git checkout $name >>/dev/null 2>$tmp_error_log
-  #   # if [ "$?" != "0" ]; then
-  #   #   log::error "[git::checkout] failed to checkout $typ($name) ..."
-  #   #   cat $tmp_error_log
-  #   # fi
-
-  #   # cd $origin_context
-  #   # return
+  # # type: commit
+  # log::info "[git::checkout] check out new repository with $typ($name) to $context ..."
+  # git clone --depth=1 $url $context >>/dev/null 2>$tmp_error_log
+  # if [ "$?" != "0" ]; then
+  #   log::error "[git::checkout] failed to checkout repo with $typ($name) ..."
+  #   cat $tmp_error_log
+  #   return 1
   # fi
 
   # cd $context
 
-  # # local repo_url=$(git::repo_url)
-  # # if [ "$repo_url" != "$url" ]; then
-  # #   log::info "[git::checkout] repo url not match(got: $repo_url, want: $url), create new ..."
-  # #   rm -rf $context
-  # #   git clone --depth=1 $url $context >>/dev/null 2>$tmp_error_log
-  # #   if [ "$?" != "0" ]; then
-  # #     log::error "[git::checkout] failed to checkout repo with $typ($name) ..."
-  # #     cat $tmp_error_log
-  # #   fi
+  # log::info "[git::checkout] updating remote name at context($context)..."
+  # git fetch --depth=1 origin $name >>/dev/null 2>$tmp_error_log
+  # if [ "$?" != "0" ]; then
+  #   log::error "[git::checkout] failed to fetch origin with $typ($name) ..."
+  #   cat $tmp_error_log
+  #   return 1
+  # fi
 
-  # #   cd $context
-  # #   git fetch --depth=1 --tags origin $name >>/dev/null 2>$tmp_error_log
-  # #   if [ "$?" != "0" ]; then
-  # #     log::error "[git::checkout] failed to fetch origin with $typ($name) ..."
-  # #     cat $tmp_error_log
-  # #   fi
+  # log::info "[git::checkout] switch to $typ($name) ..."
+  # git checkout $name >>/dev/null 2>$tmp_error_log
+  # if [ "$?" != "0" ]; then
+  #   log::error "[git::checkout] failed to checkout $typ($name) ..."
+  #   cat $tmp_error_log
+  #   return 1
+  # fi
 
-  # #   git checkout $name >>/dev/null 2>$tmp_error_log
-  # #   if [ "$?" != "0" ]; then
-  # #     log::error "[git::checkout] failed to checkout $typ($name) ..."
-  # #     cat $tmp_error_log
-  # #   fi
-
-  # #   cd $origin_context
-  # #   return
-  # # fi
+  # type: commit
+  # fix Server does not allow request for unadvertised object 
 
   log::info "[git::checkout] check out new repository with $typ($name) to $context ..."
-  git clone --depth=1 $url $context >>/dev/null 2>$tmp_error_log
+  git clone $url $context >>/dev/null 2>$tmp_error_log
   if [ "$?" != "0" ]; then
     log::error "[git::checkout] failed to checkout repo with $typ($name) ..."
     cat $tmp_error_log
+    return 1
   fi
 
   cd $context
 
-  if [ "$typ" = "commit" ]; then
-    log::info "[git::checkout] updating remote name at context($context)..."
-    git fetch --depth=1 origin $name >>/dev/null 2>$tmp_error_log
-    if [ "$?" != "0" ]; then
-      log::error "[git::checkout] failed to fetch origin with $typ($name) ..."
-      cat $tmp_error_log
-    fi
-
-    log::info "[git::checkout] switch to $typ($name) ..."
-    git checkout $name >>/dev/null 2>$tmp_error_log
-    if [ "$?" != "0" ]; then
-      log::error "[git::checkout] failed to checkout $typ($name) ..."
-      cat $tmp_error_log
-    fi
-  else
-    log::error "[git::checkout] unknown type($typ)"
+  log::info "[git::checkout] switch to $typ($name) ..."
+  git reset --hard $name >>/dev/null 2>$tmp_error_log
+  if [ "$?" != "0" ]; then
+    log::error "[git::checkout] failed to checkout $typ($name) ..."
+    cat $tmp_error_log
+    return 1
   fi
 
   cd $origin_context

@@ -183,7 +183,7 @@ function test_git::checkout_with_branch() {
 
   rm -rf $context
 
-  git::checkout $url $typ $name $context
+  git::checkout $typ $name $url $context
 
   testing::expect \
     "${FUNCNAME[0]} branch repo url" \
@@ -208,7 +208,7 @@ function test_git::checkout_with_tag() {
 
   rm -rf $context
 
-  git::checkout $url $typ $name $context
+  git::checkout $typ $name $url $context
 
   testing::expect \
     "${FUNCNAME[0]} repo url 1" \
@@ -224,7 +224,7 @@ function test_git::checkout_with_tag() {
 
   # # exist
   # name="v1.21.20"
-  # git::checkout $url $typ $name $context
+  # git::checkout $typ $name $url $context
 
   # testing::expect \
   #   "${FUNCNAME[0]} repo url 2" \
@@ -249,7 +249,7 @@ function test_git::checkout_with_commit() {
 
   rm -rf $context
 
-  git::checkout $url $typ $name $context
+  git::checkout $typ $name $url $context
 
   testing::expect \
     "${FUNCNAME[0]} commit repo url" \

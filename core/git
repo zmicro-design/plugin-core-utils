@@ -272,12 +272,12 @@ git::use_version() {
 
 # git::checkout checkouts git repository to context dir with specified branch
 git::checkout() {
-  local url=$1
   # branch
   # tag
   # commit
-  local typ=$2
-  local name=$3
+  local typ=$1
+  local name=$2
+  local url=$3
   local context=$4
 
   if [ -z "$url" ]; then

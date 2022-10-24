@@ -41,10 +41,10 @@ sync::docker_image() {
   # log::info "[sync::docker_image][remote] create registry tag ..."
   # ssh $remote docker tag $name $private_registry/$name
 
-  # log::info "[sync::docker_image][remote] push to private registry ..."
+  # log::info "[sync::docker_image][remote] push to private registry ($private_registry) ..."
   # ssh $remote docker push $private_registry/$name
 
-  log::info "[sync::docker_image][remote] sync ${base_registry} => private registry ..."
+  log::info "[sync::docker_image][remote] sync ${base_registry} => private registry ($private_registry) ..."
   ssh $remote <<EOF
   echo "[sync::docker_image][remote] pull from docker hub ..."
   docker pull $base_registry/$name
@@ -52,20 +52,20 @@ sync::docker_image() {
   echo "[sync::docker_image][remote] create registry tag ..."
   docker tag $base_registry/$name $private_registry/$name
 
-  echo "[sync::docker_image][remote] push to private registry ..."
+  echo "[sync::docker_image][remote] push to private registry ($private_registry) ..."
   docker push $private_registry/$name
 EOF
   if [ "$?" != "0" ]; then
-    log::error "[sync::docker_image] failed to sync ${base_registry} => private registry ."
+    log::error "[sync::docker_image] failed to sync ${base_registry} => private registry ($private_registry) ."
     return 1
   fi
 
-  log::info "[sync::docker_image][remote] sync private registry => local ..."
+  log::info "[sync::docker_image][remote] sync private registry ($private_registry) => local ..."
 
-  log::info "[sync::docker_image][remote] pull from private registry ..."
+  log::info "[sync::docker_image][remote] pull from private registry ($private_registry) ..."
   docker pull $private_registry/$name
   if [ "$?" != "0" ]; then
-    log::error "[sync::docker_image] failed to pull from private registry."
+    log::error "[sync::docker_image] failed to pull from private registry ($private_registry)."
     return 1
   fi
 

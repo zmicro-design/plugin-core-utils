@@ -322,6 +322,7 @@ git::checkout() {
     if [ "$?" != "0" ]; then
       log::error "[git::checkout] failed to checkout repo with $typ($name) ..."
       cat $tmp_error_log
+      return 1
     fi
     return
   fi

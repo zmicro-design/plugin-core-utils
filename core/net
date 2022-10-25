@@ -205,7 +205,11 @@ net::status_code() {
     return 1
   fi
 
-  curl -s -o /dev/null -w "%{http_code}" $url
+  # @TODO bug this will download url, if it is huge package, too slow.
+  # os::curl -s -o /dev/null -w "%{http_code}" $url
+
+  # example: curl -s -I https://nodejs.org/dist/v16.18.0/node-v16.18.0-darwin-arm64.tar.gz | head -n 1 | awk '{print $2}'
+  curl -s -I $url | head -n 1 | awk '{print $2}'
 }
 
 net::is_not_found() {

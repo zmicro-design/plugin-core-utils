@@ -49,29 +49,41 @@ function test_net::using_smart_proxy() {
 }
 
 function test_net::status_code() {
-    testing::expect \
-      "${FUNCNAME[0]} 200" \
-      "to_equal" \
-      "200" \
-      "$(net::status_code https://httpbin.zcorky.com/)"
+  testing::expect \
+    "${FUNCNAME[0]} 200" \
+    "to_equal" \
+    "200" \
+    "$(net::status_code https://httpbin.zcorky.com/)"
 
-    testing::expect \
-      "${FUNCNAME[0]} 404" \
-      "to_equal" \
-      "404" \
-      "$(net::status_code https://httpbin.zcorky.com/404)"
+  testing::expect \
+    "${FUNCNAME[0]} 404" \
+    "to_equal" \
+    "404" \
+    "$(net::status_code https://httpbin.zcorky.com/404)"
+
+  testing::expect \
+    "${FUNCNAME[0]} 200 nodejs" \
+    "to_equal" \
+    "200" \
+    "$(net::status_code https://nodejs.org/dist/v16.18.0/node-v16.18.0-darwin-arm64.tar.gz)"
+
+  testing::expect \
+    "${FUNCNAME[0]} 404 nodejs" \
+    "to_equal" \
+    "404" \
+    "$(net::status_code https://nodejs.org/dist/v16.18.0/node-v16.18.0-darwin-arm64.tar.gzx)"
 }
 
 function test_net::is_not_found() {
-    testing::expect \
-      "${FUNCNAME[0]} found" \
-      "to_equal" \
-      "false" \
-      "$(net::is_not_found https://httpbin.zcorky.com/)"
+  testing::expect \
+    "${FUNCNAME[0]} found" \
+    "to_equal" \
+    "false" \
+    "$(net::is_not_found https://httpbin.zcorky.com/)"
 
-    testing::expect \
-      "${FUNCNAME[0]} not found" \
-      "to_equal" \
-      "true" \
-      "$(net::is_not_found https://httpbin.zcorky.com/404)"
+  testing::expect \
+    "${FUNCNAME[0]} not found" \
+    "to_equal" \
+    "true" \
+    "$(net::is_not_found https://httpbin.zcorky.com/404)"
 }

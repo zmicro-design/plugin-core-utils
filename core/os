@@ -435,7 +435,11 @@ os::disk_usage() {
   fi
 
   if [ "$(os::has_command bc)" != "true" ]; then
-    pm install -yqq bc
+    pm install -yqq bc >> /dev/null 2>&1
+    if [ "$(os::has_command bc)" != "true" ]; then
+      echo -1
+      return
+    fi
   fi 
 
   local type=$1

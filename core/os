@@ -1085,7 +1085,9 @@ os::distribution() {
 
   local name="unknown"
   if [ "$(os::is_linux)" = "true" ]; then
-    if [ -f /etc/redhat-release ]; then
+    if [ -f /etc/fedora-release ]; then
+      name=$(cat /etc/fedora-release)
+    elif [ -f /etc/redhat-release ]; then
       name='RedHat'
     elif [ -f /etc/SuSE-release ]; then
       name=$(cat /etc/SuSE-release | tr "\n" ' ' | sed s/VERSION.*//)
@@ -1095,6 +1097,8 @@ os::distribution() {
       name=$(awk -F "PRETTY_NAME=" '{print $2}' /etc/os-release | tr -d '\n"')
     elif [ -f /etc/debian_version ]; then
       name="Debian $(cat /etc/debian_version)"
+    elif [ -f /etc/issue ]; then
+      name=$(cat /etc/issue)
     fi
 
     if [ -f /etc/UnitedLinux-release ]; then

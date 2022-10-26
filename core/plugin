@@ -515,6 +515,8 @@ plugin::run() {
   #
   export PLUGIN_CONFIG=$PLUGIN_CONFIGS/config
   #
+  export PLUGIN_PKGS=$PLUGIN_DIR/${PLUGIN_NAME}s
+  #
   if [ ! -d "$PLUGIN_DATA" ]; then
     mkdir -p $PLUGIN_DATA
   fi

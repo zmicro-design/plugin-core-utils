@@ -463,6 +463,16 @@ git::clone() {
     branch="master"
   fi
 
+  if [ -z "$path" ]; then
+    log::error "[git::clone] path is required"
+    return 1
+  fi
+
+  if [ -z "$repository_url" ]; then
+    log::error "[git::clone] repository_url is required"
+    return 1
+  fi
+
   local tmp_error_log=$(os::tmp_file)
   log::debug "[git::clone] clone repo($repository_url) to $path ..."
   os::git clone --depth=1 -b $branch $repository_url $path >>/dev/null 2>$tmp_error_log

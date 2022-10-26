@@ -133,22 +133,36 @@ net::get_ip() {
 net::get_ip_internal() {
   # reference: https://apple.stackexchange.com/questions/20547/how-do-i-find-my-ip-address-from-the-command-line
   if [ "$(os::is_macos)" = "true" ]; then
-    ifconfig | grep "inet " | grep -Fv 127.0.0.1 | awk '{print $2}'
+    ifconfig | grep "inet " | grep -Fv 127.0.0.1 | awk '{print $2}' | head -n 1
     return
   fi
 
-  # echo $HOST
-  if [ "$(os::has_command hostname)" = "false" ]; then
-    # reference: https://commandnotfound.cn/linux/1/347/hostname-%E5%91%BD%E4%BB%A4
-    pm install -y hostname >>/dev/null 2>&1
+  # # echo $HOST
+  # if [ "$(os::has_command hostname)" = "false" ]; then
+  #   # reference: https://commandnotfound.cn/linux/1/347/hostname-%E5%91%BD%E4%BB%A4
+  #   pm install -y hostname >>/dev/null 2>&1
+  # fi
+
+  # if [ "$(os::is_alpine)" = "true" ]; then
+  #   ip route | awk '/default/ {print $3}'
+  #   return
+  # fi
+
+  # echo $(hostname -I)
+
+  # ip
+  if [ "$(os::has_command ip)" = "false" ]; then
+    # reference: https://stackoverflow.com/questions/42679270/docker-bash-ip-command-not-found
+    pm install -yqq net-tools >>/dev/null 2>&1
   fi
 
-  if [ "$(os::is_alpine)" = "true" ]; then
-    ip route | awk '/default/ {print $3}'
-    return
+  # ifconfig
+  if [ "$(os::has_command ip)" = "false" ]; then
+    # reference: https://stackoverflow.com/questions/42679270/docker-bash-ip-command-not-found
+    pm install -yqq iproute2 >>/dev/null 2>&1
   fi
 
-  echo $(hostname -I)
+  ip route | awk '/default/ {print $3}'
 }
 
 net::using_smart_proxy() {

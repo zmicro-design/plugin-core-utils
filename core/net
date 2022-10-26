@@ -137,6 +137,12 @@ net::get_ip_internal() {
     return
   fi
 
+  # echo $HOST
+  if [ "$(os::has_command hostname)" = "false" ]; then
+    # reference: https://commandnotfound.cn/linux/1/347/hostname-%E5%91%BD%E4%BB%A4
+    pm install -y hostname >>/dev/null 2>&1
+  fi
+
   echo $(hostname -I)
 }
 

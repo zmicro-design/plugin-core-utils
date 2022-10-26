@@ -1,22 +1,36 @@
 #!/bin/bash
 
 os::homedir() {
-  echo $HOME
+  if [ -n "$HOME" ]; then
+    echo $HOME
+    return
+  fi
+
+  echo ~
 }
 
 os::username() {
-  if [ "$GIT_USER" != "" ]; then
+  if [ -n "$GIT_USER" ]; then
     echo $GIT_USER
     return
   fi
 
-  if [ "$USER" != "" ]; then
+  if [ -n "$USER" ]; then
     echo $USER
     return
   fi
 
+  local homedir=$(os::homedir)
+  if [ -n "$homedir" ]; then
+    local user=$(path::basename $homedir)
+    if [ -n "$user" ]; then
+      echo $user
+      return
+    fi
+  fi
+
   local user=$(id -u -n)
-  if [ "$user" != "" ]; then
+  if [ -n "$user" ]; then
     echo $user
     return
   fi

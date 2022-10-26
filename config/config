@@ -1,6 +1,6 @@
 export PLUGIN_CORE_UTILS_NAME=core-utils
 
-if [ -z "$USER" ]; then
-  USER=$(id -u)
-  GROUP=$(id -g:)
-fi 
+# if [ -z "$USER" ]; then
+#   USER=$(id -u)
+#   GROUP=$(id -g)
+# fi 

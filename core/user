@@ -15,10 +15,20 @@ users::online() {
 }
 
 users::login::histories() {
+  if [ ! -f "/var/log/wtmp" ]; then
+    # pm install -y hostname >>/dev/null 2>&1
+    return
+  fi
+
   last
 }
 
 users::doing() {
+  if [ "$(os::has_command w)" = "false" ]; then
+    # pm install -y hostname >>/dev/null 2>&1
+    return
+  fi
+
   w
 }
 

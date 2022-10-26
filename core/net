@@ -143,6 +143,11 @@ net::get_ip_internal() {
     pm install -y hostname >>/dev/null 2>&1
   fi
 
+  if [ "$(os::is_alpine)" = "true" ]; then
+    ip route | awk '/default/ {print $3}'
+    return
+  fi
+
   echo $(hostname -I)
 }
 

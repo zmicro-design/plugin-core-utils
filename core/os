@@ -96,7 +96,8 @@ os::uptime() {
       fi
     fi
 
-    echo $(uptime -p)
+    # echo $(uptime -p)
+    uptime
   fi
 }
 
@@ -741,7 +742,7 @@ os::info() {
   local homedir=$(os::homedir)
   local shell=$(os::shell)
   local id=$(os::device_id)
-  local uptime=$(uptime)
+  local uptime=$(os::uptime)
   local hostname=$(os::hostname)
   local kernel=$(os::kernel)
   local release=$(os::release)
@@ -806,7 +807,7 @@ os::info_json() {
   local homedir=$(os::homedir)
   local shell=$(os::shell)
   local id=$(os::device_id)
-  local uptime=$(uptime)
+  local uptime=$(os::uptime)
   local hostname=$(os::hostname)
   local kernel=$(os::kernel)
   local release=$(os::release)

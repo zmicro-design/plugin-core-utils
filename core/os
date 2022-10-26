@@ -1423,6 +1423,16 @@ os::copy() {
   echo "$text" | xclip -selection clipboard
 }
 
+os::usr_bin_dir() {
+  local usr_bin_dir=/usr/bin
+
+  if [ "$(os::is_macos)" = "true" ]; then
+    usr_bin_dir=/usr/local/bin
+  fi
+
+  echo "$usr_bin_dir"
+}
+
 export -f os::arch
 export -f os::platform
 export -f os::release
@@ -1558,3 +1568,5 @@ export -f os::ssh
 export -f os::git
 
 export -f os::gzfetch
+
+export -f os::usr_bin_dir

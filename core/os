@@ -1395,6 +1395,34 @@ os::gzfetch() {
   gzfetch "$@"
 }
 
+os::copy() {
+  local text=$1
+  if [ -z "$text" ]; then
+    log::error "[os::copy] text is required"
+    return 1
+  fi
+
+  # if [ "$(os::has_command pbcopy)" = "true" ]; then
+  #   log::error "[os::copy] failed to copy(reason: pbcopy not found)"
+  #   return 1
+  # fi
+
+  # macos
+  if [ "$(os::is_macos)" = "true" ]; then
+    echo "$text" | pbcopy
+    return
+  fi
+
+  # linux
+  # https://linux.cn/article-9917-1.html
+  if [ "$(os::has_command xclip)" = "true" ]; then
+    log::info "[os::copy] install dependencies: xclip and xel ..."
+    pm install -yqq xclip xsel
+  fi
+
+  echo "$text" | xclip -selection clipboard
+}
+
 export -f os::arch
 export -f os::platform
 export -f os::release
@@ -1498,6 +1526,7 @@ export -f os::healthcheck
 export -f os::get_options
 
 export -f os::open
+export -f os::copy
 
 export -f os::encode_uri_component
 

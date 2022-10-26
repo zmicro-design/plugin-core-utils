@@ -457,6 +457,19 @@ os::memory_usage() {
     return
   fi
 
+  if [ "$(os::has_command free)" = "false" ]; then
+    # reference: https://commandnotfound.cn/linux/1/190/top-%E5%91%BD%E4%BB%A4
+    if [ "$(os::has_command pacman)" ]; then
+      pm install -y procps-ng >>/dev/null 2>&1
+    elif [ "$(os::has_command yum)" ]; then
+      pm install -y procps-ng >>/dev/null 2>&1
+    elif [ "$(os::has_command dnf)" ]; then
+      pm install -y procps-ng >>/dev/null 2>&1
+    else
+      pm install -y procps >>/dev/null 2>&1
+    fi
+  fi
+
   local type=$1
   local all=$(free -m | awk 'NR==2{printf "%s/%sMB (%.2f%%)", $3,$2,$3*100/$2 }')
 

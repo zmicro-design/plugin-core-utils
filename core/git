@@ -454,6 +454,25 @@ git::global_setup() {
   git::fix_permissions
 }
 
+git::clone() {
+  local path=$1
+  local repository_url=$2
+  local branch=$3
+
+  if [ -z "$branch" ]; then
+    branch="master"
+  fi
+
+  local tmp_error_log=$(os::tmp_file)
+  log::debug "[git::clone] clone repo($repository_url) to $path ..."
+  os::git clone --depth=1 -b $branch $repository_url $path >>/dev/null 2>$tmp_error_log
+  if [ "$?" != "0" ]; then
+    log::error "[git::clone] failed to clone repo($repository_url) to $path ..."
+    cat $tmp_error_log
+    return 1
+  fi
+}
+
 export -f git::commit_message
 export -f git::commit_message_full
 export -f git::commit_hash
@@ -496,3 +515,5 @@ export -f git::global_user
 export -f git::global_email
 
 export -f git::global_setup
+
+export -f git::clone

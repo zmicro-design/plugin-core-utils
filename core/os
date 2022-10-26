@@ -714,6 +714,8 @@ os::info() {
 * internal: $(os::network_ip_internal)\n\
 \n\
 ## User\n\
+* current: $user\n\
+* homedir: $homedir\n\
 * all: $(users::all | tr '\n' ',')\n\
 * online: \n\
 $(users::online | tr '\n' ',')\n\
@@ -799,6 +801,7 @@ os::info_json() {
   "ip": "$ip",
   "ip_internal": "$ip_internal",
   "user": "$user",
+  "homedir": "$homedir",
   "users_all": "$(users::all)",
   "users_online": "$(users::online)",
   "users_history": "$(users::login::histories | head -5)",

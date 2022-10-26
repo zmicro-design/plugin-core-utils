@@ -6,7 +6,15 @@ os::homedir() {
     return
   fi
 
-  echo ~
+  local home=$(echo ~)
+  if [ -n "$HOME" ]; then
+    echo $home
+    return
+  fi
+
+  # @TODO
+  cd
+  pwd
 }
 
 os::username() {

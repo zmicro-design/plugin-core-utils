@@ -594,7 +594,11 @@ plugin::run() {
   elif [ "$plugin_command_real" = "go" ] && [ "$plugin_command_args_real" != "-h" ] && [ "$plugin_command_args_real" != "--help" ]; then
     zmicro go plugin $plugin_name $plugin_command_args_real
   elif [ "$plugin_command_real" = "code" ]; then
-    zmicro code plugin $plugin_name
+    if [ -z "$plugin_command_args_real" ]; then
+      zmicro code plugin $plugin_name
+    else
+      zmicro code $plugin_name $plugin_command_args_real
+    fi
   elif [ "$plugin_command_real" = "test" ] && [ ! -f "$PLUGIN_DIR/commands/test" ]; then
     local script_path=$plugin_command_args_real
     if [ -z "$script_path" ]; then

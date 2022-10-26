@@ -1088,11 +1088,11 @@ os::distribution() {
     if [ -f /etc/fedora-release ]; then
       name=$(cat /etc/fedora-release)
     elif [ -f /etc/redhat-release ]; then
-      name='RedHat'
+      name="RedHat ($(cat /etc/redhat-release))"
     elif [ -f /etc/SuSE-release ]; then
       name=$(cat /etc/SuSE-release | tr "\n" ' ' | sed s/VERSION.*//)
     elif [ -f /etc/mandrake-release ]; then
-      name='Mandrake'
+      name="Mandrake ($(cat /etc/mandrake-release))"
     elif [ -f /etc/os-release ]; then
       name=$(awk -F "PRETTY_NAME=" '{print $2}' /etc/os-release | tr -d '\n"')
     elif [ -f /etc/debian_version ]; then

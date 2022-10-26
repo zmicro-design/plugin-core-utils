@@ -59,7 +59,6 @@ plugin::register() {
     for bin in $sub_bins; do
       local bin_path=$ZMICRO_HOME/bin/sub/$bin
       if [ "$bin" = "alias" ]; then
-        log::info "[$(timestamp)][plugin][register][sub] alias => $plugin_name ..."
         bin_path=$ZMICRO_HOME/bin/sub/$plugin_name
       fi
 
@@ -68,8 +67,17 @@ plugin::register() {
         rm $bin_path
       fi
 
-      log::success "[$(timestamp)][plugin][sub][$(color::green "register")] $plugin_name sub bin: $(color::success $bin)"
       ln -sf $plugin_sub_bin_path/$bin $bin_path
+      # if [ "$?" != "0" ]; then
+      #   log::error "[$(timestamp)][plugin][register] failed to register sub bin: $bin."
+      #   continue
+      # fi
+
+      if [ "$bin" = "alias" ]; then
+        log::success "[$(timestamp)][plugin][sub][$(color::green "register")] alias => $(color::success $plugin_name) ..."
+      else
+        log::success "[$(timestamp)][plugin][sub][$(color::green "register")] $plugin_name sub bin: $(color::success $bin)"
+      fi
     done
   fi
 

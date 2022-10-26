@@ -78,6 +78,18 @@ os::uptime() {
   if [ "$(os::is_macos)" = "true" ]; then
     uptime
   else
+    if [ "$(os::has_command uptime)" = "false" ]; then
+      if [ "$(os::has_command pacman)" ]; then
+        pm install -y procps-ng >>/dev/null 2>&1
+      elif [ "$(os::has_command yum)" ]; then
+        pm install -y procps-ng >>/dev/null 2>&1
+      elif [ "$(os::has_command dnf)" ]; then
+        pm install -y procps-ng >>/dev/null 2>&1
+      else
+        pm install -y procps >>/dev/null 2>&1
+      fi
+    fi
+
     echo $(uptime -p)
   fi
 }

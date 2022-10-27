@@ -1,0 +1,40 @@
+#!/bin/bash
+
+bind::port_over_ssh() {
+  local server=$1
+  local port=$2
+  if [ -z "$server" ]; then
+    log::error "[bind::port_over_ssh] server is required"
+    return 1
+  fi
+
+  if [ -z "$port" ]; then
+    log::error "[bind::port_over_ssh] port is required"
+    return 1
+  fi
+
+  if [ "$(string::has : $port)" != "true" ]; then
+    port="127.0.0.1:$port:127.0.0.1:$port"
+  fi
+
+  os::ssh -N -L $port $server
+}
+
+bind::socks5() {
+  local server=$1
+  local port=$2
+  if [ -z "$server" ]; then
+    log::error "[bind::socks5] server is required"
+    return 1
+  fi
+
+  if [ -z "$port" ]; then
+    log::error "[bind::socks5] port is required"
+    return 1
+  fi
+
+  os::ssh -D -N localhost:$port $server
+}
+
+export -f bind::port_over_ssh
+export -f bind::socks5

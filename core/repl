@@ -17,8 +17,8 @@ os::repl::scope() {
 
 os::repl() {
   while true; do
-    local startFlag="$(color::success $)"
-    while IFS="" read -r -e -d $'\n' -p $startFlag" " commandAndArgs; do
+    local startFlag=$(color::success "[zmicro] $")
+    while IFS="" read -r -e -d $'\n' -p "$startFlag " commandAndArgs; do
       local cmd=$(array::first_element $commandAndArgs)
       local args=$(array::slice 1 1000 $commandAndArgs)
       # echo "cmd: $cmd"
@@ -35,13 +35,18 @@ os::repl() {
         fi
 
         if [ "$?" != "0" ]; then
-          startFlag="$(color::error $)"
+          startFlag=$(color::error "[zmicro] $")
         else
-          startFlag="$(color::success $)"
+          startFlag=$(color::success "[zmicro] $")
         fi
       fi
     done
   done
+
+  # local ORIGIN_PROMPT=$PROMPT
+  # export XXPROMPT="[zmicro] $PROMPT"
+  # exec zsh
+  # export PROMPT="$ORIGIN_PROMPT"
 }
 
 export -f os::repl::scope

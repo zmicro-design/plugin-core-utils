@@ -11,4 +11,39 @@ github::get_token() {
   export GITHUB_TOKEN=$token
 }
 
+github::create_repository() {
+  local organization=$1
+  local name=$2
+  
+  if [ -z "$organization" ]; then
+    log::error "[github::create_repository] organization is required"
+    return 1
+  fi
+
+  if [ -z "$name" ]; then
+    log::error "[github::create_repository] repository name is required"
+    return 1
+  fi
+
+  if [ -z "$GITHUB_TOKEN" ]; then
+    github::get_token
+    if [ "$?" != "0" ]; then
+      log::error "[github::create_repository] cannot get github token"
+      return 1
+    fi
+  fi
+
+  os::curl \
+    -X POST \
+    -H "Accept: application/vnd.github+json" \
+    -H "Authorization: Bearer $GITHUB_TOKEN" \
+    -d "{\"name\":\"$name\",\"private\": false,\"org\": \"$organization\" }" \
+    https://api.github.com/orgs/$organization/repos >>/dev/null 2>&1
+  if [ "$?" != "0" ]; then
+    log::error "[github::create_repository] failed to create repository: $organization/$name"
+    return 1
+  fi
+}
+
 export -f github::get_token
+export -f github::create_repository

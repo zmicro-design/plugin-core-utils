@@ -1,0 +1,14 @@
+#!/bin/bash
+
+github::get_token() {
+  local token=$(cat $HOME/.git-credentials | grep github | awk -F ':' '{print $3}' | awk -F '@' '{print $1}')
+  if [ -z "$token" ]; then
+    log::error "[github::get_token] cannot find token, you need to login github with: zmicro login git <USERNAME> <TOKEN>"
+    return 1
+  fi
+
+  # echo $token
+  export GITHUB_TOKEN=$token
+}
+
+export -f github::get_token

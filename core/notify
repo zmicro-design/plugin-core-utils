@@ -115,6 +115,11 @@ notify::install() {
 }
 
 notify::update() {
+  # ignore ci
+  if [ "$(os::is_ci)" = "true" ]; then
+    return
+  fi
+
   if [ "$(os::is_macos)" = "true" ]; then
     notify::update::now "$@"
     return

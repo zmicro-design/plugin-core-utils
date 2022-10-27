@@ -20,6 +20,41 @@ bind::port_over_ssh() {
   os::ssh -N -L $port $server
 }
 
+bind::port_over_tcp() {
+  # @TODO
+  log::info "WIP"
+}
+
+bind::port_over_http() {
+  # @TODO
+  log::info "WIP"
+}
+
+bind::port_over_https() {
+  # @TODO
+  log::info "WIP"
+}
+
+bind::port_over_websocket() {
+  # @TODO
+  log::info "WIP"
+}
+
+bind::port_over_inlets() {
+  # @TODO
+  log::info "WIP"
+}
+
+bind::port_over_v2fly() {
+  # @TODO
+  log::info "WIP"
+}
+
+bind::port_over_nps() {
+  # @TODO
+  log::info "WIP"
+}
+
 bind::socks5() {
   local server=$1
   local port=$2
@@ -37,4 +72,15 @@ bind::socks5() {
 }
 
 export -f bind::port_over_ssh
+
+export -f bind::port_over_tcp
+export -f bind::port_over_http
+export -f bind::port_over_https
+export -f bind::port_over_websocket
+
+export -f bind::port_over_inlets
+export -f bind::port_over_v2fly
+
+export -f bind::port_over_nps
+
 export -f bind::socks5

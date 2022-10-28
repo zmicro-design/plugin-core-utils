@@ -8,7 +8,7 @@ ENV CI=true
 
 RUN curl -o- https://raw.githubusercontent.com/zcorky/zmicro/master/install | bash
 
-WORKDIR /build
+WORKDIR /usr/local/lib/zmicro/plugins/core-utils
 
 COPY . .
 

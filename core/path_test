@@ -1,27 +1,22 @@
 #!/bin/bash
 
 function test_path::resolve() {
-  local current_path=$PWD
-  if [ "$current_path" = "/" ]; then
-    current_path=""
-  fi
-
   testing::expect \
     "${FUNCNAME[0]} - relative" \
     "to_equal" \
-    "$current_path/bin/zmicro" \
+    "$PWD/bin/zmicro" \
     "$(path::resolve bin/zmicro)" 
   
   testing::expect \
     "${FUNCNAME[0]} - relative dot" \
     "to_equal" \
-    "$current_path/bin/zmicro" \
+    "$PWD/bin/zmicro" \
     "$(path::resolve ./bin/zmicro)" 
 
   testing::expect \
     "${FUNCNAME[0]} - relative dot dot" \
     "to_equal" \
-    "$(dirname $current_path)/bin/zmicro" \
+    "$(dirname $PWD)/bin/zmicro" \
     "$(path::resolve ../bin/zmicro)" 
   
   testing::expect \

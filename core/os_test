@@ -55,6 +55,9 @@ function test_os::base64_decode() {
 }
 
 function test_os::gzfetch() {
+  log::info "安装 GZFetch ..."
+  zmicro package install gzfetch
+
   local received=$(os::gzfetch get https://httpbin.zcorky.com/ | awk '{print $1}')
 
   testing::expect \

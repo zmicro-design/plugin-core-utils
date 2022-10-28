@@ -641,6 +641,7 @@ os::ensure_logs_permission() {
   os::ensure_permission $ZMICRO_LOG_UPDATE_PATH
   os::ensure_permission $ZMICRO_LOG_VERSION_PATH
   os::ensure_permission $ZMICRO_LOG_NOTIFY_PATH
+  os::ensure_permission $ZMICRO_LOG_UPDATE_TIMESTAMP
 }
 
 os::is_pid_valid() {

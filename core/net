@@ -117,8 +117,7 @@ net::get_ip() {
     return
   fi
 
-  which dig >>/dev/null 2>&1
-  if [ "$?" != "0" ]; then
+  if [ "$(os::has_command dig)" != "true" ]; then
     if [ "$(os::is_centos)" = "true" ]; then
       pm install -yy bind-utils >>/dev/null 2>&1
     else

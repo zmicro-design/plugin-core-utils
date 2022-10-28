@@ -59,8 +59,8 @@ jobs:
         with:
           fetch-depth: "0"
 
-      # - name: Install Docker CLI
-      #   run: zmicro package install docker
+      - name: Install Docker CLI
+        run: zmicro package install docker
 
       - name: Install in ubuntu
         run: docker build -t zmicro:ubuntu -f config/docker/Dockerfile.ubuntu .

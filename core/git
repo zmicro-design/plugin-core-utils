@@ -117,7 +117,7 @@ git::commit() {
   if [ -n "$context" ]; then
     cd $context
   fi
-  
+
   git::commit_hash_full
 }
 
@@ -357,7 +357,7 @@ git::checkout() {
   # fi
 
   # type: commit
-  # fix Server does not allow request for unadvertised object 
+  # fix Server does not allow request for unadvertised object
 
   log::info "[git::checkout] clone new repository with $typ($name) to $context ..."
   git clone $url $context >>/dev/null 2>$tmp_error_log
@@ -483,6 +483,26 @@ git::clone() {
   fi
 }
 
+git::has_branch() {
+  local name=$1
+  local repo=$2
+  if [ -z "$name" ]; then
+    log::error "[git::has_branch] name is required"
+    return 1
+  fi
+
+  if [ -z "$repo" ]; then
+    repo=$(git::origin_url)
+  fi
+
+  local branch=$(git ls-remote --heads $repo $name)
+  if [ -z "$branch" ]; then
+    echo "false"
+  else
+    echo "true"
+  fi
+}
+
 export -f git::commit_message
 export -f git::commit_message_full
 export -f git::commit_hash
@@ -527,3 +547,5 @@ export -f git::global_email
 export -f git::global_setup
 
 export -f git::clone
+
+export -f git::has_branch

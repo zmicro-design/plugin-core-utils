@@ -24,11 +24,13 @@ timestamp::to_date() {
   local text=$@
   if [ -z "$text" ]; then
     log::error "[timestamp::to_date] timestamp string is required"
-    exit 1
+    return 1
   fi
 
   if [ "$(os::is_macos)" = "true" ]; then
-    date -jf "%Y-%m-%d %H:%M:%S" "$text" +%Y-%m-%d
+    # @TODO not support
+    # date -jf "%Y-%m-%d %H:%M:%S" "$text" +%Y-%m-%d
+    echo "$text"
     return
   fi
 

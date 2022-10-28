@@ -58,11 +58,11 @@ notify::logs() {
 
   echo $data >$tmp_file
 
-  if [ -n "$DEBUG" ]; then
-    log::info "POST $url"
-    echo ""
-    log::info "$(cat $tmp_file)"
-    echo ""
+  if [ "$LOG_LEVEL" = "debug" ]; then
+    log::debug "POST $url"
+    log::debug
+    log::debug "$(cat $tmp_file)"
+    log::debug
 
     curl \
       -X POST \

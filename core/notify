@@ -127,7 +127,7 @@ notify::update() {
 
   # @TODO avoid too many request at the same time
   local sleep_time=$(os::random_int 600)
-  log::debug "[$(timstamp)][notify::update] waiting time: $sleep_time"
+  log::debug "[$(timestamp)][notify::update] waiting time: $sleep_time"
   sleep $sleep_time
 
   notify::update::now "$@"

@@ -27,7 +27,8 @@ git::commit_timestamp() {
   if [ "$gitMainVersion" -ge "2" ] && [ "$gitSubVersion" -ge "7" ]; then
     git show -s --format=%cd --date="format:%Y-%m-%d"
   else
-    git show -s --format=%cd --date=local
+    local datetime_str=$(git show -s --format=%cd --date=local)
+    timestamp::to_date "$datetime_str"
   fi
 }
 

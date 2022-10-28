@@ -20,6 +20,21 @@ timestamp::to_seconds() {
   date -d "$text" +%s
 }
 
+timestamp::to_date() {
+  local text=$@
+  if [ -z "$text" ]; then
+    log::error "[timestamp::to_date] timestamp string is required"
+    exit 1
+  fi
+
+  if [ "$(os::is_macos)" = "true" ]; then
+    date -jf "%Y-%m-%d %H:%M:%S" "$text" +%Y-%m-%d
+    return
+  fi
+
+  date -d "$text" +%Y-%m-%d
+}
+
 timestamp::gt() {
   local a=$1
   local b=$2
@@ -91,7 +106,10 @@ timestamp::now() {
 }
 
 export -f timestamp
+
 export -f timestamp::to_seconds
+export -f timestamp::to_date
+
 export -f timestamp::gt
 export -f timestamp::lt
 export -f timestamp::in_x_minutes

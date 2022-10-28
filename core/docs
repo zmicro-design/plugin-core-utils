@@ -1,0 +1,68 @@
+#!/bin/bash
+
+docs::module() {
+  local module=$1
+  if [ -z "$module" ]; then
+    log::error "[docs::module] module is required"
+    return 1
+  fi
+
+  local filepath=$ZMICRO_PLUGINS_PATH/core-utils/core/$module
+  if [ ! -f "$filepath" ]; then
+    log::error "[docs::module] ${module} is not a module"
+    return 1
+  fi
+
+  local fns=$(cat $filepath | grep "^export" | awk '{print $3}')
+  local i=0
+  for fn in $fns; do
+    i=$((i + 1))
+    local comment=$(cat $filepath | grep "^# ${fn} " | awk -F '#' '{print $2}' | awk -F $fn" " '{print $2}')
+    if [ -z "$comment" ]; then
+      comment="@TODO comment missing"
+    fi
+
+    log::info "${i}. $fn - $comment"
+    echo ""
+  done
+}
+
+docs::method() {
+  local fn=$1
+  if [ -z "$fn" ]; then
+    log::error "[docs::method] fn is required"
+    return 1
+  fi
+
+  local module=$(echo "$fn" | awk -F '::' '{print $1}')
+  local short_name=$(echo "$fn" | awk -F '::' '{print $2}')
+  if [ -z "$short_name" ]; then
+    log::error "[docs::method] invalid method name, syntax: module::short_name."
+    return 1
+  fi
+
+  local filepath=$ZMICRO_PLUGINS_PATH/core-utils/core/$module
+  if [ ! -f "$filepath" ]; then
+    log::error "[docs::method] ${module} is not a module"
+    return 1
+  fi
+
+  local comment=$(cat $filepath | grep "^# ${fn} " | awk -F '#' '{print $2}' | awk -F $fn" " '{print $2}')
+  if [ -z "$comment" ]; then
+    comment="@TODO comment missing"
+  fi
+
+  local usage=$(cat $filepath | grep "^# ${fn}@usage" | awk -F '#' '{print $2}')
+  if [ -z "$usage" ]; then
+    usage="@TODO usage missing"
+  fi
+
+  log::info "$fn"
+  log::info ""
+  log::info "  $comment"
+  log::info ""
+  log::info "  usage: $usage"
+}
+
+export -f docs::module
+export -f docs::method

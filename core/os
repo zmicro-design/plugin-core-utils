@@ -931,6 +931,7 @@ os::get_env() {
   env::get $1
 }
 
+# os::inquirer interacts with users.
 os::inquirer() {
   # load inquirer
   . $ZMICRO_PLUGINS_PATH/core-utils/core/inquirer/export
@@ -1355,6 +1356,8 @@ os::device() {
   os::device_config
 }
 
+# os::device_id get the device id
+# os::device_id@usage os::device_id
 os::device_id() {
   os::machine_id
 }
@@ -1515,6 +1518,7 @@ os::copy() {
   echo "$text" | xclip -selection clipboard
 }
 
+# os::usr_bin_dir gets the user bind directory.
 os::usr_bin_dir() {
   local usr_bin_dir=/usr/bin
 

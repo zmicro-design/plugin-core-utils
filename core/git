@@ -549,3 +549,5 @@ export -f git::global_setup
 export -f git::clone
 
 export -f git::has_branch
+
+

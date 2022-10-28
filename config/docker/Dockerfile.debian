@@ -8,6 +8,10 @@ ENV CI=true
 
 RUN curl -o- https://raw.githubusercontent.com/zcorky/zmicro/master/install | bash
 
+WORKDIR /build
+
+COPY . .
+
 RUN zmicro info
 
 RUN zmicro test core

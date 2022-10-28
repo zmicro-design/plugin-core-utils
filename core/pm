@@ -3,8 +3,7 @@
 pm() {
   # MacOS
   if [ "$(os::is_macos)" = "true" ]; then
-    which brew >>/dev/null 2>&1
-    if [ "$?" != "0" ]; then
+    if [ "$(os::has_command brew)" != "true" ]; then
       log::info "[$(timestamp)] homebrew is not installed, installing ..."
       zmicro package install brew
     fi
@@ -26,22 +25,19 @@ pm() {
   fi
 
   # CentOS
-  which yum >>/dev/null 2>&1
-  if [ "$?" = "0" ]; then
+  if [ "$(os::has_command yum)" = "true" ]; then
     sudo yum $@
     return
   fi
 
   # Ubuntu/Debian
-  which apt >>/dev/null 2>&1
-  if [ "$?" = "0" ]; then
+  if [ "$(os::has_command apt)" = "true" ]; then
     sudo apt $@
     return
   fi
 
   # Alpine
-  which apk >>/dev/null 2>&1
-  if [ "$?" = "0" ]; then
+  if [ "$(os::has_command apk)" = "true" ]; then
     local args=""
     for arg in $@; do
       case $arg in
@@ -59,15 +55,13 @@ pm() {
   fi
 
   # Fedora
-  which dnf >>/dev/null 2>&1
-  if [ "$?" = "0" ]; then
+  if [ "$(os::has_command dnf)" = "true" ]; then
     sudo dnf $@
     return
   fi
 
   # Archlinux
-  which pacman >>/dev/null 2>&1
-  if [ "$?" = "0" ]; then
+  if [ "$(os::has_command pacman)" = "true" ]; then
     # ignore -yqq in mac
     local args=""
     for arg in $@; do
@@ -88,8 +82,7 @@ pm() {
   fi
 
   # Flatpak
-  which flatpak >>/dev/null 2>&1
-  if [ "$?" = "0" ]; then
+  if [ "$(os::has_command flatpak)" = "true" ]; then
     # ignore -yqq in mac
     local args=""
     for arg in $@; do
@@ -107,8 +100,7 @@ pm() {
   fi
 
   # Scoop
-  which scoop >>/dev/null 2>&1
-  if [ "$?" = "0" ]; then
+  if [ "$(os::has_command scoop)" = "true" ]; then
     # ignore -yqq in mac
     local args=""
     for arg in $@; do
@@ -126,8 +118,7 @@ pm() {
   fi
 
   # Winget
-  which winget >>/dev/null 2>&1
-  if [ "$?" = "0" ]; then
+  if [ "$(os::has_command winget)" = "true" ]; then
     # ignore -yqq in mac
     local args=""
     for arg in $@; do

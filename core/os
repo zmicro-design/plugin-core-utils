@@ -755,6 +755,7 @@ os::info() {
   local architecture=$(os::arch)
   local is_docker=false
   local device=$(os::device)
+  local cpu_brand=$(os::cpu_brand)
   local load=$(os::usage)
   local timestamp=$(os::timestamp)
 
@@ -795,6 +796,7 @@ $(users::doing)\n\
 ## Device\n\
 * id: $id\n\
 * device: $device\n\
+* cpu brand: $cpu_brand\n\
 \n\
 ## Load\n\
 * load: $load\n\
@@ -826,6 +828,7 @@ os::info_json() {
   # local load=$(os::usage)
   local timestamp=$(os::timestamp)
 
+  local cpu_brand=$(os::cpu_brand)
   local cpu_cores=$(os::cpu_cores)
   local memory_total=$(os::memory_total)
   local disk_total=$(os::disk_total)
@@ -870,6 +873,7 @@ os::info_json() {
   "system_distribution": "$distribution",
   "system_arch": "$architecture",
   "device_id": "$id",
+  "cpu_brand": "$cpu_brand",
   "cpu_cores": $cpu_cores,
   "memory_total": $memory_total,
   "disk_total": $disk_total,

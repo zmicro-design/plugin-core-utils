@@ -265,3 +265,13 @@ function test_git::checkout_with_commit() {
 
   rm -rf $context
 }
+
+function test_git::commit_timestamp() {
+  local commit_timestamp=$(git::commit_timestamp)
+  
+  testing::expect \
+    "${FUNCNAME[0]}" \
+    "to_equal" \
+    "3" \
+    "$(string::split_length - $commit_timestamp)"
+}

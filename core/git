@@ -21,15 +21,7 @@ git::commit_author() {
 }
 
 git::commit_timestamp() {
-  local gitMainVersion=$(git --version | awk '{print $3}' | awk -F '.' '{print $1}')
-  local gitSubVersion=$(git --version | awk '{print $3}' | awk -F '.' '{print $2}')
-
-  if [ "$gitMainVersion" -ge "2" ] && [ "$gitSubVersion" -ge "7" ]; then
-    git show -s --format=%cd --date="format:%Y-%m-%d"
-  else
-    local datetime_str=$(git show -s --format=%cd --date=local)
-    timestamp::to_date "$datetime_str"
-  fi
+  git::commit_timestamp_date
 }
 
 git::commit_timestamp_date() {
@@ -39,7 +31,8 @@ git::commit_timestamp_date() {
   if [ "$gitMainVersion" -ge "2" ] && [ "$gitSubVersion" -ge "7" ]; then
     git show -s --format=%cd --date="format:%Y-%m-%d"
   else
-    git show -s --format=%cd --date=local
+    local datetime_str=$(git show -s --format=%cd --date=local)
+    timestamp::to_date "$datetime_str"
   fi
 }
 

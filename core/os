@@ -1353,6 +1353,20 @@ os::curl() {
   curl "$@"
 }
 
+os::download() {
+  local filepath=$1
+  local url=$2
+  if [ -z "$filepath" ]; then
+    log::error "[os::download] filepath(.1) is required"
+  fi
+
+  if [ -z "$url" ]; then
+    log::error "[os::download] url(.2) is required"
+  fi
+
+  os::curl --progress-bar -fSL $url -o $filepath
+}
+
 os::device() {
   os::device_config
 }
@@ -1644,6 +1658,7 @@ export -f os::md5
 
 export -f os::wget
 export -f os::curl
+export -f os::download
 
 export -f os::device
 export -f os::device_id

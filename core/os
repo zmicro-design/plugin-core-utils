@@ -341,10 +341,23 @@ os::is_ip() {
   fi
 }
 
+os::cpu_brand() {
+  # references:
+  #   1. https://osxdaily.com/2011/07/15/get-cpu-info-via-command-line-in-mac-os-x/
+  #   2. https://apple.stackexchange.com/questions/352769/does-macos-have-a-command-to-retrieve-detailed-cpu-information-like-proc-cpuinf
+  if [ "$(os::is_macos)" = "true" ]; then
+    sysctl -n machdep.cpu.brand_string
+    return
+  fi
+
+  cat /proc/cpuinfo | grep "model name" | awk -F ':' '{print $2}'
+}
+
 os::cpu_cores() {
   local cpus=0
 
   if [ "$(os::is_macos)" = "true" ]; then
+    # also sysctl -n machdep.cpu.core_count
     cpus=$(sysctl -n hw.ncpu)
   else
     cpus=$(cat /proc/cpuinfo | grep processor | wc -l)
@@ -1653,6 +1666,7 @@ export -f os::download
 export -f os::device
 export -f os::device_id
 
+export -f os::cpu_brand
 export -f os::cpu_cores
 export -f os::memory_total
 export -f os::disk_total

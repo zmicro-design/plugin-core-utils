@@ -3,8 +3,7 @@
 # clean::docker cleans docker images and containers
 # reference: https://note.qidong.name/2017/06/26/docker-clean/
 clean::docker() {
-  which docker >>/dev/null 2>&1
-  if [ "$?" != "0" ]; then
+  if [ "$(os::has_command docker)" != "true" ]; then
     log::info "[$(timestamp)][clean::docker] ignored, docker not found"
     return
   fi

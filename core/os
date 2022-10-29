@@ -123,8 +123,7 @@ os::platform() {
 
 os::release() {
   if [ "$(os::is_macos)" = "true" ]; then
-    which sw_vers > /dev/null 2>&1
-    if [ $? -eq 0 ]; then
+    if [ "$(os::has_command sw_vers)" = "true" ]; then
       echo "$(sw_vers -productName) $(sw_vers -productVersion)"
     else
       echo "macOS unknown version"
@@ -141,8 +140,7 @@ os::release() {
   #   return
   # fi
 
-  which lsb_release >>/dev/null 2>&1
-  if [ "$?" = "0" ]; then
+  if [ "$(os::has_command lsb_release)" = "true" ]; then
     issue=$(lsb_release -d)
   else
     issue=$(cat /etc/issue)
@@ -238,8 +236,7 @@ os::is_linux() {
 }
 
 os::is_centos() {
-  which yum >>/dev/null 2>&1
-  if [ $? -eq 0 ]; then
+  if [ "$(os::has_command yum)" = "true" ]; then
     echo true
   else
     echo false
@@ -247,8 +244,7 @@ os::is_centos() {
 }
 
 os::is_ubuntu() {
-  which apt >>/dev/null 2>&1
-  if [ $? -eq 0 ]; then
+  if [ "$(os::has_command apt)" = "true" ]; then
     echo true
   else
     echo false
@@ -256,8 +252,7 @@ os::is_ubuntu() {
 }
 
 os::is_alpine() {
-  which apk >>/dev/null 2>&1
-  if [ $? -eq 0 ]; then
+  if [ "$(os::has_command apk)" = "true" ]; then
     echo true
   else
     echo false
@@ -265,8 +260,7 @@ os::is_alpine() {
 }
 
 os::is_archlinux() {
-  which pacman >>/dev/null 2>&1
-  if [ $? -eq 0 ]; then
+  if [ "$(os::has_command pacman)" = "true" ]; then
     echo true
   else
     echo false
@@ -274,8 +268,7 @@ os::is_archlinux() {
 }
 
 os::is_federa() {
-  which dnf >>/dev/null 2>&1
-  if [ $? -eq 0 ]; then
+  if [ "$(os::has_command dnf)" = "true" ]; then
     echo true
   else
     echo false
@@ -375,8 +368,7 @@ os::disk_total() {
   local disk=0
 
   if [ "$(os::is_macos)" = "true" ]; then
-    which diskutil >> /dev/null 2>&1
-    if [ "$?" = "0" ]; then
+    if [ "$(os::has_command diskutil)" = "true" ]; then
       local disk_name=disk0
       diskutil info $disk_name >> /dev/null 2>&1
       if [ "$?" = "0" ]; then
@@ -407,8 +399,7 @@ os::device_config() {
     memory=$(hostinfo | grep memory | awk -F " " '{print $4}' | awk -F '.' '{print $1}')
     # disk=$(os::disk_usage total)
 
-    which diskutil >> /dev/null 2>&1
-    if [ "$?" = "0" ]; then
+    if [ "$(os::has_command diskutil)" = "true" ]; then
       local disk_name=disk0
       diskutil info $disk_name >> /dev/null 2>&1
       if [ "$?" = "0" ]; then
@@ -1077,8 +1068,7 @@ os::fix_permissions() {
 
 os::distribution() {
   if [ "$(os::is_macos)" = "true" ]; then
-    which sw_vers > /dev/null 2>&1
-    if [ $? -eq 0 ]; then
+    if [ "$(os::has_command sw_vers)" = "true" ]; then
       echo "$(sw_vers -productName) $(sw_vers -productVersion)"
     else
       echo "macOS unknown version"
@@ -1143,8 +1133,7 @@ os::is_nodejs_installed() {
   export NODE_USER_HOME=$HOME/.node
   export PATH=$NODE_HOME/bin:$NODE_USER_HOME/bin:$PATH
 
-  which node >>/dev/null 2>&1
-  if [ "$?" = "0" ]; then
+  if [ "$(os::has_command node)" = "true" ]; then
     echo "true"
   else
     echo "false"
@@ -1157,8 +1146,7 @@ os::is_zx_installed() {
   export NODE_USER_HOME=$HOME/.node
   export PATH=$NODE_HOME/bin:$NODE_USER_HOME/bin:$PATH
 
-  which zx >>/dev/null 2>&1
-  if [ "$?" = "0" ]; then
+  if [ "$(os::has_command zx)" = "true" ]; then
     echo "true"
   else
     echo "false"
@@ -1171,8 +1159,7 @@ os::is_go_installed() {
   export GOPATH=$HOME/.go
   export PATH=$GOHOME/bin:$GOPATH/bin:$PATH
 
-  which go >>/dev/null 2>&1
-  if [ "$?" = "0" ]; then
+  if [ "$(os::has_command go)" = "true" ]; then
     echo "true"
   else
     echo "false"
@@ -1185,8 +1172,7 @@ os::is_deno_installed() {
   export DENO_USER_HOME=$HOME/.deno
   export PATH=$DENO_HOME/bin:$DENO_USER_HOME/bin:$PATH
 
-  which deno >>/dev/null 2>&1
-  if [ "$?" = "0" ]; then
+  if [ "$(os::has_command deno)" = "true" ]; then
     echo "true"
   else
     echo "false"
@@ -1199,8 +1185,7 @@ os::is_rust_installed() {
   export RUST_USER_HOME=$HOME/.rust
   export PATH=$RUST_HOME/rustc/bin:$RUST_HOME/cargo/bin:$RUST_USER_HOME/bin:$PATH
 
-  which rustc >>/dev/null 2>&1
-  if [ "$?" = "0" ]; then
+  if [ "$(os::has_command rustc)" = "true" ]; then
     echo "true"
   else
     echo "false"
@@ -1324,8 +1309,7 @@ os::md5() {
     return 1
   fi
   
-  which md5sum >>/dev/null 2>&1
-  if [ "$?" = "0" ]; then
+  if [ "$(os::has_command md5sum)" = "true" ]; then
     echo -n "$string" | md5sum | awk '{print $1}'
   else
     echo -n "$string" | openssl md5
@@ -1333,8 +1317,7 @@ os::md5() {
 }
 
 os::wget() {
-  which wget >>/dev/null 2>&1
-  if [ "$?" != "0" ]; then
+  if [ "$(os::has_command wget)" != "true" ]; then
     pm install -y wget
   fi
 
@@ -1345,8 +1328,7 @@ os::curl() {
   # apply proxy
   net::using_smart_proxy
 
-  which curl >>/dev/null 2>&1
-  if [ "$?" != "0" ]; then
+  if [ "$(os::has_command curl)" != "true" ]; then
     pm install -y curl
   fi
 
@@ -1544,6 +1526,14 @@ os::usr_bin_dir() {
   echo "$usr_bin_dir"
 }
 
+os::which() {
+  if [ "$(os::has_command which)" != "true" ]; then
+    pm install -yqq which
+  fi
+
+  which "$@"
+}
+
 export -f os::arch
 export -f os::platform
 export -f os::release
@@ -1682,3 +1672,5 @@ export -f os::git
 export -f os::gzfetch
 
 export -f os::usr_bin_dir
+
+export -f os::which

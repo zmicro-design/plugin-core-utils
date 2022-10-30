@@ -176,7 +176,6 @@ net::using_smart_proxy() {
       PROXY_PORT="$(config::get PROXY_PORT)"
 
       if [ "$(net::is_ip $PROXY_IP)" = "true" ]; then
-        echo "22"
         if [ "$(net::is_port_visitable $PROXY_IP $PROXY_PORT)" != "true" ]; then
           PROXY_IP=""
           PROXY_PORT=""

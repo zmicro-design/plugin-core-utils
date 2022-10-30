@@ -360,7 +360,11 @@ os::cpu_cores() {
     # also sysctl -n machdep.cpu.core_count
     cpus=$(sysctl -n hw.ncpu)
   else
-    cpus=$(cat /proc/cpuinfo | grep processor | wc -l)
+    if [ "$(os::has_command nproc)" ]; then
+      cpus=$(nproc)
+    else
+      cpus=$(cat /proc/cpuinfo | grep processor | wc -l)
+    fi
   fi
 
   echo $cpus

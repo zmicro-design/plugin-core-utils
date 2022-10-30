@@ -44,6 +44,8 @@ pm() {
       install)
         args="$args add"
         ;;
+      -yqq) ;;
+      -y) ;;
       *)
         args="$args $arg"
         ;;

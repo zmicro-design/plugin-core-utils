@@ -1375,7 +1375,15 @@ os::curl() {
     pm install -y curl
   fi
 
-  curl "$@"
+  # 1. retry mechanism: https://stackoverflow.com/questions/42873285/curl-retry-mechanism
+  # 2. follow redirect
+  # 3. @TODO continue
+  curl \
+    --connect-timeout 10 \
+    --retry 5 \
+    --retry-delay 1 \
+    -L \
+    "$@"
 }
 
 os::download() {

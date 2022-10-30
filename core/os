@@ -267,7 +267,7 @@ os::is_archlinux() {
   fi
 }
 
-os::is_federa() {
+os::is_fedora() {
   if [ "$(os::has_command dnf)" = "true" ]; then
     echo true
   else
@@ -1587,7 +1587,7 @@ export -f os::is_centos
 export -f os::is_ubuntu
 export -f os::is_alpine
 export -f os::is_archlinux
-export -f os::is_federa
+export -f os::is_fedora
 
 export -f os::is_docker
 

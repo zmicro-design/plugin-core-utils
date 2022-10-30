@@ -770,6 +770,27 @@ os::info() {
     # load="$(os::usage)"
   fi
 
+  local CI_INFO=""
+  if [ "$(os::is_ci)" = "true" ]; then
+CI_INFO"\
+## CI env
+* GITHUB_REPOSITORY: $GITHUB_REPOSITORY\n\
+* GITHUB_REPOSITORY_OWNER:$GITHUB_REPOSITORY_OWNER\n\
+* GITHUB_REF_NAME: $GITHUB_REF_NAME\n\
+* GITHUB_REF: $GITHUB_REF\n\
+* GITHUB_SERVER_URL: $GITHUB_SERVER_URL\n\
+* RUNNER_NAME: $RUNNER_NAME\n\
+* RUNNER_OS: $RUNNER_OS\n\
+* RUNNER_ARCH: $RUNNER_ARCH\n\
+* RUNNER_TRACKING_ID: $RUNNER_TRACKING_ID\n\
+* RUNNER_TEMP: $RUNNER_TEMP\n\
+* RUNNER_USER: $RUNNER_USER\n\
+* RUNNER_TOOL_CACHE: $RUNNER_TOOL_CACHE\n\
+* RUNNER_WORKSPACE: $RUNNER_WORKSPACE\n\
+* RUNNER_PERFLOG: $RUNNER_PERFLOG\n\
+"
+  fi
+
   local info="\
 ## Network\n\
 * public: $ip\n\
@@ -801,6 +822,7 @@ $(users::doing)\n\
 * id: $id\n\
 * device: $device\n\
 * cpu brand: $cpu_brand\n\
+${CI_INFO}
 \n\
 ## Load\n\
 * load: $load\n\

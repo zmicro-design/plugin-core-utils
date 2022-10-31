@@ -167,33 +167,37 @@ net::get_ip_internal() {
 net::using_smart_proxy() {
   # if no proxy is specified, check the proxy settings
   if [ -z "$HTTPS_PROXY" ]; then
-    # @TODO auto check proxy and using
-    export PROXY_IP=${PROXY_IP}
-    export PROXY_PORT=${PROXY_PORT}
-    # CUSTOM
-    if [ "$(config::get PROXY_IP)" != "" ]; then
-      PROXY_IP="$(config::get PROXY_IP)"
-      PROXY_PORT="$(config::get PROXY_PORT)"
+    # if no PROXY_IP or PROXY_PORT found, try to get PROXY_IP and PROXY_PORT from config
+    if [ -z "$PROXY_IP" ] || [ -z "$PROXY_PORT" ]; then
+      # @TODO auto check proxy and using
+      export PROXY_IP=${PROXY_IP}
+      export PROXY_PORT=${PROXY_PORT}
+      # CUSTOM
+      if [ "$(config::get PROXY_IP)" != "" ]; then
+        PROXY_IP="$(config::get PROXY_IP)"
+        PROXY_PORT="$(config::get PROXY_PORT)"
 
-      if [ "$(net::is_ip $PROXY_IP)" = "true" ]; then
-        if [ "$(net::is_port_visitable $PROXY_IP $PROXY_PORT)" != "true" ]; then
-          PROXY_IP=""
-          PROXY_PORT=""
+        if [ "$(net::is_ip $PROXY_IP)" = "true" ]; then
+          if [ "$(net::is_port_visitable $PROXY_IP $PROXY_PORT)" != "true" ]; then
+            PROXY_IP=""
+            PROXY_PORT=""
+          fi
+        else
+          curl -s -I http://$PROXY_IP:$PROXY_PORT --connect-timeout 3 >>/dev/null 2>&1
+          if [ "$?" != "0" ]; then
+            PROXY_IP=""
+            PROXY_PORT=""
+          fi
         fi
       else
-        curl -s -I http://$PROXY_IP:$PROXY_PORT --connect-timeout 3 >>/dev/null 2>&1
-        if [ "$?" != "0" ]; then
-          PROXY_IP=""
-          PROXY_PORT=""
+        PROXY_PORT=$(net::try_to_get_proxy_port)
+        if [ "$PROXY_PORT" != "" ]; then
+          PROXY_IP="127.0.0.1"
         fi
-      fi
-    else
-      PROXY_PORT=$(net::try_to_get_proxy_port)
-      if [ "$PROXY_PORT" != "" ]; then
-        PROXY_IP="127.0.0.1"
       fi
     fi
 
+    # found PROXY_IP and PROXY_PORT, apply the proxy settings
     if [ -n "$PROXY_IP" ] && [ -n "$PROXY_PORT" ]; then
       log::debug "[$(timestamp)] using proxy: $PROXY_IP:$PROXY_PORT"
       export PROXY_IP=$PROXY_IP

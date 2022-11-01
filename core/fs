@@ -224,6 +224,9 @@ fs::watch() {
   done
 }
 
+# fs::has_flag checks whether the file exists flag
+# fs::has_flag@usage <filepath> <flag>
+# fs::has_flag@example $HOME/.zshrc ZMICRO
 fs::has_flag() {
   local filepath=$1
   local flag=$2

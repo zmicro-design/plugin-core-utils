@@ -52,16 +52,23 @@ docs::method() {
     comment="@TODO comment missing"
   fi
 
-  local usage=$(cat $filepath | grep "^# ${fn}@usage" | awk -F '#' '{print $2}')
+  local usage=$(cat $filepath | grep "^# ${fn}@usage" | awk -F '#' '{print $2}' | awk -F '@usage ' '{print $2}')
   if [ -z "$usage" ]; then
     usage="@TODO usage missing"
+  fi
+
+  local usage=$(cat $filepath | grep "^# ${fn}@example" | awk -F '#' '{print $2}' | awk -F '@example ' '{print $2}')
+  if [ -z "$usage" ]; then
+    usage="@TODO example missing"
   fi
 
   log::info "$fn"
   log::info ""
   log::info "  $comment"
   log::info ""
-  log::info "  usage: $usage"
+  log::info "  usage: $fn $usage"
+  log::info ""
+  log::info "  example: $fn $usage"
 }
 
 export -f docs::module

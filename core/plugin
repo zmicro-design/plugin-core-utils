@@ -569,7 +569,7 @@ plugin::run() {
     zmicro plugin description $plugin_name
   elif [ "$plugin_command_real" = "dependencies" ]; then
     zmicro plugin dependencies $plugin_name
-  elif [ "$plugin_command_real" = "update" ] && [ ! -f "$PLUGIN_DIR/commands/update" ]; then
+  elif [ "$plugin_command_real" = "update" ]; then
     # @TODO
     local option=$(echo $plugin_command_args_real | awk '{print $1}')
     if [ "$option" = "-f" ] || [ "$option" = "--force" ]; then
@@ -578,8 +578,11 @@ plugin::run() {
     else
       zmicro plugin update $plugin_name
     fi
-    if [ "$?" = "0" ]; then
-      plugin::try_to_run_command $plugin_name $plugin_command_real $plugin_command_args_real
+
+    if [ -f "$PLUGIN_DIR/commands/update" ]; then
+      if [ "$?" = "0" ]; then
+        plugin::try_to_run_command $plugin_name $plugin_command_real $plugin_command_args_real
+      fi
     fi
   elif [ "$plugin_command_real" = "register" ]; then
     zmicro plugin register $plugin_name

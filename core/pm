@@ -32,6 +32,13 @@ pm() {
 
   # Ubuntu/Debian
   if [ "$(os::has_command apt)" = "true" ]; then
+    # apt proxy support
+    # stackoverflow: https://askubuntu.com/questions/7470/how-to-run-sudo-apt-get-update-through-proxy-in-commandline
+    if [ -n "$HTTP_PROXY" ]; then
+      sudo apt -o Acquire::http::Proxy="$HTTP_PROXY" $@
+      return
+    fi
+
     sudo apt $@
     return
   fi

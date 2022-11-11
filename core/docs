@@ -57,9 +57,9 @@ docs::method() {
     usage="@TODO usage missing"
   fi
 
-  local usage=$(cat $filepath | grep "^# ${fn}@example" | awk -F '#' '{print $2}' | awk -F '@example ' '{print $2}')
+  local example=$(cat $filepath | grep "^# ${fn}@example" | awk -F '#' '{print $2}' | awk -F '@example ' '{print $2}')
   if [ -z "$usage" ]; then
-    usage="@TODO example missing"
+    example="@TODO example missing"
   fi
 
   log::info "$fn"
@@ -68,7 +68,7 @@ docs::method() {
   log::info ""
   log::info "  usage: $fn $usage"
   log::info ""
-  log::info "  example: $fn $usage"
+  log::info "  example: $fn $example"
 }
 
 export -f docs::module

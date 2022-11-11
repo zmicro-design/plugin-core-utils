@@ -295,6 +295,17 @@ os::is_docker() {
   echo "false"
 }
 
+# os::is_docker_build_env checks is in docker build env
+# os::is_docker_build_env@usage => true | false
+# os::is_docker_build_env@example
+os::is_docker_build_env() {
+  if [ "$(hostname)" = "buildkitsandbox" ]; then
+    echo "true"
+  else
+    echo "false"
+  fi
+}
+
 os::top() {
   htop -t
 }
@@ -1638,6 +1649,7 @@ export -f os::is_archlinux
 export -f os::is_fedora
 
 export -f os::is_docker
+export -f os::is_docker_build_env
 
 export -f os::top
 export -f os::is_command_exist

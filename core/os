@@ -299,7 +299,7 @@ os::is_docker() {
 # os::is_docker_build_env@usage => true | false
 # os::is_docker_build_env@example
 os::is_docker_build_env() {
-  if [ "$(hostname)" = "buildkitsandbox" ]; then
+  if [ "$(os::hostname)" = "buildkitsandbox" ]; then
     echo "true"
   else
     echo "false"

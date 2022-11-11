@@ -1585,6 +1585,24 @@ os::which() {
   which "$@"
 }
 
+# os::create_large_file creates a large file for testing purposes.
+# os::create_large_file@usage <filepath> <size>
+# os::create_large_file@example $PWD/test.bin 10240 (size: 10G)
+os::create_large_file() {
+  local filepath=$1
+  local size=$2
+
+  if [ -z "$filepath" ]; then
+    filepath="./largefile.tmp"
+  fi
+
+  if [ -z "$size" ]; then
+    size=1024
+  fi
+
+  dd if=/dev/urandom of=$filepath bs=1M count=$size >>/dev/null 2>&1
+}
+
 export -f os::arch
 export -f os::platform
 export -f os::release
@@ -1726,3 +1744,6 @@ export -f os::gzfetch
 export -f os::usr_bin_dir
 
 export -f os::which
+
+export -f os::create_large_file
+

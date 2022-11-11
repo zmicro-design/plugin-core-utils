@@ -754,6 +754,7 @@ os::info() {
   local uptime=$(os::uptime)
   local hostname=$(os::hostname)
   local kernel=$(os::kernel)
+  local platform=$(os::platform)
   local release=$(os::release)
   local distribution=$(os::distribution)
   local architecture=$(os::arch)
@@ -813,9 +814,10 @@ $(users::doing)\n\
 ## System\n\
 * shell: $shell\n\
 * hostname: $hostname\n\
-* kernel: $kernel\n\
-* distribution: $distribution\n\
 * arch: $architecture\n\
+* kernel: $kernel\n\
+* platform: $platform\n\
+* distribution: $distribution\n\
 * is_docker: $is_docker\n\
 \n\
 ## Device\n\
@@ -846,6 +848,7 @@ os::info_json() {
   local release=$(os::release)
   local distribution=$(os::distribution)
   local architecture=$(os::arch)
+  local platform=$(os::platform)
   local is_workspace=$(os::is_workspace)
   local is_docker=$(os::is_docker)
   local is_macos=$(os::is_macos)
@@ -898,6 +901,7 @@ os::info_json() {
   "system_kernel": "$kernel",
   "system_distribution": "$distribution",
   "system_arch": "$architecture",
+  "system_platform": "$platform",
   "device_id": "$id",
   "cpu_brand": "$cpu_brand",
   "cpu_cores": $cpu_cores,

@@ -103,6 +103,11 @@ timestamp::recently() {
   timestamp::in_x_minutes 5 $@
 }
 
+# in 1 days
+timestamp::in_one_day() {
+  timestamp::in_x_minutes 1440 $@
+}
+
 timestamp::now() {
   date +%s
 }
@@ -116,4 +121,5 @@ export -f timestamp::gt
 export -f timestamp::lt
 export -f timestamp::in_x_minutes
 export -f timestamp::recently
+export -f timestamp::in_one_day
 export -f timestamp::now

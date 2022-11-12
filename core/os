@@ -1618,6 +1618,14 @@ os::create_large_file() {
   dd if=/dev/urandom of=$filepath bs=1M count=$size >>/dev/null 2>&1
 }
 
+os::timeout() {
+  if [ "$(os::has_command gztimeout)" = "false" ]; then
+    zmicro package install gztimeout
+  fi
+
+  gztimeout "$@"
+}
+
 export -f os::arch
 export -f os::platform
 export -f os::release
@@ -1763,3 +1771,4 @@ export -f os::which
 
 export -f os::create_large_file
 
+export -f os::timeout

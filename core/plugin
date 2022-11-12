@@ -806,6 +806,22 @@ plugin::has_update() {
   fi
 }
 
+plugin::has_update_speed() {
+  local name=$1
+  if [ -z "$name" ]; then
+    log::error "[$(timestamp)][plugin::has_update_speed] name is required"
+    return 1
+  fi
+
+  # if check in 1 day, return false
+  if [ "$(lock::request plugin_has_update_speed.${name} 1440)" = "false" ]; then
+    echo "false"
+    return
+  fi
+
+  plugin::has_update $name
+}
+
 plugin::get_remote_url() {
   local name=$1
   if [ -z "$name" ]; then
@@ -1045,6 +1061,8 @@ export -f plugin::version_echo
 export -f plugin::update
 
 export -f plugin::has_update
+export -f plugin::has_update_speed
+
 export -f plugin::get_remote_url
 export -f plugin::get_remote_version
 

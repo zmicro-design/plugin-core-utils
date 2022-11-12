@@ -16,7 +16,7 @@ function test_lock::request() {
     "${FUNCNAME[0]}" \
     "to_equal" \
     "true" \
-    "$(lock::request $name 3600)"
+    "$(lock::request $name 1440)"
 
   testing::expect \
     "${FUNCNAME[0]}" \
@@ -48,19 +48,19 @@ function test_lock::clean() {
     "${FUNCNAME[0]}" \
     "to_equal" \
     "true" \
-    "$(lock::request test_lock_clean_1 3600)"
+    "$(lock::request test_lock_clean_1 1440)"
 
   testing::expect \
     "${FUNCNAME[0]}" \
     "to_equal" \
     "true" \
-    "$(lock::request test_lock_clean_2 3600)"
+    "$(lock::request test_lock_clean_2 1440)"
 
   testing::expect \
     "${FUNCNAME[0]}" \
     "to_equal" \
     "true" \
-    "$(lock::request test_lock_clean_3 3600)"
+    "$(lock::request test_lock_clean_3 1440)"
 
   testing::expect \
     "${FUNCNAME[0]}" \

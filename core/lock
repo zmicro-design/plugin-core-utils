@@ -62,12 +62,12 @@ lock::request() {
     return 1
   fi
 
-  local lock_pattern="zmicro.lock.${name}"
-  local lock_filepath="/tmp/${lock_pattern}.$(date +%s)"
+  local lock_pattern="zmicro.lock.${name}."
+  local lock_filepath="/tmp/${lock_pattern}$(date +%s)"
 
-  ls /tmp | grep "${lock_pattern}" >>/dev/null 2>&1
-  if [ "$?" = "0" ]; then
-    local last_update_timestamp=$(ls /tmp | grep "${lock_pattern}" | tail -n 1 | awk -F '.' '{print $4}')
+  local filepath=$(ls /tmp | grep "${lock_pattern}")
+  if [ -n "$filepath" ]; then
+    local last_update_timestamp=$(echo ${filepath#$lock_pattern})
     if [ "$(timestamp::in_x_minutes $age $last_update_timestamp)" = "true" ]; then
       echo "false"
     else

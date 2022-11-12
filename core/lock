@@ -22,7 +22,7 @@ plugin::is_plugin_need_update() {
   local new_update_lock_file="/tmp/${format_prefix}$(date +%s)"
   # echo "plugin_name: $new_update_lock_file"
 
-  ls /tmp | grep "${format_prefix}" >> /dev/null 2>&1
+  ls /tmp | grep "${format_prefix}" >>/dev/null 2>&1
   if [ "$?" = "0" ]; then
     local last_update_timestamp=$(ls /tmp | grep "${format_prefix}" | tail -n 1 | awk -F '.' '{print $4}')
     # echo "xxx: $last_update_timestamp $(timestamp::recently $last_update_timestamp)"
@@ -38,7 +38,7 @@ plugin::is_plugin_need_update() {
       echo "true"
     fi
   else
-    touch $new_update_lock_file >> /dev/null 2>&1
+    touch $new_update_lock_file >>/dev/null 2>&1
     echo "true"
   fi
 }
@@ -49,6 +49,77 @@ plugin::clean_lock() {
   sudo rm -f $path
 }
 
+lock::request() {
+  local name=$1
+  local age=$2
+  if [ -z "$name" ]; then
+    log::error "[lock::request] name is required"
+    return 1
+  fi
+
+  if [ -z "$age" ]; then
+    log::error "[lock::request] age is required"
+    return 1
+  fi
+
+  local lock_pattern="zmicro.lock.${name}"
+  local lock_filepath="/tmp/${lock_pattern}.$(date +%s)"
+
+  ls /tmp | grep "${lock_pattern}" >>/dev/null 2>&1
+  if [ "$?" = "0" ]; then
+    local last_update_timestamp=$(ls /tmp | grep "${lock_pattern}" | tail -n 1 | awk -F '.' '{print $4}')
+    # echo "xxx: $last_update_timestamp $(timestamp::recently $last_update_timestamp)"
+    if [ "$(timestamp::recently $last_update_timestamp)" = "true" ]; then
+      echo "false"
+    else
+      # local origin_lock_filename=$(ls /tmp | grep "${lock_pattern}" | tail -n 1)
+      # echo "remove /tmp/$origin_lock_filename"
+
+      lock::release $name
+
+      sleep 1
+      touch $lock_filepath >>/dev/null
+      echo "true"
+    fi
+  else
+    touch $lock_filepath >>/dev/null
+    echo "true"
+  fi
+}
+
+lock::release() {
+  local name=$1
+  local lock_filepattern="zmicro.lock.${name}."
+  local lock_filename=$(ls /tmp | grep "${lock_filepattern}")
+  local lock_filepath="/tmp/${lock_filename}"
+  
+  if [ -z "$lock_filename" ] || [ ! -f "$lock_filepath" ]; then
+    return
+  fi
+
+  if [ ! -w "$lock_filepath" ]; then
+    sudo rm -f $lock_filepath
+  else
+    rm -f $lock_filepath
+  fi
+}
+
+lock::clean() {
+  local files=$(ls /tmp | grep "zmicro.lock.")
+  for file in $files; do
+    local file_path="/tmp/$file"
+    if [ ! -w "$file_path" ]; then
+      sudo rm -f $file_path
+    else
+      rm -f $file_path
+    fi
+  done
+}
+
 export -f plugin::get_plugin_update_lock
 export -f plugin::is_plugin_need_update
 export -f plugin::clean_lock
+
+export -f lock::request
+export -f lock::release
+export -f lock::clean

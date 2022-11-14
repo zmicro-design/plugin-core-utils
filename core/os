@@ -1550,7 +1550,13 @@ os::gzfetch() {
   net::using_smart_proxy
 
   if [ "$(os::is_command_exist gzfetch)" != "true" ]; then
-    zmicro package install gzfetch >> /dev/null 2>&1
+    local tmp_error_file=$(os::tmp_file)
+    zmicro package install gzfetch >> /dev/null 2>$tmp_error_file
+    if [ "$?" != "0" ]; then
+      log::error "[os::gzfetch] failed to install gzfetch"
+      log::error "[os::gzfetch] error detail: $(cat $tmp_error_file)"
+      return 1
+    fi
   fi
 
   gzfetch "$@"

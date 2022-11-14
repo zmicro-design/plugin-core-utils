@@ -1629,6 +1629,22 @@ os::timeout() {
   gztimeout "$@"
 }
 
+os::unzip() {
+  if [ "$(os::has_command unzip)" != "true" ]; then
+    pm install -y unzip
+  fi
+
+  unzip "$@"
+}
+
+os::tar() {
+  if [ "$(os::has_command tar)" != "true" ]; then
+    pm install -y tar
+  fi
+
+  tar "$@"
+}
+
 export -f os::arch
 export -f os::platform
 export -f os::release
@@ -1775,3 +1791,6 @@ export -f os::which
 export -f os::create_large_file
 
 export -f os::timeout
+
+export -f os::unzip
+export -f os::tar

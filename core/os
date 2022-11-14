@@ -1379,6 +1379,9 @@ os::wget() {
     pm install -y wget
   fi
 
+  # apply proxy
+  net::using_smart_proxy
+
   wget "$@"
 }
 

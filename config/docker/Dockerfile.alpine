@@ -12,6 +12,4 @@ COPY . .
 
 RUN zmicro info
 
-RUN zmicro package install gzfetch
-
 RUN zmicro test core

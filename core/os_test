@@ -74,3 +74,43 @@ function test_os::gzfetch() {
 #     "098f6bcd4621d373cade4e832627b4f6" \
 #     "$(os::md5 test)"
 # }
+
+function test_os::is_file_type_tar_gz() {
+  testing::expect \
+    "${FUNCNAME[0]} abc.tar.gz" \
+    "to_equal" \
+    "true" \
+    "$(os::is_file_type_tar_gz abc.tar.gz)"
+
+  testing::expect \
+    "${FUNCNAME[0]} /path/to/abc.tar.gz" \
+    "to_equal" \
+    "true" \
+    "$(os::is_file_type_tar_gz /path/to/abc.tar.gz)"
+
+  testing::expect \
+    "${FUNCNAME[0]} abc.zip" \
+    "to_equal" \
+    "false" \
+    "$(os::is_file_type_tar_gz abc.zip)"
+}
+
+function test_os::is_file_type_zip() {
+  testing::expect \
+    "${FUNCNAME[0]} abc.zip" \
+    "to_equal" \
+    "true" \
+    "$(os::is_file_type_zip abc.zip)"
+
+  testing::expect \
+    "${FUNCNAME[0]} /path/to/abc.zip" \
+    "to_equal" \
+    "true" \
+    "$(os::is_file_type_zip /path/to/abc.zip)"
+
+  testing::expect \
+    "${FUNCNAME[0]} abc.tar.gz" \
+    "to_equal" \
+    "false" \
+    "$(os::is_file_type_zip abc.tar.gz)"
+}

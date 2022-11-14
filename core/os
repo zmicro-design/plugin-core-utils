@@ -1645,6 +1645,54 @@ os::tar() {
   tar "$@"
 }
 
+os::is_file_type_tar_gz() {
+  local name=$1
+  echo "${name##*/}" | grep ".tar.gz" >> /dev/null 2>&1
+  if [ "$?" = "0" ]; then
+    echo "true"
+  else
+    echo "false"
+  fi
+}
+
+os::is_file_type_zip() {
+  local name=$1
+  if [ "${name##*.}" = "zip" ]; then
+    echo "true"
+  else
+    echo "false"
+  fi
+}
+
+os::extract() {
+  local filepath=$1
+  if [ -z "$filepath" ]; then
+    log::error "[os::extract] filepath is required"
+    return 1
+  fi
+
+  local tmp_error_file=$(os::tmp_file)
+
+  if [ "$(os::is_file_type_tar_gz $filepath)" = "true" ]; then
+    os::tar -zxvf $filepath >> /dev/null 2>$tmp_error_file
+    if [ "$?" != "0" ]; then
+      log::error "[os::extract] failed to extract file type(tar.gz): $filepath."
+      log::error "[os::extract] error detail: $(cat $tmp_error_file)"
+      return 1
+    fi
+  elif [ "$(os::is_file_type_zip $filepath)" = "true" ]; then
+    os::unzip -xo $filepath >> /dev/null 2>$tmp_error_file
+    if [ "$?" != "0" ]; then
+      log::error "[os::extract] failed to extract file type(zip): $filepath."
+      log::error "[os::extract] error detail: $(cat $tmp_error_file)"
+      return 1
+    fi
+  else
+    log::error "[os::extract] unsupported file type: $filepath."
+    return 1
+  fi
+}
+
 export -f os::arch
 export -f os::platform
 export -f os::release
@@ -1794,3 +1842,8 @@ export -f os::timeout
 
 export -f os::unzip
 export -f os::tar
+
+export -f os::is_file_type_tar_gz
+export -f os::is_file_type_zip
+
+export -f os::extract

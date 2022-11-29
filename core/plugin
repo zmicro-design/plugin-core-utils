@@ -768,19 +768,20 @@ plugin::update() {
     log::update plugin $plugin_name END $plugin_origin_version $plugin_new_version
   }
 
-  local name=$1
-  if [ "$name" != "" ]; then
-    update_one $name
-    return 0
-  fi
+  # local name=$1
+  # if [ "$name" != "" ]; then
+  #   update_one $name
+  #   return 0
+  # fi
 
   fn() {
     local name=$2
 
+    log::debug "[$(timestamp)][plugin::update] name => $name ..."
     update_one $name
   }
 
-  plugin::each fn
+  array::each fn $@
 }
 
 plugin::has_update() {

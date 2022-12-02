@@ -775,6 +775,11 @@ os::info() {
   local load=$(os::usage)
   local timestamp=$(os::timestamp)
 
+  local is_proxy_on=$(os::is_proxy_on)
+  local is_clash_on=$(os::is_clash_on)
+  local is_clashz_on=$(os::is_clashz_on)
+  local is_shadowsocks_on=$(os::is_shadowsocks_on)
+
   if [ "$(os::is_macos)" != "true" ]; then
     # release=$(os::release)
     # distribution=$(os::distribution)
@@ -782,26 +787,26 @@ os::info() {
     # load="$(os::usage)"
   fi
 
-  local CI_INFO=""
-  if [ "$(os::is_ci)" = "true" ]; then
-CI_INFO"\
-## CI env
-* GITHUB_REPOSITORY: $GITHUB_REPOSITORY\n\
-* GITHUB_REPOSITORY_OWNER:$GITHUB_REPOSITORY_OWNER\n\
-* GITHUB_REF_NAME: $GITHUB_REF_NAME\n\
-* GITHUB_REF: $GITHUB_REF\n\
-* GITHUB_SERVER_URL: $GITHUB_SERVER_URL\n\
-* RUNNER_NAME: $RUNNER_NAME\n\
-* RUNNER_OS: $RUNNER_OS\n\
-* RUNNER_ARCH: $RUNNER_ARCH\n\
-* RUNNER_TRACKING_ID: $RUNNER_TRACKING_ID\n\
-* RUNNER_TEMP: $RUNNER_TEMP\n\
-* RUNNER_USER: $RUNNER_USER\n\
-* RUNNER_TOOL_CACHE: $RUNNER_TOOL_CACHE\n\
-* RUNNER_WORKSPACE: $RUNNER_WORKSPACE\n\
-* RUNNER_PERFLOG: $RUNNER_PERFLOG\n\
-"
-  fi
+#   local CI_INFO=""
+#   if [ "$(os::is_ci)" = "true" ]; then
+# CI_INFO"\
+# ## CI env
+# * GITHUB_REPOSITORY: $GITHUB_REPOSITORY\n\
+# * GITHUB_REPOSITORY_OWNER:$GITHUB_REPOSITORY_OWNER\n\
+# * GITHUB_REF_NAME: $GITHUB_REF_NAME\n\
+# * GITHUB_REF: $GITHUB_REF\n\
+# * GITHUB_SERVER_URL: $GITHUB_SERVER_URL\n\
+# * RUNNER_NAME: $RUNNER_NAME\n\
+# * RUNNER_OS: $RUNNER_OS\n\
+# * RUNNER_ARCH: $RUNNER_ARCH\n\
+# * RUNNER_TRACKING_ID: $RUNNER_TRACKING_ID\n\
+# * RUNNER_TEMP: $RUNNER_TEMP\n\
+# * RUNNER_USER: $RUNNER_USER\n\
+# * RUNNER_TOOL_CACHE: $RUNNER_TOOL_CACHE\n\
+# * RUNNER_WORKSPACE: $RUNNER_WORKSPACE\n\
+# * RUNNER_PERFLOG: $RUNNER_PERFLOG\n\
+# "
+#   fi
 
   local info="\
 ## Network\n\
@@ -830,6 +835,15 @@ $(users::doing)\n\
 * platform: $platform\n\
 * distribution: $distribution\n\
 * is_docker: $is_docker\n\
+\n\
+## Proxy\n\
+* is_proxy_on: $is_proxy_on\n\
+* is_clash_on: $is_clash_on\n\
+* is_clashz_on: $is_clashz_on\n\
+* is_shadowsocks_on: $is_shadowsocks_on\n\
+* HTTP_PROXY: $HTTP_PROXY\n\
+* HTTPS_PROXY: $HTTPS_PROXY\n\
+* ALL_PROXY: $ALL_PROXY\n\
 \n\
 ## Device\n\
 * id: $id\n\
@@ -886,6 +900,11 @@ os::info_json() {
   local is_gitlab_ci=$(os::is_gitlab_ci)
   local is_eunomia_ci=$(os::is_eunomia_ci)
 
+  local is_proxy_on=$(os::is_proxy_on)
+  local is_clash_on=$(os::is_clash_on)
+  local is_clashz_on=$(os::is_clashz_on)
+  local is_shadowsocks_on=$(os::is_shadowsocks_on)
+
   local is_unchanged=false
   if [ "$zmicro_version_origin" = "$zmicro_version" ]; then
     is_unchanged=true
@@ -933,7 +952,14 @@ os::info_json() {
   "is_github_action": $is_github_action,
   "is_gitlab_ci": $is_gitlab_ci,
   "is_eunomia_ci": $is_eunomia_ci,
-  "system_timestamp": "$timestamp"
+  "system_timestamp": "$timestamp",
+  "is_proxy_on": "$is_proxy_on",
+  "is_clash_on": "$is_clash_on",
+  "is_clashz_on": "$is_clashz_on",
+  "is_shadowsocks_on": "$is_shadowsocks_on",
+  "http_proxy": "$HTTP_PROXY",
+  "https_proxy": "$HTTPS_PROXY",
+  "all_proxy": "$ALL_PROXY"
 }
 END
 )
@@ -1699,6 +1725,26 @@ os::extract() {
   fi
 }
 
+os::is_clash_on() {
+  net::is_port_visitable 127.0.0.1 7890
+}
+
+os::is_clashz_on() {
+  net::is_port_visitable 127.0.0.1 17890
+}
+
+os::is_shadowsocks_on() {
+  net::is_port_visitable 127.0.0.1 1080
+}
+
+os::is_proxy_on() {
+  if [ -n "$HTTPS_PROXY" ] || [ -n "$HTTP_PROXY" ] || [ -n "$ALL_PROXY" ]; then
+    echo "true"
+  else
+    echo "false"
+  fi
+}
+
 export -f os::arch
 export -f os::platform
 export -f os::release
@@ -1853,3 +1899,9 @@ export -f os::is_file_type_tar_gz
 export -f os::is_file_type_zip
 
 export -f os::extract
+
+export -f os::is_clash_on
+export -f os::is_clashz_on
+export -f os::is_shadowsocks_on
+
+export -f os::is_proxy_on

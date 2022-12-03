@@ -26,7 +26,8 @@ plugin::is_plugin_need_update() {
   if [ "$?" = "0" ]; then
     local last_update_timestamp=$(ls /tmp | grep "${format_prefix}" | tail -n 1 | awk -F '.' '{print $4}')
     # echo "xxx: $last_update_timestamp $(timestamp::recently $last_update_timestamp)"
-    if [ "$(timestamp::in_one_day $last_update_timestamp)" = "true" ]; then
+    # if [ "$(timestamp::in_one_day $last_update_timestamp)" = "true" ]; then
+    if [ "$(timestamp::recently $last_update_timestamp)" = "true" ]; then
       echo "false"
     else
       # local origin_lock_filename=$(ls /tmp | grep "${format_prefix}" | tail -n 1)

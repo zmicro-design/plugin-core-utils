@@ -1745,6 +1745,57 @@ os::is_proxy_on() {
   fi
 }
 
+os::get_system_http_proxy() {
+  # macos
+  if [ "$(os::is_macos)" = "true" ]; then
+    local is_enabled=$(scutil --proxy | grep HTTPEnable | awk '{print $3}')
+    if [ "${is_enabled}" = "1" ]; then
+      local ip="$(scutil --proxy | grep HTTPProxy | awk '{print $3}')"
+      local port="$(scutil --proxy | grep HTTPPort | awk '{print $3}')"
+      echo "http://$ip:$port"
+      return
+    fi
+  fi
+
+  # linux @TODO
+
+  echo ""
+}
+
+os::get_system_https_proxy() {
+  # macos
+  if [ "$(os::is_macos)" = "true" ]; then
+    local is_enabled=$(scutil --proxy | grep HTTPSEnable | awk '{print $3}')
+    if [ "${is_enabled}" = "1" ]; then
+      local ip="$(scutil --proxy | grep HTTPSProxy | awk '{print $3}')"
+      local port="$(scutil --proxy | grep HTTPSPort | awk '{print $3}')"
+      echo "http://$ip:$port"
+      return
+    fi
+  fi
+
+  # linux @TODO
+
+  echo ""
+}
+
+os::get_system_socks_proxy() {
+  # macos
+  if [ "$(os::is_macos)" = "true" ]; then
+    local is_enabled=$(scutil --proxy | grep SOCKSEnable | awk '{print $3}')
+    if [ "${is_enabled}" = "1" ]; then
+      local ip="$(scutil --proxy | grep SOCKSProxy | awk '{print $3}')"
+      local port="$(scutil --proxy | grep SOCKSPort | awk '{print $3}')"
+      echo "socks5://$ip:$port"
+      return
+    fi
+  fi
+
+  # linux @TODO
+
+  echo ""
+}
+
 export -f os::arch
 export -f os::platform
 export -f os::release
@@ -1905,3 +1956,7 @@ export -f os::is_clashz_on
 export -f os::is_shadowsocks_on
 
 export -f os::is_proxy_on
+
+export -f os::get_system_http_proxy
+export -f os::get_system_https_proxy
+export -f os::get_system_socks_proxy

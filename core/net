@@ -197,27 +197,38 @@ net::using_smart_proxy() {
       fi
     fi
 
-    if [ -z "$PROXY_IP" ] || [ -z "$PROXY_PORT" ]; then
-      # @TODO
-      PROXY_IP=inlets.zcorky.com
-      PROXY_PORT=20099
-      curl -s -I http://$PROXY_IP:$PROXY_PORT --connect-timeout 3 >>/dev/null 2>&1
-      if [ "$?" != "0" ]; then
-        PROXY_IP=""
-        PROXY_PORT=""
-      fi
-    fi
-
     # found PROXY_IP and PROXY_PORT, apply the proxy settings
     if [ -n "$PROXY_IP" ] && [ -n "$PROXY_PORT" ]; then
       log::debug "[$(timestamp)] using proxy: $PROXY_IP:$PROXY_PORT"
       export PROXY_IP=$PROXY_IP
       export PROXY_PORT=$PROXY_PORT
-      #
-      export https_proxy=http://$PROXY_IP:$PROXY_PORT http_proxy=http://$PROXY_IP:$PROXY_PORT all_proxy=socks5://$PROXY_IP:$PROXY_PORT
-      export HTTPS_PROXY=http://$PROXY_IP:$PROXY_PORT HTTP_PROXY=http://$PROXY_IP:$PROXY_PORT ALL_PROXY=socks5://$PROXY_IP:$PROXY_PORT
+
+      net::use_proxy $PROXY_IP $PROXY_PORT
     fi
   fi
+}
+
+net::use_proxy() {
+  local PROXY_IP=$1
+  local PROXY_PORT=$2
+
+  if [ -z "$PROXY_IP" ]; then
+    log::error "[$(timestamp)] PROXY_IP is required"
+    return 1
+  fi
+
+  if [ -z "$PROXY_PORT" ]; then
+    log::error "[$(timestamp)] PROXY_PORT is required"
+    return 1
+  fi
+
+  export https_proxy=http://$PROXY_IP:$PROXY_PORT http_proxy=http://$PROXY_IP:$PROXY_PORT all_proxy=socks5://$PROXY_IP:$PROXY_PORT
+  export HTTPS_PROXY=http://$PROXY_IP:$PROXY_PORT HTTP_PROXY=http://$PROXY_IP:$PROXY_PORT ALL_PROXY=socks5://$PROXY_IP:$PROXY_PORT
+}
+
+net::use_proxy_inlets() {
+  # @TODO
+  net::use_proxy inlets.zcorky.com 20099
 }
 
 net::try_to_get_proxy_port() {
@@ -277,6 +288,8 @@ export -f net::is_port_visitable
 export -f net::get_ip
 export -f net::get_ip_internal
 
+export -f net::use_proxy
+export -f net::use_proxy_inlets
 export -f net::using_smart_proxy
 export -f net::try_to_get_proxy_port
 

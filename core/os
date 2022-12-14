@@ -1796,6 +1796,50 @@ os::get_system_socks_proxy() {
   echo ""
 }
 
+os::make_executable() {
+  local filepath=$1
+  if [ -z "$filepath" ]; then
+    log::error "[$(timestamp)] filepath is required"
+    return 1
+  fi
+
+  if [ ! -f "$filepath" ]; then
+    log::error "[$(timestamp)] file($filepath) not found or not a file"
+    return 1
+  fi
+
+  chmod 755 $filepath
+}
+
+os::install() {
+  local bin_file=$1
+  local bin_dir=$2
+
+  if [ -z "$bin_file" ]; then
+    log::error "[$(timestamp)] bin_file is required"
+    return 1
+  fi
+
+  if [ -z "$bin_dir" ]; then
+    log::error "[$(timestamp)] bin_dir is required"
+    return 1
+  fi
+
+  if [ ! -f "$bin_file" ]; then
+    log::error "[$(timestamp)] bin_file($bin_file) not found or not a file"
+    return 1
+  fi
+
+  if [ ! -d "$bin_dir" ]; then
+    log::error "[$(timestamp)] bin_dir($bin_dir) not found or not a directory"
+    return 1
+  fi
+
+  os::make_executable $bin_file
+
+  sudo mv $bin_file $bin_dir
+}
+
 export -f os::arch
 export -f os::platform
 export -f os::release
@@ -1960,3 +2004,6 @@ export -f os::is_proxy_on
 export -f os::get_system_http_proxy
 export -f os::get_system_https_proxy
 export -f os::get_system_socks_proxy
+
+export -f os::make_executable
+export -f os::install

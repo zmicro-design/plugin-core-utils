@@ -1796,6 +1796,33 @@ os::get_system_socks_proxy() {
   echo ""
 }
 
+os::get_system_current_network_adapter() {
+  local currentservice="not_supported"
+  if [ "$(os::is_macos)" = "true" ]; then
+    # https://apple.stackexchange.com/questions/191879/how-to-find-the-currently-connected-network-service-from-the-command-line
+    while read -r line; do
+      local sname=$(echo "$line" | awk -F  "(, )|(: )|[)]" '{print $2}')
+      local sdev=$(echo "$line" | awk -F  "(, )|(: )|[)]" '{print $4}')
+      #echo "Current service: $sname, $sdev, $currentservice"
+      if [ -n "$sdev" ]; then
+          ifout="$(ifconfig "$sdev" 2>/dev/null)"
+          echo "$ifout" | grep 'status: active' > /dev/null 2>&1
+          rc="$?"
+          if [ "$rc" -eq 0 ]; then
+              currentservice="$sname"
+              # currentdevice="$sdev"
+              # currentmac=$(echo "$ifout" | awk '/ether/{print $2}')
+
+              # may have multiple active devices, so echo it here
+              # echo "$currentservice, $currentdevice, $currentmac"
+          fi
+      fi
+    done <<< "$(networksetup -listnetworkserviceorder | grep 'Hardware Port')"
+  fi
+
+  echo "$currentservice"
+}
+
 os::make_executable() {
   local filepath=$1
   if [ -z "$filepath" ]; then
@@ -2004,6 +2031,8 @@ export -f os::is_proxy_on
 export -f os::get_system_http_proxy
 export -f os::get_system_https_proxy
 export -f os::get_system_socks_proxy
+
+export -f os::get_system_current_network_adapter
 
 export -f os::make_executable
 export -f os::install

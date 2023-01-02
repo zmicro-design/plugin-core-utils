@@ -1796,8 +1796,11 @@ os::get_system_socks_proxy() {
   echo ""
 }
 
+# os::get_system_current_network_adapter gets system network adapter
+# os::get_system_current_network_adapter@usage  => adapter_name
+# os::get_system_current_network_adapter@example
 os::get_system_current_network_adapter() {
-  local currentservice="not_supported"
+  local currentservice=""
   if [ "$(os::is_macos)" = "true" ]; then
     # https://apple.stackexchange.com/questions/191879/how-to-find-the-currently-connected-network-service-from-the-command-line
     while read -r line; do
@@ -1821,6 +1824,45 @@ os::get_system_current_network_adapter() {
   fi
 
   echo "$currentservice"
+}
+
+# os::set_system_network_proxy sets system network proxy
+# os::set_system_network_proxy@usage adapter, proxy_ip, proxy_port, status => exit_code(1 | 0)
+# os::set_system_network_proxy@example
+os::set_system_network_proxy() {
+  local adapter="$1"
+  local proxy_ip="$2"
+  local proxy_port="$3"
+  local status="$4"
+  if [ "$adapter" = "" ]; then
+    log::error "[os::set_system_network_proxy] network adapter is required"
+    return 1
+  fi
+
+  if [ "$proxy_ip" = "" ]; then
+    log::error "[os::set_system_network_proxy] network proxy_ip is required"
+    return 1
+  fi
+
+  if [ "$proxy_port" = "" ]; then
+    log::error "[os::set_system_network_proxy] network proxy_port is required"
+    return 1
+  fi
+
+  if [ "$status" != "on" ] && [ "$status" != "off" ]; then
+    log::error "[os::set_system_network_proxy] status must in on | off, but got $status."
+    return 1
+  fi
+
+  if [ "$(os::is_macos)" = "true" ]; then
+    networksetup -setwebproxy ${adapter} ${proxy_ip} ${proxy_port} && networksetup -setwebproxystate ${adapter} ${status}
+    networksetup -setsecurewebproxy ${adapter} ${proxy_ip} ${proxy_port} && networksetup -setsecurewebproxystate ${adapter} ${status}
+    networksetup -setsocksfirewallproxy ${adapter} ${proxy_ip} ${proxy_port} && networksetup -setsocksfirewallproxystate ${adapter} ${status}
+    networksetup -setproxybypassdomains ${adapter} Empty
+  else
+    log::error "[os::set_system_network_proxy] not support current os, current only support macos"
+    return 1
+  fi
 }
 
 os::make_executable() {
@@ -2033,6 +2075,7 @@ export -f os::get_system_https_proxy
 export -f os::get_system_socks_proxy
 
 export -f os::get_system_current_network_adapter
+export -f os::set_system_network_proxy
 
 export -f os::make_executable
 export -f os::install

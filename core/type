@@ -130,9 +130,9 @@ string::replace() {
 }
 
 string::remove() {
-  local text=$1
-  local need_remove=$2
-  string::replace $text $need_remove
+  local text="$1"
+  local need_remove="$2"
+  string::replace "$text" "$need_remove"
 }
 
 string::match() {

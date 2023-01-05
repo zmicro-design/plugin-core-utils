@@ -126,7 +126,7 @@ string::replace() {
   fi
 
   # @TODO
-  echo $base | sed -e "s%${origin}%${new}%g"
+  echo "$base" | sed -e "s%${origin}%${new}%g"
 }
 
 string::remove() {

@@ -486,6 +486,8 @@ config::unset_ignore_if_exists() {
   export CONFIG_IGNORE_IF_EXISTS=
 }
 
+# config::profile_one config env to profile
+# config::profile_one@usage <filepath> <size>
 config::profile_one() {
   local profile=$1
   local flag=$2
@@ -497,14 +499,26 @@ config::profile_one() {
 
   local found=$(fs::has_flag "$profile" "$flag")
   if [ "$found" != "true" ]; then
+    echo "$flag" | fs::write -a $profile
     echo "$text" | fs::write -a $profile
   fi
 }
 
+# config::profile config env to the profile (.bashrc/.zshrc/.bash_profile/.profile)
+# config::profile@usage <filepath> <size>
+#
+# config::profile@example:
+#
+#   local envs=$(
+#     cat <<-END
+# export MVND_HOME=$usr_lib_dir/${name}
+# END
+# )
+#   config::profile "# ZMICRO PACKAGE MAVEN-MVND" "$envs"
 config::profile() {
-  local flag=$1
-  local text=$2
-  local base_path=${3:-$HOME}
+  local flag="$1"
+  local text="$2"
+  local base_path="${3:-$HOME}"
   
   local filenames=(
     .zshrc

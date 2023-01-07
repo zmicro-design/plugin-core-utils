@@ -1616,7 +1616,7 @@ os::copy() {
   echo "$text" | xclip -selection clipboard
 }
 
-# os::usr_bin_dir gets the user bind directory.
+# os::usr_bin_dir gets the user bin directory.
 os::usr_bin_dir() {
   local usr_bin_dir=/usr/bin
 
@@ -1625,6 +1625,17 @@ os::usr_bin_dir() {
   fi
 
   echo "$usr_bin_dir"
+}
+
+# os::usr_lib_dir gets the user lib directory.
+os::usr_lib_dir() {
+  local usr_lib_dir=/usr/lib
+
+  if [ "$(os::is_macos)" = "true" ]; then
+    usr_lib_dir=/usr/local/lib
+  fi
+
+  echo "$usr_lib_dir"
 }
 
 os::which() {
@@ -2049,6 +2060,7 @@ export -f os::git
 export -f os::gzfetch
 
 export -f os::usr_bin_dir
+export -f os::usr_lib_dir
 
 export -f os::which
 

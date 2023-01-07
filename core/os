@@ -1920,6 +1920,18 @@ os::install() {
   sudo mv $bin_file $bin_dir
 }
 
+# os::hostnamectl safe hostnamectl
+# os::hostnamectl@usage ...
+os::hostnamectl() {
+  # @TODO
+  # if [ "$(os::has_command hostnamectl)" = "false" ]; then
+  #   # reference: https://commandnotfound.cn/linux/1/347/hostname-%E5%91%BD%E4%BB%A4
+  #   pm install -y hostnamectl >>/dev/null 2>&1
+  # fi
+  
+  hostnamectl "$@"
+}
+
 export -f os::arch
 export -f os::platform
 export -f os::release
@@ -2091,3 +2103,5 @@ export -f os::set_system_network_proxy
 
 export -f os::make_executable
 export -f os::install
+
+export -f os::hostnamectl

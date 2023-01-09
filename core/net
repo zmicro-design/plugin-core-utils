@@ -258,7 +258,7 @@ net::status_code() {
   # os::curl -s -o /dev/null -w "%{http_code}" $url
 
   # example: curl -s -I https://nodejs.org/dist/v16.18.0/node-v16.18.0-darwin-arm64.tar.gz | head -n 1 | awk '{print $2}'
-  curl -s -I $url 2>/dev/null | head -n 1 | awk '{print $2}'
+  os::curl -s -I $url 2>/dev/null | head -n 1 | awk '{print $2}'
 }
 
 net::is_not_found() {

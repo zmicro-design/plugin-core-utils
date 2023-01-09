@@ -1932,6 +1932,22 @@ os::hostnamectl() {
   hostnamectl "$@"
 }
 
+os::gpm() {
+  local repository=$1
+  local args=${@:2}
+
+  if [ -z "$repository" ]; then
+    log::error "[$(timestamp)] repository is required"
+    exit 1
+  fi
+
+  if [ "$(os::has_command gpm)" != "true" ]; then
+    pm::npm install -g @cliz/gpm
+  fi
+
+  gpm "$@"
+}
+
 export -f os::arch
 export -f os::platform
 export -f os::release
@@ -2105,3 +2121,5 @@ export -f os::make_executable
 export -f os::install
 
 export -f os::hostnamectl
+
+export -f os::gpm

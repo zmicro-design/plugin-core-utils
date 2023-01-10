@@ -594,7 +594,7 @@ plugin::run() {
     plugin::auto_update $plugin_name
   elif [ "$plugin_command_real" = "auto" ] && [ "$plugin_command_args_real" = "backup" ] && [ ! -f "$PLUGIN_DIR/commands/auto/backup" ]; then
     plugin::auto_backup $plugin_name
-  elif [ "$plugin_command_real" = "go" ] && [ "$plugin_command_args_real" != "-h" ] && [ "$plugin_command_args_real" != "--help" ]; then
+  elif [ "$plugin_command_real" = "go" ] && [ "$plugin_command_args_real" != "-h" ] && [ "$plugin_command_args_real" != "--help" ] && [ ! -f "$PLUGIN_DIR/commands/go" ]; then
     zmicro go plugin $plugin_name $plugin_command_args_real
   elif [ "$plugin_command_real" = "code" ]; then
     if [ -z "$plugin_command_args_real" ]; then

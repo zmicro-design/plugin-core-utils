@@ -1066,7 +1066,11 @@ os::inquirer() {
   fi
 
   if [ "$type" = "text" ]; then
-    inquirer::text "$question" value "$default_value" "value is required" inquirer::required
+    if [ "$required" = "true" ]; then
+      inquirer::text "$question" value "$default_value" "value is required" inquirer::required
+    else
+      inquirer::text "$question" value "$default_value"
+    fi
   elif [ "$type" = "yesno" ] || [ "$type" = "confirm" ]; then
     local choices=("Yes" "No")
     inquirer::select "$question" choices value

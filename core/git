@@ -508,6 +508,70 @@ git::has_branch() {
   fi
 }
 
+# git::check_token checks the git registry token exist.
+# git::check_token@usage <registry>
+# git::check_token@example git::check_token github.com
+git::check_token() {
+  local registry="$1"
+  if [ -z "$registry" ]; then
+    log::error "[git::check_token] registry is required"
+    return 1
+  fi
+
+  if [ ! -f "$HOME/.git-credentials" ]; then
+    log::error "[git::check_token] cannot find token for $registry, you need to login git with: zmicro login git <USERNAME> <TOKEN>"
+    return 1
+  fi
+
+  local token=$(cat $HOME/.git-credentials | grep $registry | awk -F ':' '{print $3}' | awk -F '@' '{print $1}')
+  if [ -z "$token" ]; then
+    log::error "[git::check_token] cannot find token for $registry, you need to login github with: zmicro login git <USERNAME> <TOKEN>"
+    return 1
+  fi
+}
+
+# git::get_token gets the git registry token.
+# git::get_token@usage <registry>
+# git::get_token@example git::get_token github.com
+git::get_token() {
+  local registry="$1"
+  if [ -z "$registry" ]; then
+    echo ""
+    return
+  fi
+
+  if [ ! -f "$HOME/.git-credentials" ]; then
+    # log::error "[git::get_token] cannot find token for $registry, you need to login git with: zmicro login git <USERNAME> <TOKEN>"
+    echo ""
+    return
+  fi
+
+  local token=$(cat $HOME/.git-credentials | grep "$registry" | head -n 1 | awk -F ':' '{print $3}' | awk -F '@' '{print $1}')
+  if [ -z "$token" ]; then
+    # log::error "[git::get_token] cannot find token for $registry, you need to login git with: zmicro login git <USERNAME> <TOKEN>"
+    return
+  fi
+
+  # echo $token
+  case $registry in
+  github.com)
+    export GITHUB_TOKEN=$token
+    ;;
+  gitlab.com)
+    export GITLAB_TOKEN=$token
+    ;;
+  bitbucket.org)
+    export BITBUCKET_TOKEN=$token
+    ;;
+  gitee.com)
+    export GIEE_TOKEN=$token
+    ;;
+  esac
+
+  export GIT_TOKEN=$token
+  echo "$token"
+}
+
 export -f git::commit_message
 export -f git::commit_message_full
 export -f git::commit_hash
@@ -555,4 +619,5 @@ export -f git::clone
 
 export -f git::has_branch
 
-
+export -f git::check_token
+export -f git::get_token

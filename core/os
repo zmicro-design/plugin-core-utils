@@ -1891,17 +1891,21 @@ os::make_executable() {
   chmod 755 $filepath
 }
 
+# os::install install bin to bin dir, you can add new name
+# os::install@usage source_bin_file target_bin_dir [target_bin_name]
+# os::install@example
 os::install() {
   local bin_file=$1
-  local bin_dir=$2
+  local target_bin_dir=$2
+  local target_bin_name=$3
 
   if [ -z "$bin_file" ]; then
     log::error "[$(timestamp)] bin_file is required"
     return 1
   fi
 
-  if [ -z "$bin_dir" ]; then
-    log::error "[$(timestamp)] bin_dir is required"
+  if [ -z "$target_bin_dir" ]; then
+    log::error "[$(timestamp)] target_bin_dir is required"
     return 1
   fi
 
@@ -1910,14 +1914,18 @@ os::install() {
     return 1
   fi
 
-  if [ ! -d "$bin_dir" ]; then
-    log::error "[$(timestamp)] bin_dir($bin_dir) not found or not a directory"
+  if [ ! -d "$target_bin_dir" ]; then
+    log::error "[$(timestamp)] target_bin_dir($target_bin_dir) not found or not a directory"
     return 1
   fi
 
   os::make_executable $bin_file
 
-  sudo mv $bin_file $bin_dir
+  if [ -n "$target_bin_name" ]; then
+    sudo mv $bin_file $target_bin_dir/$target_bin_name
+  else
+    sudo mv $bin_file $target_bin_dir
+  fi
 }
 
 # os::hostnamectl safe hostnamectl

@@ -124,6 +124,17 @@ semver::get_major() {
     prefix="v"
   fi
 
+  # v1.18-1.2.5
+  if [ "$(string::has - ${v1})" = "true" ]; then
+    local prefix="$(echo ${v1} | awk -F '-' '{print $1}')-"
+    local restV1=$(echo ${v1} | awk -F '-' '{print $2}')
+    local v11=$(semver::get_major $restV1)
+    echo "${prefix}${v11#v}"
+    return
+  fi
+
+  # v1.2.5
+  # v11-1.2.5
   local v11=$(echo ${v1#v} | awk -F '.' '{print $1}' | awk -F 'v' '{print $1}')
   echo "${prefix}${v11}"
 }
@@ -136,6 +147,17 @@ semver::get_minor() {
     prefix="v"
   fi
 
+  # v1.18-1.2.5
+  if [ "$(string::has - ${v1})" = "true" ]; then
+    local prefix="$(echo ${v1} | awk -F '-' '{print $1}')-"
+    local restV1=$(echo ${v1} | awk -F '-' '{print $2}')
+    local v11=$(semver::get_minor $restV1)
+    echo "${prefix}${v11#v}"
+    return
+  fi
+
+  # v1.2.5
+  # v11-1.2.5
   local v11=$(echo ${v1#v} | awk -F '.' '{print $1}' | awk -F 'v' '{print $1}')
   local v12=$(echo ${v1#v} | awk -F '.' '{print $2}')
   echo "${prefix}${v11}.${v12}"
@@ -149,6 +171,17 @@ semver::get_patch() {
     prefix="v"
   fi
 
+  # v1.18-1.2.5
+  if [ "$(string::has - ${v1})" = "true" ]; then
+    local prefix="$(echo ${v1} | awk -F '-' '{print $1}')-"
+    local restV1=$(echo ${v1} | awk -F '-' '{print $2}')
+    local v11=$(semver::get_patch $restV1)
+    echo "${prefix}${v11#v}"
+    return
+  fi
+
+  # v1.2.5
+  # v11-1.2.5
   local v11=$(echo ${v1#v} | awk -F '.' '{print $1}' | awk -F 'v' '{print $1}')
   local v12=$(echo ${v1#v} | awk -F '.' '{print $2}')
   local v13=$(echo ${v1#v} | awk -F '.' '{print $3}')

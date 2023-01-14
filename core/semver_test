@@ -175,6 +175,7 @@ function test_semver::next() {
 }
 
 function test_semver_without_prefix() {
+  # v1.2.5
   testing::expect \
     "${FUNCNAME[0]} - major(v1.2.5) => v1" \
     "to_equal" \
@@ -192,6 +193,44 @@ function test_semver_without_prefix() {
     "to_equal" \
     "v1.2.5" \
     "$(semver::get_patch v1.2.5)"
+
+  # v11-1.2.5
+  testing::expect \
+    "${FUNCNAME[0]} - major(v11-1.2.5) => v11-1" \
+    "to_equal" \
+    "v11-1" \
+    "$(semver::get_major v11-1.2.5)"
+
+  testing::expect \
+    "${FUNCNAME[0]} - minor(v11-1.2.5) => v11-1.2" \
+    "to_equal" \
+    "v11-1.2" \
+    "$(semver::get_minor v11-1.2.5)"
+
+  testing::expect \
+    "${FUNCNAME[0]} - patch(v11-1.2.5) => v11-1.2.5" \
+    "to_equal" \
+    "v11-1.2.5" \
+    "$(semver::get_patch v11-1.2.5)"
+
+  # v1.18-1.2.5
+  testing::expect \
+    "${FUNCNAME[0]} - major(v1.18-1.2.5) => v1.18-1" \
+    "to_equal" \
+    "v1.18-1" \
+    "$(semver::get_major v1.18-1.2.5)"
+
+  testing::expect \
+    "${FUNCNAME[0]} - minor(v1.18-1.2.5) => v1.18-1.2" \
+    "to_equal" \
+    "v1.18-1.2" \
+    "$(semver::get_minor v1.18-1.2.5)"
+
+  testing::expect \
+    "${FUNCNAME[0]} - patch(v1.18-1.2.5) => v1.18-1.2.5" \
+    "to_equal" \
+    "v1.18-1.2.5" \
+    "$(semver::get_patch v1.18-1.2.5)"
 }
 
 function test_semver_with_prefix() {

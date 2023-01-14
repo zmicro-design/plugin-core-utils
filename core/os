@@ -1952,6 +1952,30 @@ os::gpm() {
   gpm "$@"
 }
 
+os::gzfly() {
+  if [ "$(os::has_command gzfly)" != "true" ]; then
+    zmicro package install gzfly
+  fi
+
+  gzfly "$@"
+}
+
+os::gzssh() {
+  if [ "$(os::has_command gzssh)" != "true" ]; then
+    zmicro package install gzssh
+  fi
+
+  gzssh "$@"
+}
+
+os::gzlighthouse() {
+  if [ "$(os::has_command gzlighthouse)" != "true" ]; then
+    zmicro package install gzlighthouse
+  fi
+
+  gzlighthouse "$@"
+}
+
 export -f os::arch
 export -f os::platform
 export -f os::release
@@ -2127,3 +2151,7 @@ export -f os::install
 export -f os::hostnamectl
 
 export -f os::gpm
+
+export -f os::gzfly
+export -f os::gzssh
+export -f os::gzlighthouse

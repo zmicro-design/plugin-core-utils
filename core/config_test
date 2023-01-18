@@ -108,7 +108,6 @@ function test_config::profile() {
   local flag="ZMICRO_TEST_PROFILE"
   local text=$(
     cat <<-END
-# ZMICRO_TEST_PROFILE
 export ZMICRO_HOME=${ZMICRO_HOME}
 export PATH=\$ZMICRO_HOME/bin:\$PATH 
 END

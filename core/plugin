@@ -588,7 +588,7 @@ plugin::run() {
     zmicro plugin register $plugin_name
   elif [ "$plugin_command_real" = "release" ]; then
     zmicro plugin release $plugin_name
-  elif [ "$plugin_command_real" = "use" ] && [ ! -f "$PLUGIN_DIR/commands/use" ]; then
+  elif [ "$plugin_command_real" = "use" ] && [ ! -f "$PLUGIN_DIR/commands/use" ] && [ ! -d "$PLUGIN_DIR/commands/use" ]; then
     zmicro plugin use $plugin_name $plugin_command_args_real
   elif [ "$plugin_command_real" = "auto" ] && [ "$plugin_command_args_real" = "update" ] && [ ! -f "$PLUGIN_DIR/commands/auto/update" ]; then
     plugin::auto_update $plugin_name

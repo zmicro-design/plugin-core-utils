@@ -23,4 +23,11 @@ function test_var::get() {
     "to_equal" \
     "v2.0.0" \
     "$(var::get version_var)"
+
+  var::set version_var v1.0.0
+  testing::expect \
+    "${FUNCNAME[0]}" \
+    "to_equal" \
+    "v1.0.0" \
+    "$(var::get version_var)"
 }

@@ -1,17 +1,23 @@
 #!/bin/bash
 
+# var::set sets value of key
+# var::set@usage <key> <value>
+# var::set@example version v1.0.0
 var::set() {
-  local name=$1
+  local key=$1
   local value=$2
 
-  eval "$name=$value"
+  eval "$key=$value"
 }
 
+# var::get gets value of key
+# var::get@usage <key>
+# var::get@example version
 var::get() {
-  local name=$1
+  local key=$1
 
-  # echo ${$name}
-  eval "echo \${$name}"
+  # eval "echo \${$key}"
+  echo ${!key}
 }
 
 export -f var::set

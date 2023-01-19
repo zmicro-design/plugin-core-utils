@@ -1108,6 +1108,15 @@ os::inquirer() {
   export $key=$value
 }
 
+os::expect() {
+  if [ "$(os::has_command expect)" != "true" ]; then
+    log::info "[os::expect] install expect interpreter ..."
+    pm install -yqq expect
+  fi
+
+  expect "$@"
+}
+
 os::add_user_to_docker_group() {
   local user=$1
   if [ -z "$user" ]; then
@@ -2056,6 +2065,7 @@ export -f os::info_json
 export -f os::get_env
 
 export -f os::inquirer
+export -f os::expect
 
 export -f os::add_user_to_docker_group
 

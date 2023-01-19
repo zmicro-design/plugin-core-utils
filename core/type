@@ -439,10 +439,7 @@ array::slice() {
 }
 
 os::set_var() {
-  local name=$1
-  local value=$2
-
-  eval "$name=$value"
+  var::set "$@"
 }
 
 export -f get_args_length

@@ -1,0 +1,18 @@
+#!/bin/bash
+
+var::set() {
+  local name=$1
+  local value=$2
+
+  eval "$name=$value"
+}
+
+var::get() {
+  local name=$1
+
+  # echo ${$name}
+  eval "echo \${$name}"
+}
+
+export -f var::set
+export -f var::get

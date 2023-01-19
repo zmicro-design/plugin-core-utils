@@ -1,0 +1,26 @@
+#!/bin/bash
+
+function test_var::set() {
+  local version_var=""
+  testing::expect \
+    "${FUNCNAME[0]}" \
+    "to_equal" \
+    "" \
+    "$version_var"
+
+  var::set version_var v1.0.0
+  testing::expect \
+    "${FUNCNAME[0]}" \
+    "to_equal" \
+    "v1.0.0" \
+    "$version_var"
+}
+
+function test_var::get() {
+  local version_var="v2.0.0"
+  testing::expect \
+    "${FUNCNAME[0]}" \
+    "to_equal" \
+    "v2.0.0" \
+    "$(var::get version_var)"
+}

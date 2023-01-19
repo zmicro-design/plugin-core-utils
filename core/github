@@ -1,5 +1,9 @@
 #!/bin/bash
 
+github::check_token() {
+  git::check_token github.comx
+}
+
 github::get_token() {
   git::get_token github.com
 }
@@ -19,11 +23,13 @@ github::create_repository() {
   fi
 
   if [ -z "$GITHUB_TOKEN" ]; then
-    github::get_token
+    github::check_token
     if [ "$?" != "0" ]; then
       log::error "[github::create_repository] cannot get github token"
       return 1
     fi
+
+    github::get_token >> /dev/null
   fi
 
   os::curl \
@@ -38,5 +44,7 @@ github::create_repository() {
   fi
 }
 
+export -f github::check_token
 export -f github::get_token
+
 export -f github::create_repository

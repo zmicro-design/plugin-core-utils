@@ -1958,6 +1958,8 @@ os::gpm() {
     pm::npm install -g @cliz/gpm
   fi
 
+  net::using_smart_proxy
+  
   gpm "$@"
 }
 

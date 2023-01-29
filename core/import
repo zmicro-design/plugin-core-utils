@@ -1,0 +1,23 @@
+#!/bin/bash
+
+import() {
+  local module_path=$1
+  if [ -z "$module_path" ]; then
+    log::error "[$(timestamp)] module path is required"
+    return 1
+  fi
+
+  if [ ! -f "$module_path" ]; then
+    log::error "[$(timestamp)] module not found: $module_path"
+    return 1
+  fi
+
+  if [ ! -r "$module_path" ]; then
+    log::error "[$(timestamp)] module permission denied: $module_path"
+    return 1
+  fi
+
+  config::load_file $module_path
+}
+
+export -f import

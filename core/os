@@ -1703,12 +1703,22 @@ os::tar() {
 
 os::is_file_type_tar_gz() {
   local name=$1
+
+  # .tar.gz
   echo "${name##*/}" | grep ".tar.gz" >> /dev/null 2>&1
   if [ "$?" = "0" ]; then
     echo "true"
-  else
-    echo "false"
+    return
   fi
+
+  # .tgz
+  echo "${name##*/}" | grep ".tgz" >> /dev/null 2>&1
+  if [ "$?" = "0" ]; then
+    echo "true"
+    return 
+  fi
+
+  echo "false"
 }
 
 os::is_file_type_zip() {

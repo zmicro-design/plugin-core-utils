@@ -6,6 +6,12 @@ require() {
   local repo=$3
   local force_update=$IS_REQUIRE_MOD_UPDATE_TMP_GLOBAL
 
+  # require load if name is the absolute path
+  if [ "${name:0:1}" = "/" ] && [ -f "$name" ] && [ -z "$version" ] && [ -z "$repo" ]; then
+    config::load_file $name
+    return $?
+  fi
+
   if [ "$(plugin::has $name)" = "true" ]; then
     # log::info "[require][update] ${name} ${version}"
     log::debug "[$(timestamp)][require] installed before (2): ${name}"

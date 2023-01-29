@@ -499,6 +499,7 @@ config::profile_one() {
 
   local found=$(fs::has_flag "$profile" "$flag")
   if [ "$found" != "true" ]; then
+    echo "" | fs::write -a $profile
     echo "$flag" | fs::write -a $profile
     echo "$text" | fs::write -a $profile
   fi

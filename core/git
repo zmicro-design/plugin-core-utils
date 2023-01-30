@@ -479,12 +479,52 @@ git::clone() {
   fi
 
   local tmp_error_log=$(os::tmp_file)
-  log::debug "[git::clone] clone repo($repository_url) to $path ..."
-  os::git clone --depth=1 -b $branch $repository_url $path >>/dev/null 2>$tmp_error_log
-  if [ "$?" != "0" ]; then
-    log::error "[git::clone] failed to clone repo($repository_url) to $path ..."
-    cat $tmp_error_log
-    return 1
+
+  if [ ! -d "$path" ]; then
+    # clone
+    log::debug "[git::clone] clone repo($repository_url) to $path ..."
+    os::git clone --depth=1 -b $branch $repository_url $path >>/dev/null 2>$tmp_error_log
+    if [ "$?" != "0" ]; then
+      log::error "[git::clone] failed to clone repo($repository_url) to $path ..."
+      cat $tmp_error_log
+      return 1
+    fi
+  else
+    # update
+    log::debug "[$(timestamp)][git::clone] update branch: $branch ..."
+    if [ ! -w "$path" ]; then
+      sudo chown -R $USER $path
+    fi
+
+    cd $path
+
+    log::debug "[$(timestamp)][git::clone] fetching branch: $branch ..."
+    os::git fetch origin $branch >>/dev/null 2>$tmp_error_log
+    if [ "$?" != "0" ]; then
+      log::error "[$(timestamp)][git::clone] failed to git fetch ${branch}."
+      cat $tmp_error_log
+      return 1
+    fi
+
+    local current_branch=$(git::branch)
+    if [ "$current_branch" != "$branch" ]; then
+      log::debug "[$(timestamp)][git::clone] checkout branch: $branch ..."
+      git checkout -b $branch origin/$branch 2>$error_log
+      if [ "$?" != "0" ]; then
+        log::error "[$(timestamp)][git::clone] failed to checkout branch: ${branch} ."
+        cat $tmp_error_log
+        return 1
+      fi
+    fi
+
+    local error_log=$(os::tmp_file)
+    log::debug "[$(timestamp)][git::clone] merge origin branch: $branch ..."
+    git merge origin/$branch >>/dev/null 2>$tmp_error_log
+    if [ "$?" != "0" ]; then
+      log::error "[$(timestamp)][git::clone] failed to merge origin branch: ${branch} ."
+      cat $tmp_error_log
+      return 1
+    fi
   fi
 }
 

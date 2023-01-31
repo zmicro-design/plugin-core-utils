@@ -1,6 +1,9 @@
 #!/bin/bash
 
 pm() {
+  # apply proxy
+  net::using_smart_proxy
+  
   # MacOS
   if [ "$(os::is_macos)" = "true" ]; then
     if [ "$(os::has_command brew)" != "true" ]; then

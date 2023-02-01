@@ -162,3 +162,25 @@ function test_string::ends_with() {
   #   "false" \
   #   "$(string::ends_with /abc/aaa_tes _test)"
 }
+
+function test_string::to_lower() {
+  testing::expect \
+    "${FUNCNAME[0]}" \
+    "to_equal" \
+    "abc" \
+    "$(string::to_lower ABC)"
+
+  testing::expect \
+    "${FUNCNAME[0]}" \
+    "to_equal" \
+    "abc" \
+    "$(string::to_lower Abc)"
+}
+
+function test_string::to_upper() {
+  testing::expect \
+    "${FUNCNAME[0]}" \
+    "to_equal" \
+    "ABC" \
+    "$(string::to_upper abc)"
+}

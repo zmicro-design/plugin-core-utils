@@ -236,6 +236,14 @@ string::ends_with() {
   echo "false"
 }
 
+string::to_lower() {
+  echo "$@" | awk '{print tolower($0)}'
+}
+
+string::to_upper() {
+  echo "$@" | awk '{print toupper($0)}'
+}
+
 number::increase() {
   local base=$1
   local _step=$2
@@ -459,6 +467,8 @@ export -f string::equals
 export -f string::first_char
 export -f string::starts_with
 export -f string::ends_with
+export -f string::to_lower
+export -f string::to_upper
 
 export -f number::increase
 export -f number::step

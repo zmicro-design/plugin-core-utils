@@ -1997,6 +1997,42 @@ os::gzlighthouse() {
   gzlighthouse "$@"
 }
 
+# os::os_name get current os name
+# os::os_name@description now support macos | ubuntu | centos | alpine | archlinux | fedora
+os::os_name() {
+  if [ "$(os::is_macos)" = "true" ]; then
+    echo "macos"
+    return
+  fi
+
+  if [ "$(os::is_ubuntu)" = "true" ]; then
+    echo "ubuntu"
+    return
+  fi
+
+  if [ "$(os::is_centos)" = "true" ]; then
+    echo "centos"
+    return
+  fi
+
+  if [ "$(os::is_alpine)" = "true" ]; then
+    echo "alpine"
+    return
+  fi
+
+  if [ "$(os::is_archlinux)" = "true" ]; then
+    echo "archlinux"
+    return
+  fi
+
+  if [ "$(os::is_fedora)" = "true" ]; then
+    echo "fedora"
+    return
+  fi
+
+  echo "unknown"
+}
+
 export -f os::arch
 export -f os::platform
 export -f os::release
@@ -2177,3 +2213,5 @@ export -f os::gpm
 export -f os::gzfly
 export -f os::gzssh
 export -f os::gzlighthouse
+
+export -f os::os_name

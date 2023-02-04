@@ -612,6 +612,19 @@ git::get_token() {
   echo "$token"
 }
 
+# git::get_commit_hash_by_tag gets the commit hash by git tag.
+# git::get_commit_hash_by_tag@usage <tag>
+# git::get_commit_hash_by_tag@example git::get_commit_hash_by_tag v1.0.0
+git::get_commit_hash_by_tag() {
+  local tag=$1
+  if [ -z "$tag" ]; then
+    log::error "[git::get_commit_hash_by_tag] tag is required"
+    return 1
+  fi
+
+  git rev-list -n 1 $tag
+}
+
 export -f git::commit_message
 export -f git::commit_message_full
 export -f git::commit_hash
@@ -661,3 +674,5 @@ export -f git::has_branch
 
 export -f git::check_token
 export -f git::get_token
+
+export -f git::get_commit_hash_by_tag

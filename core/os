@@ -1007,6 +1007,10 @@ os::get_env() {
   env::get $1
 }
 
+os::set_env() {
+  env::set $1 $2
+}
+
 # os::inquirer interacts with users.
 os::inquirer() {
   # load inquirer
@@ -2111,6 +2115,7 @@ export -f os::info
 export -f os::info_json
 
 export -f os::get_env
+export -f os::set_env
 
 export -f os::inquirer
 export -f os::expect

@@ -273,6 +273,9 @@ config::check_or_set() {
 
   # echo "key: $key, value: $value"
   config::set $key $value $filepath
+
+  # apply env
+  os::set_env $key $value
 }
 
 # bug:

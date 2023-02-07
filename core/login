@@ -7,23 +7,23 @@ login::docker() {
 
   if [ "$registry" = "" ]; then
     log::error "[core][login::docker] registry is required"
-    exit 1
+    return 1
   fi
 
   if [ "$username" = "" ]; then
     log::error "[core][login::docker] username is required"
-    exit 1
+    return 1
   fi
 
   if [ "$password" = "" ]; then
     log::error "[core][login::docker] password is required"
-    exit 1
+    return 1
   fi
 
   docker login $registry -u $username -p $password >>/dev/null 2>&1
   if [ "$?" != "0" ]; then
     log::error "Docker Login Failed"
-    exit -1
+    return 1
   fi
 
   log::success "Docker Login Success"
@@ -36,18 +36,18 @@ login::docker_v2() {
 
   if [ "$username" = "" ]; then
     log::error "[core][login::docker] username is required"
-    exit 1
+    return 1
   fi
 
   if [ "$password" = "" ]; then
     log::error "[core][login::docker] password is required"
-    exit 1
+    return 1
   fi
 
   docker login $registry -u $username -p $password >>/dev/null 2>&1
   if [ "$?" != "0" ]; then
     log::error "Docker Login Failed"
-    exit -1
+    return 1
   fi
 
   log::success "Docker Login Success"
@@ -61,22 +61,22 @@ login::npm() {
 
   if [ "$registry" = "" ]; then
     log::error "[core][login::npm] registry is required"
-    exit 1
+    return 1
   fi
 
   if [ "$username" = "" ]; then
     log::error "[core][login::npm] username is required"
-    exit 1
+    return 1
   fi
 
   if [ "$password" = "" ]; then
     log::error "[core][login::npm] password is required"
-    exit 1
+    return 1
   fi
 
   if [ "$email" = "" ]; then
     log::error "[core][login::npm] email is required"
-    exit 1
+    return 1
   fi
 
   npm whoami --registry $registry >>/dev/null 2>&1
@@ -107,7 +107,7 @@ login::git() {
 
   if [ "$registry" = "" ]; then
     log::error "[core][login::git] registry is required"
-    exit 1
+    return 1
   fi
 
   if [ "$(string::match $registry ^http)" = "true" ]; then
@@ -121,12 +121,12 @@ login::git() {
 
   if [ "$username" = "" ]; then
     log::error "[core][login::git] username is required"
-    exit 1
+    return 1
   fi
 
   if [ "$password" = "" ]; then
     log::error "[core][login::git] password is required"
-    exit 1
+    return 1
   fi
 
   # not safe

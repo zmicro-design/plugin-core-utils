@@ -1,0 +1,65 @@
+#!/bin/bash
+
+# database::mysql_create_user creates a new user in mysql.
+# database::mysql_create_user@usage <host> <port> <admin_username> <admin_password> <new_username> <new_password> <new_database>
+# database::mysql_create_user@example:
+#    database::mysql_create_user /home/zmicro/code  zmicro@192.168.1.1
+database::mysql_create_user() {
+  local host=$1
+  local port=$2
+  local admin_username=$3
+  local admin_password=$4
+  local new_username=$5
+  local new_password=$6
+  local new_database=$7
+
+  if [ -z "$host" ]; then
+    log::error "[database::mysql_create_user] host is required"
+    return 1
+  fi
+
+  if [ -z "$port" ]; then
+    log::error "[database::mysql_create_user] port is required"
+    return 1
+  fi
+
+  if [ -z "$admin_username" ]; then
+    log::error "[database::mysql_create_user] admin_username is required"
+    return 1
+  fi
+
+  if [ -z "$admin_password" ]; then
+    log::error "[database::mysql_create_user] admin_password is required"
+    return 1
+  fi
+
+  if [ -z "$new_username" ]; then
+    log::error "[database::mysql_create_user] new_username is required"
+    return 1
+  fi
+
+  if [ -z "$new_password" ]; then
+    log::error "[database::mysql_create_user] new_password is required"
+    return 1
+  fi
+
+  if [ -z "$new_database" ]; then
+    log::error "[database::mysql_create_user] new_database is required"
+    return 1
+  fi
+
+  local create_user_sql_filepath=$(os::tmp_file)
+    cat <<EOF >$create_user_sql_filepath
+create database ${new_username} default charset 'utf8';
+create user '${new_username}' @'%' identified by '${new_password}';
+grant all on ${new_database}.* to '${new_username}' @'%';
+flush privileges;
+EOF
+
+  cat $create_user_sql_filepath
+
+  mysql -h $host -P $port -u$admin_username -p$admin_password <$create_user_sql_filepath
+
+}
+
+export -f database::mysql_create_user

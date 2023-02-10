@@ -2037,6 +2037,22 @@ os::os_name() {
   echo "unknown"
 }
 
+os::forever() {
+  if [ -z "$1" ]; then
+    log::error "[os::forever] command is required"
+    return 1
+  fi
+
+  echo "[$(timestamp)] forever command: $@ ..."
+  local count=1
+  while true; do
+    echo "[$(timestamp)][time: $count] run: $@..."
+    "$@"
+    sleep 1
+    count=$((count + 1))
+  done
+}
+
 export -f os::arch
 export -f os::platform
 export -f os::release
@@ -2220,3 +2236,5 @@ export -f os::gzssh
 export -f os::gzlighthouse
 
 export -f os::os_name
+
+export -f os::forever

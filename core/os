@@ -2054,6 +2054,8 @@ os::forever() {
 }
 
 os::run_commands_in_remote_server() {
+  set +e
+  
   local server=$1
   local commands=${@:2}
   

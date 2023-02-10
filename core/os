@@ -2053,6 +2053,26 @@ os::forever() {
   done
 }
 
+os::run_commands_in_remote_server() {
+  local server=$1
+  local commands=${@:2}
+  
+  if [ -z "$server" ]; then
+    log::error "[os::run_commands_in_remote_server] server is required"
+    return 1
+  fi
+
+  if [ -z "$commands" ]; then
+    log::error "[os::run_commands_in_remote_server] commands is required"
+    return 1
+  fi
+
+  log::info "[$(timestamp)] server: $server"
+  log::info "[$(timestamp)] commands: $commands"
+
+  ssh -o "StrictHostKeyChecking=no" $@
+}
+
 export -f os::arch
 export -f os::platform
 export -f os::release
@@ -2238,3 +2258,4 @@ export -f os::gzlighthouse
 export -f os::os_name
 
 export -f os::forever
+export -f os::run_commands_in_remote_server

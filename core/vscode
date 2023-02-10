@@ -1,0 +1,74 @@
+#!/bin/bash
+
+vscode::ensure() {
+  if [ "$(os::has_command code)" != "0" ]; then
+    log::error "you should install vscode and install 'code' command in PATH"
+    log::info "How to install 'code' command in PATH: https://code.visualstudio.com/docs/setup/mac"
+    return 1
+  fi
+}
+
+# vscode::open opens source code in vscode
+# vscode::open@usage <directory> [server]
+# vscode::open@example:
+#    vscode::open .
+#    vscode::open /home/zmicro/code
+#    vscode::open /home/zmicro/code  zmicro@192.168.1.1
+vscode::open() {
+  vscode::ensure
+  if [ "$?" != "0" ]; then
+    return 1
+  fi
+
+  local path=$1
+  local server=$2
+
+  if [ -z "$path" ]; then
+    log::error "[vscode::remote] path is required"
+    return 1
+  fi
+
+  if [ -n "$server" ]; then
+    vscode::remote "$@"
+    return $?
+  fi
+
+  code $path
+}
+
+# vscode::remote opens source code with vscode remote quickly
+# vscode::remote@usage <ssh_connection> <directory>
+# vscode::remote@example: zmicro@192.168.1.1 /home/zmicro/code
+# vscode::remote@reference:
+#    https://code.visualstudio.com/docs/remote/ssh-tutorial
+#    https://github.com/microsoft/vscode-remote-release/issues/3324
+#    https://github.com/FreshlyBrewedCode/ssh-code/blob/main/index.mjs
+vscode::remote() {
+  vscode::ensure
+  if [ "$?" != "0" ]; then
+    return 1
+  fi
+
+  local ssh_connection="$1"
+  local directory="$2"
+
+  if [ -z "$ssh_connection" ]; then
+    log::error "[vscode::remote] ssh_connection is required"
+    return 1
+  fi
+
+  if [ -z "$directory" ]; then
+    directory="/"
+  fi
+
+  if [ "${directory:0:1}" != "/" ]; then
+    directory=$PWD/$directory
+  fi
+
+  code --folder-uri vscode-remote://ssh-remote+${ssh_connection}${directory}
+}
+
+export -f vscode::ensure
+
+export -f vscode::open
+export -f vscode::remote

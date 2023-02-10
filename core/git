@@ -625,6 +625,48 @@ git::get_commit_hash_by_tag() {
   git rev-list -n 1 $tag
 }
 
+# git::get_remote_commit_hash_by_branch gets the commit hash by git tag.
+# git::get_remote_commit_hash_by_branch@usage <repo> <branch>
+# git::get_remote_commit_hash_by_branch@example git::get_remote_commit_hash_by_branch https://github.com/zmicro-design/plugin-core-utils master
+git::get_remote_commit_hash_by_branch() {
+  local repo=$1
+  local branch=$2
+
+  if [ -z "$repo" ]; then
+    log::error "[git::get_remote_commit_hash_by_branch] repo is required"
+    return 1
+  fi
+
+  if [ -z "$branch" ]; then
+    log::error "[git::get_remote_commit_hash_by_branch] branch is required"
+    return 1
+  fi
+
+  # git rev-list -n 1 $branch
+  git ls-remote --heads $repo $branch | awk '{print $1}' 
+}
+
+# git::get_remote_commit_hash_by_tag gets the commit hash by git tag.
+# git::get_remote_commit_hash_by_tag@usage <repo> <tag>
+# git::get_remote_commit_hash_by_tag@example git::get_remote_commit_hash_by_tag https://github.com/zmicro-design/plugin-core-utils v1.0.0
+git::get_remote_commit_hash_by_tag() {
+  local repo=$1
+  local tag=$2
+
+  if [ -z "$repo" ]; then
+    log::error "[git::get_remote_commit_hash_by_tag] repo is required"
+    return 1
+  fi
+
+  if [ -z "$tag" ]; then
+    log::error "[git::get_remote_commit_hash_by_tag] tag is required"
+    return 1
+  fi
+
+  # git rev-list -n 1 $tag
+  git ls-remote -t $repo $tag | awk '{print $1}' 
+}
+
 export -f git::commit_message
 export -f git::commit_message_full
 export -f git::commit_hash
@@ -676,3 +718,6 @@ export -f git::check_token
 export -f git::get_token
 
 export -f git::get_commit_hash_by_tag
+
+export -f git::get_remote_commit_hash_by_branch
+export -f git::get_remote_commit_hash_by_tag

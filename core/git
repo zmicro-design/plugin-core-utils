@@ -643,7 +643,7 @@ git::get_remote_commit_hash_by_branch() {
   fi
 
   # git rev-list -n 1 $branch
-  git ls-remote --heads $repo $branch | awk '{print $1}' 
+  git ls-remote --heads $repo $branch | awk '{print $1}'
 }
 
 # git::get_remote_commit_hash_by_tag gets the commit hash by git tag.
@@ -664,7 +664,22 @@ git::get_remote_commit_hash_by_tag() {
   fi
 
   # git rev-list -n 1 $tag
-  git ls-remote -t $repo $tag | awk '{print $1}' 
+  git ls-remote -t $repo $tag | awk '{print $1}'
+}
+
+# git::get_remote_latest_tag gets remote latest tag of the repository.
+# git::get_remote_latest_tag@usage <repo> <tag>
+# git::get_remote_latest_tag@example git::get_remote_latest_tag https://github.com/zmicro-design/plugin-core-utils
+git::get_remote_latest_tag() {
+  local repository=$1
+  if [ -z "$repository" ]; then
+    log::error "[git::get_remote_latest_tag] repository is required"
+    return 1
+  fi
+
+  git -c 'versionsort.suffix=-' ls-remote --tags --sort='v:refname' $repository |
+    tail -n 1 |
+    awk -F 'refs/tags/' '{print $2}'
 }
 
 export -f git::commit_message
@@ -721,3 +736,4 @@ export -f git::get_commit_hash_by_tag
 
 export -f git::get_remote_commit_hash_by_branch
 export -f git::get_remote_commit_hash_by_tag
+export -f git::get_remote_latest_tag

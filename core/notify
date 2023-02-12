@@ -152,7 +152,7 @@ notify::login() {
   # do not notify in 5 minutes
   if [ -f "$log_path" ]; then
     local lastlogin=$(cat $log_path)
-    if [ -n "$lastlogin" ] && [ "$(timestamp::in_x_minutes 10 $lastlogin)" = "true" ]; then
+    if [ -n "$lastlogin" ] && [ "$(timestamp::in_x_minutes 30 $lastlogin)" = "true" ]; then
       return
     fi
   fi

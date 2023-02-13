@@ -2001,6 +2001,14 @@ os::gzlighthouse() {
   gzlighthouse "$@"
 }
 
+os::gztemplate() {
+  if [ "$(os::has_command gztemplate)" != "true" ]; then
+    zmicro package install gztemplate
+  fi
+
+  gztemplate "$@"
+}
+
 # os::os_name get current os name
 # os::os_name@description now support macos | ubuntu | centos | alpine | archlinux | fedora
 os::os_name() {
@@ -2256,6 +2264,7 @@ export -f os::gpm
 export -f os::gzfly
 export -f os::gzssh
 export -f os::gzlighthouse
+export -f os::gztemplate
 
 export -f os::os_name
 

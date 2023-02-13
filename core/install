@@ -111,6 +111,12 @@ install::zip() {
     return 1
   fi
 
+  local system_app_path=/Applications/$app_name
+  if [ -d "$system_app_path" ]; then
+    log::error "[install::zip] system application ${app_name} already exists"
+    return 1
+  fi
+
   local tmp_dir=$(os::tmp_dir)
   local tmp_error_file=$(os::tmp_file)
 
@@ -120,10 +126,10 @@ install::zip() {
   log::info "[install::zip] go to tmp context ..."  
   cd $tmp_dir
 
-  log::info "[install::zip] extract zip ..."  
+  log::info "[install::zip] extract zip $zip_path ..."  
   os::unzip -xo $zip_path >>/dev/null 2>$tmp_error_file
   if [ "$?" != "0" ]; then
-    log::error "[install::zip] failed to extract file type(zip): $filepath."
+    log::error "[install::zip] failed to extract file type(zip): $zip_path."
     log::error "[install::zip] error detail: $(cat $tmp_error_file)"
     return 1
   fi

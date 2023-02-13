@@ -1,0 +1,91 @@
+#!/bin/bash
+
+# install::dmg installs mac dmg format package.
+# install::dmg@usage <dmg_path> <package_name> <app_name>
+# install::dmg@example:
+#    install::dmg $PWD/tmp/MiaoYan.dmg 妙言 MiaoYan.app
+install::dmg() {
+  local dmg_path=$1
+  local package_name=$2
+  local app_name=$3
+  #
+  local mount_path="/Volumes/$package_name"
+
+  if [ -z "$dmg_path" ]; then
+    log::error "[install::dmg] dmg path is required"
+    return 1
+  fi
+
+  if [ -z "$package_name" ]; then
+    log::error "[install::dmg] package name is required"
+    return 1
+  fi
+
+  if [ -z "$app_name" ]; then
+    log::error "[install::dmg] app name is required"
+    return 1
+  fi
+
+  # hdiutil attach $dmg_path
+  hdiutil mount $dmg_path
+  if [ "$?" != "0" ]; then
+    log::error "[install::dmg] failed to attach dmg ..."
+    return 1
+  fi
+
+  if [ ! -d "$mount_path" ]; then
+    log::error "[install::dmg] invalid package name"
+    return 1
+  fi
+
+  local app_path="$mount_path/$app_name"
+  if [ ! -d "$app_path" ]; then
+    log::error "[install::dmg] invalid app name (${app_name})"
+    return 1
+  fi
+
+  cp -rf $app_path /Applications/
+  if [ "$?" != "0" ]; then
+    log::error "[install::dmg] failed to copy app to /Applications/ ."
+    return 1
+  fi
+
+  # hdiutil detach $dmg_path
+  hdiutil unmount $mount_path >>/dev/null
+  if [ "$?" != "0" ]; then
+    log::error "[install::dmg] failed to unmount dmg."
+    return 1
+  fi
+
+  log::success "[install::dmg] succeed to install ${package_name}."
+}
+
+# install::pkg installs mac pkg format package.
+# install::pkg@usage <pkg_path> <package_name>
+# install::pkg@example:
+#    install::pkg $PWD/tmp/MiaoYan.pkg 妙言
+install::pkg() {
+  local pkg_path=$1
+  local package_name=$2
+
+  if [ -z "$pkg_path" ]; then
+    log::error "[install::pkg] pkg path is required"
+    return 1
+  fi
+
+  if [ -z "$package_name" ]; then
+    package_name=$pkg_path
+  fi
+
+  sudo installer -pkg $pkg_path -target /Applications
+  if [ "$?" != "0" ]; then
+    log::error "[install::pkg] failed to install pkg ..."
+    return 1
+  fi
+
+  log::success "[install::pkg] succeed to install ${package_name}."
+}
+
+
+export -f install::dmg
+export -f install::pkg

@@ -86,6 +86,66 @@ install::pkg() {
   log::success "[install::pkg] succeed to install ${package_name}."
 }
 
+# install::zip installs the zip format package.
+# install::zip@usage <zip_path> <package_name>
+# install::zip@example:
+#    install::zip $PWD/tmp/iTerm2-3_4_19.zip iTerm2 iTerm.app
+#    install::zip $PWD/tmp/VSCode-darwin-universal.zip VSCode "Visual\ Studio\ Code.app"
+install::zip() {
+  local zip_path=$1
+  local package_name=$2
+  local app_name=$3
+
+  if [ -z "$zip_path" ]; then
+    log::error "[install::zip] zip path is required"
+    return 1
+  fi
+
+  if [ -z "$package_name" ]; then
+    log::error "[install::zip] package name is required"
+    return 1
+  fi
+
+  if [ -z "$app_name" ]; then
+    log::error "[install::zip] app name is required"
+    return 1
+  fi
+
+  local tmp_dir=$(os::tmp_dir)
+  local tmp_error_file=$(os::tmp_file)
+
+  log::info "[install::zip] creating tmp dir ${tmp_dir} ..."  
+  mkdir -p $tmp_dir
+
+  log::info "[install::zip] go to tmp context ..."  
+  cd $tmp_dir
+
+  log::info "[install::zip] extract zip ..."  
+  os::unzip -xo $zip_path >>/dev/null 2>$tmp_error_file
+  if [ "$?" != "0" ]; then
+    log::error "[install::zip] failed to extract file type(zip): $filepath."
+    log::error "[install::zip] error detail: $(cat $tmp_error_file)"
+    return 1
+  fi
+
+  # os::install $source_bin_file $target_bin_dir $target_bin_name >>/dev/null 2>$tmp_error_file
+  cp -rf $app_name /Applications
+  if [ "$?" != "0" ]; then
+    log::error "[install::zip] failed to install $target_bin_name."
+    log::error "[install::zip] error detail: $(cat $tmp_error_file)"
+    return 1
+  fi
+
+  log::info "[install::zip] clear tmp dir ..."  
+  rm -rf $tmp_dir >>/dev/null 2>$tmp_error_file
+  if [ "$?" != "0" ]; then
+    log::error "[install::zip] failed to remove tmp dir: $(cat $tmp_error_file)"
+    return 1
+  fi
+
+  log::success "[install::zip] succeed to install ${package_name}."
+}
 
 export -f install::dmg
 export -f install::pkg
+export -f install::zip

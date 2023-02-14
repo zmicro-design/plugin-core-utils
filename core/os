@@ -1403,11 +1403,28 @@ os::base64_decode() {
   echo "$decoded"
 }
 
+# os::md5 gets the md5 sume of string or file.
+# os::md5@usage 
+# os::md5@example helloworld
+# os::md5@example $ZMICRO_HOME/mod
 os::md5() {
   local string="$1"
   if [ -z "$string" ]; then
-    log::error "[os::md5] string is required"
+    log::error "[os::md5] string or path is required"
     return 1
+  fi
+
+  # file
+  if [ -f "$string" ]; then
+    local filepath=$string
+    # mac
+    if [ "$(os::is_macos)" = "true" ]; then
+      md5 -q $filepath
+    else
+      # linux
+      md5sum $filepath | awk '{print $1}'
+    fi
+    return
   fi
   
   if [ "$(os::has_command md5sum)" = "true" ]; then
@@ -2083,6 +2100,9 @@ os::run_commands_in_remote_server() {
   ssh -o "StrictHostKeyChecking=no" $@
 }
 
+# os::is_in_vscode checks if in vscode.
+# os::is_in_vscode@usage 
+# os::is_in_vscode@example os::is_in_vscode
 os::is_in_vscode() {
   if [ -n "$VSCODE_INJECTION" ]; then
     echo "true"
@@ -2091,6 +2111,9 @@ os::is_in_vscode() {
   fi
 }
 
+# os::is_in_iterm2 checks if in iterm2.
+# os::is_in_iterm2@usage 
+# os::is_in_iterm2@example os::is_in_iterm2
 os::is_in_iterm2() {
   # if [ "$TERM_PROGRAM" = "iTerm.app" ]; then
   if [ "$LC_TERMINAL" = "iTerm2" ]; then

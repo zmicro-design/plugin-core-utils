@@ -2083,6 +2083,23 @@ os::run_commands_in_remote_server() {
   ssh -o "StrictHostKeyChecking=no" $@
 }
 
+os::is_in_vscode() {
+  if [ -n "$VSCODE_INJECTION" ]; then
+    echo "true"
+  else
+    echo "false"
+  fi
+}
+
+os::is_in_iterm2() {
+  # if [ "$TERM_PROGRAM" = "iTerm.app" ]; then
+  if [ "$LC_TERMINAL" = "iTerm2" ]; the
+    echo "true"
+  else
+    echo "false"
+  fi
+}
+
 export -f os::arch
 export -f os::platform
 export -f os::release
@@ -2270,3 +2287,6 @@ export -f os::os_name
 
 export -f os::forever
 export -f os::run_commands_in_remote_server
+
+export -f os::is_in_vscode
+export -f os::is_in_iterm2

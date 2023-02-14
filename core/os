@@ -2093,7 +2093,7 @@ os::is_in_vscode() {
 
 os::is_in_iterm2() {
   # if [ "$TERM_PROGRAM" = "iTerm.app" ]; then
-  if [ "$LC_TERMINAL" = "iTerm2" ]; the
+  if [ "$LC_TERMINAL" = "iTerm2" ]; then
     echo "true"
   else
     echo "false"

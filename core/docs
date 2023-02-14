@@ -58,9 +58,6 @@ docs::method() {
   fi
 
   local example=$(cat $filepath | grep "^# ${fn}@example" | awk -F '#' '{print $2}' | awk -F '@example ' '{print $2}')
-  if [ -z "$usage" ]; then
-    example="@TODO example missing"
-  fi
 
   log::info "$fn"
   log::info ""
@@ -68,7 +65,19 @@ docs::method() {
   log::info ""
   log::info "  usage: $fn $usage"
   log::info ""
-  log::info "  example: $fn $example"
+  if [ -z "$example" ]; then
+    log::info "  example: @TODO example missing"
+    return 0
+  fi
+
+  log::info "  example: "
+  cat $filepath | grep "^# ${fn}@example" | while read line; do
+    local example=$(echo $line | grep "^# ${fn}@example")
+    if [ -n "$example" ]; then
+      local one=${example#"# ${fn}@example "}
+      log::info "    $fn $one"
+    fi
+  done
 }
 
 export -f docs::module

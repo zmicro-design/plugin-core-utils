@@ -509,6 +509,9 @@ plugin::run() {
   export PLUGIN_DESCRIPTION=$(plugin::get_description $plugin_name)
   #
   export PLUGIN_DIR=$(plugin::get_path $plugin_name)
+  export PLUGIN_CORE_DIR=$PLUGIN_DIR/core
+  export PLUGIN_CONFIG_DIR=$PLUGIN_DIR/config
+  export PLUGIN_CONFIG_FILE=$PLUGIN_CONFIG_DIR/config
   export PLUGIN_DATA=$(plugin::get_app_data_path $plugin_name)
   export PLUGIN_LOGS=$(plugin::get_app_logs_path $plugin_name)
   export PLUGIN_CONFIGS=$(plugin::get_app_configs_path $plugin_name)
@@ -1010,6 +1013,82 @@ plugin::auto_update() {
   fi
 }
 
+# plugin::run_nodejs runs nodejs module at PLUGIN_CORE_DIR/nodejs/{module}.js
+# plugin::run_nodejs@usage <module>
+# plugin::run_nodejs@example plugin::run_nodejs hostname
+plugin::run_nodejs() {
+  local module=$1
+  if [ -z "$module" ]; then
+    log::error "[plugin::run_nodejs] module is required"
+    return 1
+  fi
+
+  local final_filepath="$PLUGIN_CORE_DIR/nodejs/${module}.js"
+  if [ ! -f "$final_filepath" ]; then
+    log::error "[plugin::run_nodejs] module($module) not found"
+    return 1
+  fi
+
+  run::nodejs $final_filepath
+}
+
+# plugin::run_zx runs zx module at PLUGIN_CORE_DIR/zx/{module}.zx
+# plugin::run_zx@usage <module>
+# plugin::run_zx@example plugin::run_zx hostname
+plugin::run_zx() {
+  local module=$1
+  if [ -z "$module" ]; then
+    log::error "[plugin::run_zx] module is required"
+    return 1
+  fi
+
+  local final_filepath="$PLUGIN_CORE_DIR/zx/${module}.zx"
+  if [ ! -f "$final_filepath" ]; then
+    log::error "[plugin::run_zx] module($module) not found"
+    return 1
+  fi
+
+  run::zx $final_filepath
+}
+
+# plugin::run_deno runs deno module at PLUGIN_CORE_DIR/deno/{module}.deno
+# plugin::run_deno@usage <module>
+# plugin::run_deno@example plugin::run_deno hostname
+plugin::run_deno() {
+  local module=$1
+  if [ -z "$module" ]; then
+    log::error "[plugin::run_deno] module is required"
+    return 1
+  fi
+
+  local final_filepath="$PLUGIN_CORE_DIR/deno/${module}.deno"
+  if [ ! -f "$final_filepath" ]; then
+    log::error "[plugin::run_deno] module($module) not found"
+    return 1
+  fi
+
+  run::deno $final_filepath
+}
+
+# plugin::run_go runs go module at PLUGIN_CORE_DIR/go/{module}/main.go
+# plugin::run_go@usage <module>
+# plugin::run_go@example plugin::run_go hostname
+plugin::run_go() {
+  local module=$1
+  if [ -z "$module" ]; then
+    log::error "[plugin::run_go] module is required"
+    return 1
+  fi
+
+  local final_filepath="$PLUGIN_CORE_DIR/go/${module}/main.go"
+  if [ ! -f "$final_filepath" ]; then
+    log::error "[plugin::run_go] module($module) not found"
+    return 1
+  fi
+
+  run::go $final_filepath
+}
+
 export -f plugin::register_all
 export -f plugin::register
 export -f plugin::unregister
@@ -1073,3 +1152,8 @@ export -f plugin::use
 
 export -f plugin::auto_backup
 export -f plugin::auto_update
+
+export -f plugin::run_nodejs
+export -f plugin::run_zx
+export -f plugin::run_deno
+export -f plugin::run_go

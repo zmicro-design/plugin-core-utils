@@ -175,40 +175,15 @@ function test_git::url_ssh_to_http() {
     "$received"
 }
 
-function test_git::checkout_with_branch() {
-  local url="https://github.com/zmicro-design/plugin-core-utils"
-  local typ="branch"
-  local name="keep/test_core_git_checkout"
-  local context="/tmp/zmicro_core_utils_test_git_checkout"
-
-  rm -rf $context
-
-  git::checkout $typ $name $url $context
-
-  testing::expect \
-    "${FUNCNAME[0]} branch repo url" \
-    "to_equal" \
-    "$url" \
-    "$(git::repo_url $context)"
-
-  testing::expect \
-    "${FUNCNAME[0]} branch name" \
-    "to_equal" \
-    "$name" \
-    "$(git::branch $context)"
-
-  rm -rf $context
-}
-
 function test_git::checkout_with_tag() {
-  local url="https://github.com/zcorky/zmicro"
-  local typ="tag"
-  local name="v1.21.20"
+  local tag="v1.21.20"
+  local commit="59b99614db69f05b778df31dd56198b93e5ece4a"
   local context="/tmp/zmicro_core_utils_test_git_checkout"
+  local url="https://github.com/zcorky/zmicro"
 
   rm -rf $context
 
-  git::checkout $typ $name $url $context
+  git::checkout $tag $commit $context $url
 
   testing::expect \
     "${FUNCNAME[0]} repo url 1" \
@@ -219,37 +194,46 @@ function test_git::checkout_with_tag() {
   testing::expect \
     "${FUNCNAME[0]} name" \
     "to_equal" \
-    "$name" \
+    "$tag" \
     "$(git::tag $context)"
-
-  # # exist
-  # name="v1.21.20"
-  # git::checkout $typ $name $url $context
-
-  # testing::expect \
-  #   "${FUNCNAME[0]} repo url 2" \
-  #   "to_equal" \
-  #   "$url" \
-  #   "$(git::repo_url $context)"
-
-  # testing::expect \
-  #   "${FUNCNAME[0]} name" \
-  #   "to_equal" \
-  #   "$name" \
-  #   "$(git::tag $context)"
 
   rm -rf $context
 }
 
-function test_git::checkout_with_commit() {
-  local url="https://github.com/zmicro-design/plugin-core-utils"
-  local typ="commit"
-  local name="9ae98ced42407f17635d0098a045367a8650020b"
+function test_git::checkout_with_branch() {
+  local branch="keep/test_core_git_checkout"
+  local commit="2c2ee6b8f54637376da7c0ae5bdb40d5476d19b1"
   local context="/tmp/zmicro_core_utils_test_git_checkout"
+  local url="https://github.com/zmicro-design/plugin-core-utils"
 
   rm -rf $context
 
-  git::checkout $typ $name $url $context
+  git::checkout $branch $commit $context $url
+
+  testing::expect \
+    "${FUNCNAME[0]} branch repo url" \
+    "to_equal" \
+    "$url" \
+    "$(git::repo_url $context)"
+
+  testing::expect \
+    "${FUNCNAME[0]} branch name" \
+    "to_equal" \
+    "$branch" \
+    "$(git::branch $context)"
+
+  # rm -rf $context
+}
+
+function test_git::checkout_with_commit() {
+  local branch="tmp"
+  local commit="9ae98ced42407f17635d0098a045367a8650020b"
+  local context="/tmp/zmicro_core_utils_test_git_checkout"
+  local url="https://github.com/zmicro-design/plugin-core-utils"
+
+  # rm -rf $context
+
+  git::checkout $branch $commit $context $url 
 
   testing::expect \
     "${FUNCNAME[0]} commit repo url" \
@@ -260,15 +244,15 @@ function test_git::checkout_with_commit() {
   testing::expect \
     "${FUNCNAME[0]} commit name/hash" \
     "to_equal" \
-    "$name" \
+    "$commit" \
     "$(git::commit $context)"
 
-  rm -rf $context
+  # rm -rf $context
 }
 
 function test_git::commit_timestamp() {
   local commit_timestamp=$(git::commit_timestamp)
-  
+
   testing::expect \
     "${FUNCNAME[0]}" \
     "to_equal" \

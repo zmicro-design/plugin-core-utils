@@ -264,120 +264,106 @@ git::use_version() {
   git::switch_tag $version
 }
 
-# git::checkout checkouts git repository to context dir with specified branch
-# git::checkout@usage <typ> <name> <url> <context>
+# git::checkout checkouts git repository to context dir with specified branch/tag with commit.
+# git::checkout@usage <branch/tag> <commit> <context> <url>
+# git::checkout@example master e8f94341d90d53bebe736c5bc92a38950a777b5b /tmp/zmicro https://github.com/zcorky/zmicro
+# git::checkout@example v1.0.1 e8f94341d90d53bebe736c5bc92a38950a777b5b /tmp/zmicro https://github.com/zcorky/zmicro
 git::checkout() {
-  # branch
-  # tag
-  # commit
-  local typ=$1
-  local name=$2
-  local url=$3
-  local context=$4
+  local branch=$1
+  local commit=$2
+  local context=$3
+  local url=$4
 
-  if [ -z "$typ" ]; then
-    log::error "[git::checkout] typ is required"
+  local origin_context=$(pwd)
+  local tmp_error_log=$(os::tmp_file)
+
+  log::info "[$(timestamp)][git::checkout] preparing ..."
+  log::info "[$(timestamp)][git::checkout]  => branch: $branch ..."
+  log::info "[$(timestamp)][git::checkout]  => commit: $commit ..."
+  log::info "[$(timestamp)][git::checkout]  => context: $context ..."
+  log::info "[$(timestamp)][git::checkout]  => pwd: $origin_context ..."
+  log::info "[$(timestamp)][git::checkout]  => err_log: $tmp_error_log ..."
+
+  if [ -z "$branch" ]; then
+    log::error "[$(timestamp)][git::checkout] branch is required"
     return 1
   fi
 
-  if [ -z "$name" ]; then
-    log::error "[git::checkout] name is required"
-    return 1
-  fi
-
-  if [ -z "$url" ]; then
-    log::error "[git::checkout] url is required"
-    return 1
-  fi
-
-  if [ -z "$typ" ]; then
-    log::error "[git::checkout] typ is required"
-    return 1
-  fi
-
-  if [ -z "$name" ]; then
-    log::error "[git::checkout] name is required"
+  if [ -z "$commit" ]; then
+    log::error "[$(timestamp)][git::checkout] commit is required"
     return 1
   fi
 
   if [ -z "$context" ]; then
-    log::error "[git::checkout] context is required"
+    log::error "[$(timestamp)][git::checkout] context is required"
     return 1
   fi
 
-  if [ "$typ" != "branch" ] && [ "$typ" != "tag" ] && [ "$typ" != "commit" ]; then
-    log::error "[git::checkout] type($typ) is not allowed, only allow branch,tag,commit"
-    return 1
+  if [ -z "$url" ]; then
+    # log::error "[$(timestamp)][git::checkout] url is required"
+    # return 1
+    if [ -z "$context" ]; then
+      log::error "[$(timestamp)][git::checkout] context is required when url is empty"
+      return 1
+    fi
   fi
 
-  if [ -d "$context" ]; then
-    log::error "[git::checkout] context($context) is already exists, please remove it first."
-    return 1
-  fi
+  # if [ -d "$context" ]; then
+  #   log::error "[$(timestamp)][git::checkout] context($context) is already exists, please remove it first."
+  #   return 1
+  # fi
 
   # apply proxy
   net::using_smart_proxy
 
   log::debug "HTTPS_PROXY: $HTTP_PROXY"
-  local tmp_error_log=$(os::tmp_file)
 
-  if [ "$typ" = "branch" ] || [ "$typ" = "tag" ]; then
-    log::info "[git::checkout] clone new repository with $typ($name) to $context ..."
-    os::git clone --depth=1 -b $name $url $context >>/dev/null 2>$tmp_error_log
+  if [ -d "$context" ] && [ -n "$url" ]; then
+    local old_url=$(git::origin_url $context)
+    if [ "$url" != "$old_url" ]; then
+      log::info "[$(timestamp)][git::checkout] origin url not match (old: $old_url, new: $url) => remove ..."
+      # log::error "[$(timestamp)][git::checkout] origin url not match (old: $old_url, new: $url)"
+      # return 1
+      rm -rf $context
+    fi
+  fi
+
+  if [ ! -d "$context" ]; then
+    log::info "[$(timestamp)][git::checkout] cloning repository ..."
+    os::git clone $url $context >>/dev/null 2>$tmp_error_log
     if [ "$?" != "0" ]; then
-      log::error "[git::checkout] failed to checkout repo with $typ($name) ..."
+      log::error "[$(timestamp)][git::checkout] failed to checkout repo with (branch: $branch, commit: $commit)."
       cat $tmp_error_log
       return 1
     fi
-    return
-  fi
+  else
+    cd $context
 
-  local origin_context=$(pwd)
+    # ensure clean
+    log::info "[$(timestamp)][git::checkout] ensuring worktree clean ..."
+    git checkout . >>/dev/null 2>$tmp_error_log
+    if [ "$?" != "0" ]; then
+      log::error "[$(timestamp)][git::checkout] failed to ensure worktree clean."
+      cat $tmp_error_log
+      return 1
+    fi
 
-  # # type: commit
-  # log::info "[git::checkout] check out new repository with $typ($name) to $context ..."
-  # git clone --depth=1 $url $context >>/dev/null 2>$tmp_error_log
-  # if [ "$?" != "0" ]; then
-  #   log::error "[git::checkout] failed to checkout repo with $typ($name) ..."
-  #   cat $tmp_error_log
-  #   return 1
-  # fi
-
-  # cd $context
-
-  # log::info "[git::checkout] updating remote name at context($context)..."
-  # git fetch --depth=1 origin $name >>/dev/null 2>$tmp_error_log
-  # if [ "$?" != "0" ]; then
-  #   log::error "[git::checkout] failed to fetch origin with $typ($name) ..."
-  #   cat $tmp_error_log
-  #   return 1
-  # fi
-
-  # log::info "[git::checkout] switch to $typ($name) ..."
-  # git checkout $name >>/dev/null 2>$tmp_error_log
-  # if [ "$?" != "0" ]; then
-  #   log::error "[git::checkout] failed to checkout $typ($name) ..."
-  #   cat $tmp_error_log
-  #   return 1
-  # fi
-
-  # type: commit
-  # fix Server does not allow request for unadvertised object
-
-  log::info "[git::checkout] clone new repository with $typ($name) to $context ..."
-  os::git clone $url $context >>/dev/null 2>$tmp_error_log
-  if [ "$?" != "0" ]; then
-    log::error "[git::checkout] failed to checkout repo with $typ($name) ..."
-    cat $tmp_error_log
-    return 1
+    log::info "[$(timestamp)][git::checkout] fetching origin ..."
+    # os::git fetch origin $branch >>/dev/null 2>$tmp_error_log
+    os::git fetch origin # >>/dev/null 2>$tmp_error_log
+    if [ "$?" != "0" ]; then
+      log::error "[$(timestamp)][git::checkout] failed to git fetch ${branch}."
+      # cat $tmp_error_log
+      return 1
+    fi
   fi
 
   cd $context
 
-  log::info "[git::checkout] switch to $typ($name) ..."
-  git reset --hard $name >>/dev/null 2>$tmp_error_log
+  log::info "[$(timestamp)][git::checkout] checkouting to branch($branch) with commit($commit) ..."
+  git checkout -B $branch $commit >>/dev/null 2>$tmp_error_log
   if [ "$?" != "0" ]; then
-    log::error "[git::checkout] failed to checkout $typ($name) ..."
+    log::error "[$(timestamp)][git::checkout] failed to checkout to branch($branch) with commit($commit)."
     cat $tmp_error_log
     return 1
   fi

@@ -536,6 +536,11 @@ plugin::run() {
   #   1. core config (默认已加载，不需要重新加载)
   #
   #   2. plugin config (加载插件配置)
+  #     global configuration
+  if [ -f "$PLUGIN_CONFIG" ]; then
+    config::load_file $PLUGIN_CONFIG
+  fi
+  #     local configuration
   plugin::load_config $plugin_name
   #   3. user config (加载用户配置，可能会覆盖插件配置和核心配置)
   config::load_user_config

@@ -153,7 +153,7 @@ config::set() {
   if [ -f $filepath ]; then
     # @TODO
     set +e
-    line=$(cat $filepath | grep "${key}=")
+    line=$(cat $filepath | awk '!/^#/' | grep "${key}=")
     set -e
   fi
 

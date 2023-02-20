@@ -68,7 +68,7 @@ net::is_url_visitable() {
     return
   fi
 
-  curl -I $1 --connect-timeout 3 >>/dev/null 2>&1
+  os::curl -I $1 --connect-timeout 3 >>/dev/null 2>&1
   if [ "$?" != "0" ]; then
     echo "false"
   else
@@ -96,7 +96,7 @@ net::is_port_visitable() {
   fi
 
   if [ "$(os::has_command nc)" = "true" ]; then
-    nc -z -v -n -w 1 $ip $port >>/dev/null 2>&1
+    os::nc -z -v -n -w 1 $ip $port >>/dev/null 2>&1
     if [ "$?" != "0" ]; then
       echo "false"
     else

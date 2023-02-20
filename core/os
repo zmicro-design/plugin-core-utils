@@ -2123,6 +2123,14 @@ os::is_in_iterm2() {
   fi
 }
 
+os::nc() {
+  if [ "$(os::has_command nc)" != "true" ]; then
+    zmicro package install nc
+  fi
+
+  nc "$@"
+}
+
 export -f os::arch
 export -f os::platform
 export -f os::release
@@ -2313,3 +2321,5 @@ export -f os::run_commands_in_remote_server
 
 export -f os::is_in_vscode
 export -f os::is_in_iterm2
+
+export -f os::nc

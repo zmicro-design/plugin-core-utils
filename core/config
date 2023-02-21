@@ -263,8 +263,9 @@ config::check_or_set() {
       #   value="false"
       # fi
       os::inquirer value "yesno" "$message" true "$default_value"
-    # elif [ "$type" = "select" ]; then
-    #   os::inquirer value "select" choices "$message" true
+    elif [ "$type" = "select" ]; then
+      local choices=$4
+      os::inquirer value "select" $choices "$message" true
     else
       log::error "[config::check_or_set] invalid type($type), options: text, yesno"
       exit 1

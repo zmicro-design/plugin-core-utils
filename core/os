@@ -1079,6 +1079,9 @@ os::inquirer() {
     fi
   elif [ "$type" = "yesno" ] || [ "$type" = "confirm" ]; then
     local choices=("Yes" "No")
+    if [ "$default_value" = "No" ]; then
+      choices=("No" "Yes")
+    fi
     inquirer::select "$question" choices value
     if [ "$value" = "Yes" ]; then
       value="true"

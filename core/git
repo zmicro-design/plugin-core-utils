@@ -526,7 +526,12 @@ git::has_branch() {
     repo=$(git::origin_url)
   fi
 
-  local branch=$(git ls-remote --heads $repo $name)
+  local branch=$(os::git ls-remote --heads $repo $name)
+  if [ "$?" = "0" ]; then
+    echo "false"
+    return 1
+  fi
+  
   if [ -z "$branch" ]; then
     echo "false"
   else

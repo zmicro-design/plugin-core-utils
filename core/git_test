@@ -281,3 +281,18 @@ function test_git::remote_has_branch() {
     "false" \
     "$(git::remote_has_branch abcdqwer https://github.com/go-zoox/fs)"
 }
+
+function test_git::has_branch() {
+  testing::expect \
+    "${FUNCNAME[0]}" \
+    "to_equal" \
+    "true" \
+    "$(git::has_branch master https://github.com/go-zoox/fs)"
+
+ testing::expect \
+    "${FUNCNAME[0]}" \
+    "to_equal" \
+    "false" \
+    "$(git::has_branch abcdqwer https://github.com/go-zoox/fs)"
+}
+

@@ -527,15 +527,17 @@ git::has_branch() {
   fi
 
   local branch=$(os::git ls-remote --heads $repo $name)
-  if [ "$?" = "0" ]; then
+  if [ "$?" != "0" ]; then
     echo "false"
     return 1
   fi
   
   if [ -z "$branch" ]; then
     echo "false"
+    return 1
   else
     echo "true"
+    return 0
   fi
 }
 
@@ -673,6 +675,31 @@ git::get_remote_latest_tag() {
     awk -F 'refs/tags/' '{print $2}'
 }
 
+git::remote_has_branch() {
+  local name=$1
+  local repo=$2
+  if [ -z "$name" ]; then
+    log::error "[git::remote_has_branch] name is required"
+    return 1
+  fi
+
+  if [ -z "$repo" ]; then
+    repo=$(git::origin_url)
+  fi
+
+  local branch=$(os::git ls-remote --heads $repo $name)
+  if [ "$?" != "0" ]; then
+    echo "false"
+    return 1
+  fi
+  
+  if [ -z "$branch" ]; then
+    echo "false"
+  else
+    echo "true"
+  fi
+}
+
 export -f git::commit_message
 export -f git::commit_message_full
 export -f git::commit_hash
@@ -728,3 +755,5 @@ export -f git::get_commit_hash_by_tag
 export -f git::get_remote_commit_hash_by_branch
 export -f git::get_remote_commit_hash_by_tag
 export -f git::get_remote_latest_tag
+
+export -f git::remote_has_branch

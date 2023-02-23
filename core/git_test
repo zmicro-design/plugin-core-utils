@@ -267,3 +267,17 @@ function test_git::get_commit_hash_by_tag() {
     "f8fd32264368b05875b33649f95812af41af92ce" \
     "$(git::get_commit_hash_by_tag v1.0.0)"
 }
+
+function test_git::remote_has_branch() {
+  testing::expect \
+    "${FUNCNAME[0]}" \
+    "to_equal" \
+    "true" \
+    "$(git::remote_has_branch master https://github.com/go-zoox/fs)"
+
+ testing::expect \
+    "${FUNCNAME[0]}" \
+    "to_equal" \
+    "false" \
+    "$(git::remote_has_branch abcdqwer https://github.com/go-zoox/fs)"
+}

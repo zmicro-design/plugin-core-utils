@@ -577,7 +577,7 @@ plugin::run() {
     zmicro plugin description $plugin_name
   elif [ "$plugin_command_real" = "dependencies" ]; then
     zmicro plugin dependencies $plugin_name
-  elif [ "$plugin_command_real" = "update" ]; then
+  elif [ "$plugin_command_real" = "update" ] && [ ! -f "$PLUGIN_DIR/commands/update" ]; then
     # @TODO
     local option=$(echo $plugin_command_args_real | awk '{print $1}')
     if [ "$option" = "-f" ] || [ "$option" = "--force" ]; then

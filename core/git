@@ -94,6 +94,21 @@ git::branch() {
     cd $context
   fi
 
+  git show-ref -q
+  if [ "$?" != "0" ]; then
+    # new git repository, not pushed to remote
+    local current_branch="master"
+    if [ "$?" != "0" ]; then
+      local default_branch=$(git config --get init.defaultbranch)
+      if [ -n "$default_branch" ]; then
+        current_branch=$default_branch
+      fi
+    fi
+
+    echo "$current_branch"
+    return
+  fi
+
   git rev-parse --abbrev-ref HEAD
 }
 
@@ -526,7 +541,7 @@ git::has_branch() {
     repo=$(git::origin_url)
   fi
 
-  git::remote_has_branch $name $repo >> /dev/null
+  git::remote_has_branch $name $repo >>/dev/null
   if [ "$?" != "0" ]; then
     echo "false"
     return 1
@@ -687,7 +702,7 @@ git::remote_has_branch() {
     echo "false"
     return 1
   fi
-  
+
   if [ -z "$branch" ]; then
     echo "false"
     return 1

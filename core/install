@@ -9,7 +9,10 @@ install::dmg() {
   local package_name=$2
   local app_name=$3
   #
-  local mount_path="/Volumes/$package_name"
+  local mount_path=$4
+  if [ -z "$mount_path" ]; then
+    mount_path="/Volumes/$package_name"
+  fi
 
   if [ -z "$dmg_path" ]; then
     log::error "[install::dmg] dmg path is required"
@@ -44,14 +47,14 @@ install::dmg() {
     return 1
   fi
 
-  cp -rf $app_path /Applications/
+  cp -rf "$app_path" /Applications/
   if [ "$?" != "0" ]; then
     log::error "[install::dmg] failed to copy app to /Applications/ ."
     return 1
   fi
 
   # hdiutil detach $dmg_path
-  hdiutil unmount $mount_path >>/dev/null
+  hdiutil unmount "$mount_path" >>/dev/null
   if [ "$?" != "0" ]; then
     log::error "[install::dmg] failed to unmount dmg."
     return 1
@@ -120,13 +123,13 @@ install::zip() {
   local tmp_dir=$(os::tmp_dir)
   local tmp_error_file=$(os::tmp_file)
 
-  log::info "[install::zip] creating tmp dir ${tmp_dir} ..."  
+  log::info "[install::zip] creating tmp dir ${tmp_dir} ..."
   mkdir -p $tmp_dir
 
-  log::info "[install::zip] go to tmp context ..."  
+  log::info "[install::zip] go to tmp context ..."
   cd $tmp_dir
 
-  log::info "[install::zip] extract zip $zip_path ..."  
+  log::info "[install::zip] extract zip $zip_path ..."
   os::unzip -xo $zip_path >>/dev/null 2>$tmp_error_file
   if [ "$?" != "0" ]; then
     log::error "[install::zip] failed to extract file type(zip): $zip_path."
@@ -142,7 +145,7 @@ install::zip() {
     return 1
   fi
 
-  log::info "[install::zip] clear tmp dir ..."  
+  log::info "[install::zip] clear tmp dir ..."
   rm -rf $tmp_dir >>/dev/null 2>$tmp_error_file
   if [ "$?" != "0" ]; then
     log::error "[install::zip] failed to remove tmp dir: $(cat $tmp_error_file)"

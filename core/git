@@ -530,6 +530,7 @@ git::clone() {
 }
 
 git::update() {
+  local tmp_error_log=$(os::tmp_file)
   local path=$1
   if [ -z "$path" ]; then
     path=$PWD

@@ -549,30 +549,21 @@ git::update() {
 
   cd $path
   
-  log::debug "[$(timestamp)][git::update] fetching branch: $branch ..."
-  os::git fetch origin $branch >>/dev/null 2>$tmp_error_log
+  local current_branch=$(git::branch)
+
+  log::debug "[$(timestamp)][git::update] fetching remote branch: $current_branch ..."
+  os::git fetch origin $current_branch >>/dev/null 2>$tmp_error_log
   if [ "$?" != "0" ]; then
-    log::error "[$(timestamp)][git::update] failed to git fetch ${branch}."
+    log::error "[$(timestamp)][git::update] failed to git fetch ${current_branch}."
     cat $tmp_error_log
     return 1
   fi
 
-  local current_branch=$(git::branch)
-  if [ "$current_branch" != "$branch" ]; then
-    log::debug "[$(timestamp)][git::update] checkout branch: $branch ..."
-    git checkout -b $branch origin/$branch 2>$tmp_error_log
-    if [ "$?" != "0" ]; then
-      log::error "[$(timestamp)][git::update] failed to checkout branch: ${branch} ."
-      cat $tmp_error_log
-      return 1
-    fi
-  fi
-
   local error_log=$(os::tmp_file)
-  log::debug "[$(timestamp)][git::update] merge origin branch: $branch ..."
-  git merge origin/$branch >>/dev/null 2>$tmp_error_log
+  log::debug "[$(timestamp)][git::update] merge remote branch: $current_branch ..."
+  git merge origin/$current_branch >>/dev/null 2>$tmp_error_log
   if [ "$?" != "0" ]; then
-    log::error "[$(timestamp)][git::update] failed to merge origin branch: ${branch} ."
+    log::error "[$(timestamp)][git::update] failed to merge remote branch: ${current_branch}."
     cat $tmp_error_log
     return 1
   fi

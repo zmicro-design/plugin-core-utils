@@ -529,6 +529,54 @@ git::clone() {
   fi
 }
 
+git::update() {
+  local path=$1
+  if [ -z "$path" ]; then
+    path=$PWD
+  fi
+
+  if [ ! -d "$PWD/.git" ]; then
+    log::error "[git::update] current dir is not a git repo (path: $path)"
+    return 1
+  fi
+
+  # update
+  log::debug "[$(timestamp)][git::update] update branch: $branch ..."
+  if [ ! -w "$path" ]; then
+    sudo chown -R $USER $path
+  fi
+
+  cd $path
+  
+  log::debug "[$(timestamp)][git::update] fetching branch: $branch ..."
+  os::git fetch origin $branch >>/dev/null 2>$tmp_error_log
+  if [ "$?" != "0" ]; then
+    log::error "[$(timestamp)][git::update] failed to git fetch ${branch}."
+    cat $tmp_error_log
+    return 1
+  fi
+
+  local current_branch=$(git::branch)
+  if [ "$current_branch" != "$branch" ]; then
+    log::debug "[$(timestamp)][git::update] checkout branch: $branch ..."
+    git checkout -b $branch origin/$branch 2>$error_log
+    if [ "$?" != "0" ]; then
+      log::error "[$(timestamp)][git::update] failed to checkout branch: ${branch} ."
+      cat $tmp_error_log
+      return 1
+    fi
+  fi
+
+  local error_log=$(os::tmp_file)
+  log::debug "[$(timestamp)][git::update] merge origin branch: $branch ..."
+  git merge origin/$branch >>/dev/null 2>$tmp_error_log
+  if [ "$?" != "0" ]; then
+    log::error "[$(timestamp)][git::update] failed to merge origin branch: ${branch} ."
+    cat $tmp_error_log
+    return 1
+  fi
+}
+
 git::has_branch() {
   local name=$1
   local repo=$2
@@ -756,6 +804,7 @@ export -f git::global_email
 export -f git::global_setup
 
 export -f git::clone
+export -f git::update
 
 export -f git::has_branch
 

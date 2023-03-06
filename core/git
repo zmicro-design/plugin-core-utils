@@ -560,7 +560,7 @@ git::update() {
   local current_branch=$(git::branch)
   if [ "$current_branch" != "$branch" ]; then
     log::debug "[$(timestamp)][git::update] checkout branch: $branch ..."
-    git checkout -b $branch origin/$branch 2>$error_log
+    git checkout -b $branch origin/$branch 2>$tmp_error_log
     if [ "$?" != "0" ]; then
       log::error "[$(timestamp)][git::update] failed to checkout branch: ${branch} ."
       cat $tmp_error_log

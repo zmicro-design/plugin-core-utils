@@ -536,7 +536,7 @@ git::update() {
     path=$PWD
   fi
 
-  if [ ! -d "$PWD/.git" ]; then
+  if [ ! -d "$path/.git" ]; then
     log::error "[git::update] current dir is not a git repo (path: $path)"
     return 1
   fi

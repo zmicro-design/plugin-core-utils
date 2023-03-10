@@ -139,6 +139,75 @@ EOF
   PGPASSWORD=$admin_password psql -h $host -p $port -U $admin_username -f $create_user_sql_filepath
 }
 
+# database::mongo_create_user creates a new user in mongo.
+# database::mongo_create_user@usage <host> <port> <admin_username> <admin_password> <new_username> <new_password> <new_database>
+# database::mongo_create_user@example:
+#    database::mongo_create_user /home/zmicro/code  zmicro@192.168.1.1
+database::mongo_create_user() {
+  local host=$1
+  local port=$2
+  local admin_username=$3
+  local admin_password=$4
+  local new_username=$5
+  local new_password=$6
+  local new_database=$7
+
+  if [ -z "$host" ]; then
+    log::error "[database::postgres_create_user] host is required"
+    return 1
+  fi
+
+  if [ -z "$port" ]; then
+    log::error "[database::postgres_create_user] port is required"
+    return 1
+  fi
+
+  if [ -z "$admin_username" ]; then
+    log::error "[database::postgres_create_user] admin_username is required"
+    return 1
+  fi
+
+  if [ -z "$admin_password" ]; then
+    log::error "[database::postgres_create_user] admin_password is required"
+    return 1
+  fi
+
+  if [ -z "$new_username" ]; then
+    log::error "[database::postgres_create_user] new_username is required"
+    return 1
+  fi
+
+  if [ -z "$new_password" ]; then
+    log::error "[database::postgres_create_user] new_password is required"
+    return 1
+  fi
+
+  if [ -z "$new_database" ]; then
+    log::error "[database::postgres_create_user] new_database is required"
+    return 1
+  fi
+
+  export PATH="/opt/homebrew/opt/libpq/bin:$PATH"
+  if [ "$(os::has_command mongosh)" != "true" ]; then
+    zmicro package install mongo-client
+    if [ "$?" != "0" ]; then
+      log::error "[database::mongo_create_user] failed to install mongo client"
+      return 1
+    fi
+  fi
+
+  # 连接到 MongoDB 数据库
+  mongosh --host $host --port $port -u $admin_username -p $admin_password --eval "
+  use admin;
+  db = db.getSiblingDB('$new_database');
+  db.createUser({
+    user: '$new_username',
+    pwd: '$new_password',
+    roles: [ { role: 'readWrite', db: '$new_database' } ]
+  });
+"
+}
+
 # database::redis_create_user creates a new user in redis.
 # database::redis_create_user@usage <host> <port> <admin_password> <new_username> <new_password>
 # database::redis_create_user@example:
@@ -185,6 +254,8 @@ database::redis_create_user() {
 
   rdcli -h $host -p $port -a $admin_password ACL SETUSER $new_username ON ">$new_password"
 }
+
+
 
 export -f database::mysql_create_user
 export -f database::postgres_create_user

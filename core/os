@@ -1469,6 +1469,26 @@ os::curl() {
     "$@"
 }
 
+os::brew() {
+  if [ "$(os::has_command brew)" != "true" ]; then
+    if [ "$GITHUB_ACTIONS" = "true" ]; then
+      echo "in GitHub Actions, not necessary to change homebrew mirror"
+    else
+      # mirror: https://github.com/eryajf/Thanks-Mirror#homebrew
+      export HOMEBREW_BREW_GIT_REMOTE="https://mirrors.tuna.tsinghua.edu.cn/git/homebrew/brew.git"
+      export HOMEBREW_CORE_GIT_REMOTE="https://mirrors.tuna.tsinghua.edu.cn/git/homebrew/homebrew-core.git"
+      export HOMEBREW_BOTTLE_DOMAIN="https://mirrors.tuna.tsinghua.edu.cn/homebrew-bottles"
+    fi
+
+    os::curl -o- https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh | bash
+  fi
+
+  # apply proxy
+  net::using_smart_proxy
+
+  brew "$@"
+}
+
 os::download() {
   local filepath=$1
   local url=$2
@@ -2254,6 +2274,8 @@ export -f os::md5
 export -f os::wget
 export -f os::curl
 export -f os::download
+
+export -f os::brew
 
 export -f os::device
 export -f os::device_id

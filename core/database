@@ -259,5 +259,6 @@ database::redis_create_user() {
 
 export -f database::mysql_create_user
 export -f database::postgres_create_user
+export -f database::mongo_create_user
 
 export -f database::redis_create_user

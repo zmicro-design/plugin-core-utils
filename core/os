@@ -101,6 +101,14 @@ os::uptime() {
   fi
 }
 
+os::is_root() {
+  if [ "$(id -u)" = "0" ]; then
+    echo "true"
+  else
+    echo "false"
+  fi
+}
+
 os::arch() {
   local arch=$(uname -m)
   if [ "$arch" = "x86_64" ] || [ "$arch" = "amd64" ]; then
@@ -2170,6 +2178,8 @@ export -f os::zsh_profile
 export -f os::bash_profile
 export -f os::hostname
 export -f os::uptime
+
+export -f os::is_root
 
 export -f os::ps
 export -f os::top

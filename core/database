@@ -3,7 +3,7 @@
 # database::mysql_create_user creates a new user in mysql.
 # database::mysql_create_user@usage <host> <port> <admin_username> <admin_password> <new_username> <new_password> <new_database>
 # database::mysql_create_user@example:
-#    database::mysql_create_user /home/zmicro/code  zmicro@192.168.1.1
+#    database::mysql_create_user 10.0.0.1 3306 admin_username admin_password new_username new_password new_database
 database::mysql_create_user() {
   local host=$1
   local port=$2
@@ -73,7 +73,7 @@ EOF
 # database::postgres_create_user creates a new user in postgres.
 # database::postgres_create_user@usage <host> <port> <admin_username> <admin_password> <new_username> <new_password> <new_database>
 # database::postgres_create_user@example:
-#    database::postgres_create_user /home/zmicro/code  zmicro@192.168.1.1
+#    database::postgres_create_user 10.0.0.1 5432 admin_username admin_password new_username new_password new_database
 database::postgres_create_user() {
   local host=$1
   local port=$2
@@ -142,7 +142,7 @@ EOF
 # database::mongo_create_user creates a new user in mongo.
 # database::mongo_create_user@usage <host> <port> <admin_username> <admin_password> <new_username> <new_password> <new_database>
 # database::mongo_create_user@example:
-#    database::mongo_create_user /home/zmicro/code  zmicro@192.168.1.1
+#    database::mongo_create_user 10.0.0.1 27017 admin_username admin_password new_username new_password new_database
 database::mongo_create_user() {
   local host=$1
   local port=$2
@@ -211,7 +211,7 @@ database::mongo_create_user() {
 # database::redis_create_user creates a new user in redis.
 # database::redis_create_user@usage <host> <port> <admin_password> <new_username> <new_password>
 # database::redis_create_user@example:
-#    database::redis_create_user /home/zmicro/code  zmicro@192.168.1.1
+#    database::redis_create_user 10.0.0.1 6379 admin_password new_username new_userpassword
 database::redis_create_user() {
   local host=$1
   local port=$2
@@ -254,8 +254,6 @@ database::redis_create_user() {
 
   rdcli -h $host -p $port -a $admin_password ACL SETUSER $new_username ON ">$new_password"
 }
-
-
 
 export -f database::mysql_create_user
 export -f database::postgres_create_user

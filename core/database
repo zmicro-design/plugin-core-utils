@@ -67,6 +67,9 @@ EOF
 
   cat $create_user_sql_filepath
 
+  # fix MacOS intel bin:  /usr/local/opt/mysql-client/bin/mysql
+  export PATH=/usr/local/opt/mysql-client/bin:$PATH
+
   mysql -h $host -P $port -u$admin_username -p$admin_password <$create_user_sql_filepath
 }
 

@@ -198,6 +198,156 @@ version::get_patch() {
   semver::get_patch "$@"
 }
 
+version::curl() {
+  local name="curl"
+  if [ "$(os::has_command $name)" != "true" ]; then
+    echo "- (not found)"
+    return
+  fi
+
+  curl --version | head -n 1
+}
+
+version::wget() {
+  local name="wget"
+  if [ "$(os::has_command $name)" != "true" ]; then
+    echo "- (not found)"
+    return
+  fi
+
+  wget --version | head -n 1
+}
+
+version::git() {
+  local name="git"
+  if [ "$(os::has_command $name)" != "true" ]; then
+    echo "- (not found)"
+    return
+  fi
+
+  git --version
+}
+
+version::code() {
+  local name="code"
+  if [ "$(os::has_command $name)" != "true" ]; then
+    echo "- (not found)"
+    return
+  fi
+
+  code --version | head -n 1
+}
+
+version::ssh() {
+  local name="ssh"
+  if [ "$(os::has_command $name)" != "true" ]; then
+    echo "- (not found)"
+    return
+  fi
+
+  ssh -V 2>&1
+}
+
+version::docker() {
+  local name="docker"
+  if [ "$(os::has_command $name)" != "true" ]; then
+    echo "- (not found)"
+    return
+  fi
+
+  docker --version | head -n 1
+}
+
+version::lima() {
+  local name="lima"
+  if [ "$(os::has_command $name)" != "true" ]; then
+    echo "- (not found)"
+    return
+  fi
+
+  lima --version | head -n 1
+}
+
+version::colima() {
+  local name="colima"
+  if [ "$(os::has_command $name)" != "true" ]; then
+    echo "- (not found)"
+    return
+  fi
+
+  colima version | head -n 1
+}
+
+version::multipass() {
+  local name="multipass"
+  if [ "$(os::has_command $name)" != "true" ]; then
+    echo "- (not found)"
+    return
+  fi
+
+  multipass version | awk -v d=" - " '{s=(NR==1?s:s d)$0}END{print s}'
+}
+
+version::node() {
+  local name="node"
+  if [ "$(os::has_command $name)" != "true" ]; then
+    echo "- (not found)"
+    return
+  fi
+
+  node --version
+}
+
+version::go() {
+  local name="go"
+  if [ "$(os::has_command $name)" != "true" ]; then
+    echo "- (not found)"
+    return
+  fi
+
+  go version
+}
+
+version::python() {
+  local name="python3"
+  if [ "$(os::has_command $name)" != "true" ]; then
+    echo "- (not found)"
+    return
+  fi
+
+  python3 --version
+}
+
+version::deno() {
+  local name="deno"
+  if [ "$(os::has_command $name)" != "true" ]; then
+    echo "- (not found)"
+    return
+  fi
+
+  deno --version | awk -v d=" - " '{s=(NR==1?s:s d)$0}END{print s}'
+}
+
+version::rust() {
+  local name="rustc"
+  if [ "$(os::has_command $name)" != "true" ]; then
+    echo "- (not found)"
+    return
+  fi
+
+  rustc --version
+}
+
+version::java() {
+  local name="java"
+  if [ "$(os::has_command $name)" != "true" ]; then
+    echo "- (not found)"
+    return
+  fi
+
+  java --version | head -n 2 | awk -v d=" - " '{s=(NR==1?s:s d)$0}END{print s}'
+}
+
 export -f version::get
 export -f version::git_hash
 export -f version::timestamp
@@ -230,3 +380,23 @@ export -f version::next
 export -f version::get_major
 export -f version::get_minor
 export -f version::get_patch
+
+export -f version::curl
+export -f version::wget
+export -f version::git
+
+export -f version::code
+export -f version::ssh
+
+export -f version::docker
+
+export -f version::lima
+export -f version::colima
+export -f version::multipass
+
+export -f version::node
+export -f version::go
+export -f version::python
+export -f version::deno
+export -f version::rust
+export -f version::java

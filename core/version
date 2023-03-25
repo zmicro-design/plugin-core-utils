@@ -201,7 +201,7 @@ version::get_patch() {
 version::curl() {
   local name="curl"
   if [ "$(os::has_command $name)" != "true" ]; then
-    echo "- (not found)"
+    echo "-"
     return
   fi
 
@@ -211,7 +211,7 @@ version::curl() {
 version::wget() {
   local name="wget"
   if [ "$(os::has_command $name)" != "true" ]; then
-    echo "- (not found)"
+    echo "-"
     return
   fi
 
@@ -221,7 +221,7 @@ version::wget() {
 version::git() {
   local name="git"
   if [ "$(os::has_command $name)" != "true" ]; then
-    echo "- (not found)"
+    echo "-"
     return
   fi
 
@@ -231,7 +231,7 @@ version::git() {
 version::code() {
   local name="code"
   if [ "$(os::has_command $name)" != "true" ]; then
-    echo "- (not found)"
+    echo "-"
     return
   fi
 
@@ -241,7 +241,7 @@ version::code() {
 version::ssh() {
   local name="ssh"
   if [ "$(os::has_command $name)" != "true" ]; then
-    echo "- (not found)"
+    echo "-"
     return
   fi
 
@@ -251,7 +251,7 @@ version::ssh() {
 version::docker() {
   local name="docker"
   if [ "$(os::has_command $name)" != "true" ]; then
-    echo "- (not found)"
+    echo "-"
     return
   fi
 
@@ -261,7 +261,7 @@ version::docker() {
 version::lima() {
   local name="lima"
   if [ "$(os::has_command $name)" != "true" ]; then
-    echo "- (not found)"
+    echo "-"
     return
   fi
 
@@ -271,7 +271,7 @@ version::lima() {
 version::colima() {
   local name="colima"
   if [ "$(os::has_command $name)" != "true" ]; then
-    echo "- (not found)"
+    echo "-"
     return
   fi
 
@@ -281,7 +281,7 @@ version::colima() {
 version::multipass() {
   local name="multipass"
   if [ "$(os::has_command $name)" != "true" ]; then
-    echo "- (not found)"
+    echo "-"
     return
   fi
 
@@ -291,7 +291,7 @@ version::multipass() {
 version::node() {
   local name="node"
   if [ "$(os::has_command $name)" != "true" ]; then
-    echo "- (not found)"
+    echo "-"
     return
   fi
 
@@ -301,7 +301,7 @@ version::node() {
 version::go() {
   local name="go"
   if [ "$(os::has_command $name)" != "true" ]; then
-    echo "- (not found)"
+    echo "-"
     return
   fi
 
@@ -311,7 +311,7 @@ version::go() {
 version::python() {
   local name="python3"
   if [ "$(os::has_command $name)" != "true" ]; then
-    echo "- (not found)"
+    echo "-"
     return
   fi
 
@@ -321,7 +321,7 @@ version::python() {
 version::deno() {
   local name="deno"
   if [ "$(os::has_command $name)" != "true" ]; then
-    echo "- (not found)"
+    echo "-"
     return
   fi
 
@@ -331,7 +331,7 @@ version::deno() {
 version::rust() {
   local name="rustc"
   if [ "$(os::has_command $name)" != "true" ]; then
-    echo "- (not found)"
+    echo "-"
     return
   fi
 
@@ -341,7 +341,7 @@ version::rust() {
 version::java() {
   local name="java"
   if [ "$(os::has_command $name)" != "true" ]; then
-    echo "- (not found)"
+    echo "-"
     return
   fi
 

@@ -1,13 +1,13 @@
 #!/bin/bash
 
-# sync::docker_image syncs docker images
+# sync::docker_image_with_ssh syncs docker images
 #   principle:
 #     docker hub => thirdparty docker registry => pull from the docker registry
 #     official => private => pull from private
 #  example:
-#    sync::docker_image whatwewant/zmicro:v1 registry.example.com root@remote
-#    sync::docker_image whatwewant/zmicro:v1 registry.workspace.com workpace_xxx
-sync::docker_image() {
+#    sync::docker_image_with_ssh whatwewant/zmicro:v1 registry.example.com root@remote
+#    sync::docker_image_with_ssh whatwewant/zmicro:v1 registry.workspace.com workpace_xxx
+sync::docker_image_with_ssh() {
   local name=$1
   local private_registry=$2
   local remote=$3
@@ -15,17 +15,17 @@ sync::docker_image() {
   local base_registry="docker.io"
 
   if [ -z "$name" ]; then
-    log::error "[sync::docker_image] image name is required"
+    log::error "[sync::docker_image_with_ssh] image name is required"
     return 1
   fi
 
   if [ -z "$private_registry" ]; then
-    log::error "[sync::docker_image] image registry is required"
+    log::error "[sync::docker_image_with_ssh] image registry is required"
     return 1
   fi
 
   if [ -z "$remote" ]; then
-    log::error "[sync::docker_image] remote server is required"
+    log::error "[sync::docker_image_with_ssh] remote server is required"
     return 1
   fi
 
@@ -35,46 +35,95 @@ sync::docker_image() {
     name=$(echo $name | awk -F "${base_registry}/" '{print $2}')
   fi
 
-  # log::info "[sync::docker_image][remote] pull from docker hub ..."
+  # log::info "[sync::docker_image_with_ssh][remote] pull from docker hub ..."
   # ssh $remote docker pull $name
 
-  # log::info "[sync::docker_image][remote] create registry tag ..."
+  # log::info "[sync::docker_image_with_ssh][remote] create registry tag ..."
   # ssh $remote docker tag $name $private_registry/$name
 
-  # log::info "[sync::docker_image][remote] push to private registry ($private_registry) ..."
+  # log::info "[sync::docker_image_with_ssh][remote] push to private registry ($private_registry) ..."
   # ssh $remote docker push $private_registry/$name
 
-  log::info "[sync::docker_image][remote] sync ${base_registry} => private registry ($private_registry) ..."
+  log::info "[sync::docker_image_with_ssh][remote] sync ${base_registry} => private registry ($private_registry) ..."
   ssh $remote <<EOF
-  echo "[sync::docker_image][remote] pull from docker hub ..."
+  echo "[sync::docker_image_with_ssh][remote] pull from docker hub ..."
   docker pull $base_registry/$name
 
-  echo "[sync::docker_image][remote] create registry tag ..."
+  echo "[sync::docker_image_with_ssh][remote] create registry tag ..."
   docker tag $base_registry/$name $private_registry/$name
 
-  echo "[sync::docker_image][remote] push to private registry ($private_registry) ..."
+  echo "[sync::docker_image_with_ssh][remote] push to private registry ($private_registry) ..."
   docker push $private_registry/$name
 EOF
   if [ "$?" != "0" ]; then
-    log::error "[sync::docker_image] failed to sync ${base_registry} => private registry ($private_registry) ."
+    log::error "[sync::docker_image_with_ssh] failed to sync ${base_registry} => private registry ($private_registry) ."
     return 1
   fi
 
-  log::info "[sync::docker_image][remote] sync private registry ($private_registry) => local ..."
+  log::info "[sync::docker_image_with_ssh][remote] sync private registry ($private_registry) => local ..."
 
-  log::info "[sync::docker_image][remote] pull from private registry ($private_registry) ..."
+  log::info "[sync::docker_image_with_ssh][remote] pull from private registry ($private_registry) ..."
   docker pull $private_registry/$name
   if [ "$?" != "0" ]; then
-    log::error "[sync::docker_image] failed to pull from private registry ($private_registry)."
+    log::error "[sync::docker_image_with_ssh] failed to pull from private registry ($private_registry)."
     return 1
   fi
 
-  log::info "[sync::docker_image][remote] reset tag from $private_registry/$name to $base_registry/$name ..."
+  log::info "[sync::docker_image_with_ssh][remote] reset tag from $private_registry/$name to $base_registry/$name ..."
   docker tag $private_registry/$name $base_registry/$name
   if [ "$?" != "0" ]; then
-    log::error "[sync::docker_image] failed to reset tag."
+    log::error "[sync::docker_image_with_ssh] failed to reset tag."
     return 1
   fi
 }
 
-export -f sync::docker_image
+sync::docker_image_to_registry() {
+  local image_name=$1
+  local source_registry=$2
+  local target_registry=$3
+  local new_image_name=${4:-"$image_name"}
+
+  if [ -z "$image_name" ]; then
+    log::error "[sync::docker_image_to_registry] image name is required"
+    return 1
+  fi
+
+  if [ -z "$source_registry" ]; then
+    log::error "[sync::docker_image_to_registry] source registry is required"
+    return 1
+  fi
+
+  if [ -z "$target_registry" ]; then
+    log::error "[sync::docker_image_to_registry] target registry is required"
+    return 1
+  fi
+
+  local source_image=$source_registry/$image_name
+  local target_image=$target_registry/$new_image_name
+
+  log::info "[sync::docker_image_to_registry][image: $image_name] pull from source registry ($source_registry) ..."
+  docker pull $source_image
+  if [ "$?" != "0" ]; then
+    log::error "[sync::docker_image_to_registry][image: $image_name] failed to pull from source registry ($source_registry)."
+    return 1
+  fi
+
+  log::info "[sync::docker_image_to_registry][image: $image_name] create registry tag ..."
+  docker tag $source_image $target_image
+  if [ "$?" != "0" ]; then
+    log::error "[sync::docker_image_to_registry][image: $image_name] failed to create registry tag."
+    return 1
+  fi
+
+  log::info "[sync::docker_image_to_registry][image: $image_name] push to target registry ($target_registry) ..."
+  docker push $target_image
+  if [ "$?" != "0" ]; then
+    log::error "[sync::docker_image_to_registry][image: $image_name] failed to push to target registry ($target_registry)."
+    return 1
+  fi
+
+  log::info "[sync::docker_image_to_registry][image: $image_name] succeed to sync $source_registry => $target_registry."
+}
+
+export -f sync::docker_image_with_ssh
+export -f sync::docker_image_to_registry

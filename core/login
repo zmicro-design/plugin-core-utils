@@ -22,10 +22,12 @@ login::docker() {
     return 1
   fi
 
+  local tmp_error=$(os::tmp_file)
   log::info "[login::docker] logining to docker registry ..."
-  docker login $registry -u $username -p $password >>/dev/null 2>&1
+  docker login $registry -u $username -p $password >>/dev/null 2>$tmp_error
   if [ "$?" != "0" ]; then
     log::error "[login::docker] failed to login docker registry(registry: ${registry:-'Docker Hub'})."
+    cat $tmp_error
     return 1
   fi
 

@@ -345,7 +345,7 @@ version::java() {
     return
   fi
 
-  java --version | head -n 2 | awk -v d=" - " '{s=(NR==1?s:s d)$0}END{print s}'
+  java -version | head -n 2 | awk -v d=" - " '{s=(NR==1?s:s d)$0}END{print s}'
 }
 
 export -f version::get

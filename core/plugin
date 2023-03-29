@@ -1053,6 +1053,12 @@ plugin::run_zx() {
     return 1
   fi
 
+  # @TODO not support .zx => TypeError [ERR_UNKNOWN_FILE_EXTENSION]: Unknown file extension ".zx"
+  local tmp_file="$(os::tmp_file).js"
+  cp $final_filepath $tmp_file
+  final_filepath=$tmp_file
+  # @TODO end
+
   run::zx $final_filepath
 }
 

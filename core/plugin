@@ -1060,6 +1060,8 @@ plugin::run_zx() {
   # @TODO end
 
   run::zx $final_filepath
+
+  rm $tmp_file
 }
 
 # plugin::run_deno runs deno module at PLUGIN_CORE_DIR/deno/{module}.deno

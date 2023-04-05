@@ -17,7 +17,6 @@ action::setup_node() {
   zmicro plugin install nvm
 
   log::info "[$(timestamp)] install node: $NODE_VERSION ..."
-  zmicro nvm install $NODE_VERSION
   zmicro nvm use $NODE_VERSION
 
   if [ "${GITHUB_ACTIONS}" = "true" ]; then
@@ -50,4 +49,18 @@ action::setup_node() {
   fi
 }
 
+action::setup_go() {
+  if [ -z "$GO_VERSION" ]; then
+    log::error "[$(timestamp)] env GO_VERSION is required"
+    return 1
+  fi
+
+  log::info "[$(timestamp)] install gvm ..."
+  zmicro plugin install gvm
+
+  log::info "[$(timestamp)] install go: $GO_VERSION ..."
+  zmicro gvm use $GO_VERSION
+}
+
 export -f action::setup_node
+export -f action::setup_go

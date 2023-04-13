@@ -138,12 +138,17 @@ notify::update() {
 notify::login() {
   local user=$(os::username)
   local log_path=$ZMICRO_LOG_PATH/lastlogin.${user}.log
+
+  # first login ignore
+  if [ ! -f "$log_path" ]; then
+    echo $(date +%s) >$log_path
+    return
+  fi
+
   # do not notify in 5 minutes
-  if [ -f "$log_path" ]; then
-    local lastlogin=$(cat $log_path)
-    if [ -n "$lastlogin" ] && [ "$(timestamp::in_x_minutes 30 $lastlogin)" = "true" ]; then
-      return
-    fi
+  local lastlogin=$(cat $log_path)
+  if [ -n "$lastlogin" ] && [ "$(timestamp::in_x_minutes 30 $lastlogin)" = "true" ]; then
+    return
   fi
 
   local ip=$(os::network_ip)

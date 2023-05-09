@@ -296,3 +296,14 @@ function test_git::has_branch() {
     "$(git::has_branch abcdqwer https://github.com/go-zoox/fs)"
 }
 
+function test_git::version() {
+  log::info "[test_git::version] raw: $(git --version)"
+
+  local version=$(echo "v$(git --version | awk '{print $3}')")
+  testing::expect \
+    "${FUNCNAME[0]}" \
+    "to_equal" \
+    "$version" \
+    "$(git::version)"
+}
+

@@ -752,6 +752,17 @@ git::remote_has_branch() {
   fi
 }
 
+# git::version gets git cli version.
+# git::version@usage
+# git::version@example
+git::version() {
+  # CentOS release 6.10 (Final) - git version 2.9.5
+  # CentOS Linux release 7.9.2009 (Core) - git version 1.8.3.1
+  # Ubuntu 22.04.1 LTS - git version 2.34.1
+  # macOS 13.2.1 - git version 2.40.0
+  echo "v$(git --version | awk '{print $3}')"
+}
+
 export -f git::commit_message
 export -f git::commit_message_full
 export -f git::commit_hash
@@ -810,3 +821,5 @@ export -f git::get_remote_commit_hash_by_tag
 export -f git::get_remote_latest_tag
 
 export -f git::remote_has_branch
+
+export -f git::version

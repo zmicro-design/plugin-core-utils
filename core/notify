@@ -244,7 +244,7 @@ notify::check_enable() {
   fi
 
   local full_env_name=NOTIFY_${type}
-  if [ "$(config::global:get $full_env_name)" == "false" ]; then
+  if [ "$(config::global:get $full_env_name)" = "false" ]; then
     echo "false"
   else
     echo "true"
@@ -264,13 +264,13 @@ notify::if_not_enable_then_turn_off() {
     exit 1
   fi
 
-  if [ "$(notify::check_enable $type)" == "false" ]; then
+  if [ "$(notify::check_enable $type)" = "false" ]; then
     $fn
   fi
 }
 
 notify::login_register_check() {
-  if [ "$(notify::check_enable LOGIN)" == "false" ]; then
+  if [ "$(notify::check_enable LOGIN)" = "false" ]; then
     notify::login_unregister
   else
     notify::login_register
@@ -292,7 +292,7 @@ notify::update_check() {
   fi
 
   # # check notify enable
-  # if [ "$(notify::check_enable UPDATE)" == "false" ]; then
+  # if [ "$(notify::check_enable UPDATE)" = "false" ]; then
   #   return
   # fi
 

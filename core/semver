@@ -18,7 +18,7 @@ semver::compare_equals() {
   local v1=$1
   local v2=$2
 
-  if [ "$v1" == "$v2" ]; then
+  if [ "$v1" = "$v2" ]; then
     echo "true"
   else
     echo "false"
@@ -67,12 +67,12 @@ semver::compare_gte() {
   local v1=$1
   local v2=$2
 
-  if [ "$(semver::compare_gt $v1 $v2)" == "true" ]; then
+  if [ "$(semver::compare_gt $v1 $v2)" = "true" ]; then
     echo "true"
     return
   fi
 
-  if [ "$(semver::compare_equals $v1 $v2)" == "true" ]; then
+  if [ "$(semver::compare_equals $v1 $v2)" = "true" ]; then
     echo "true"
     return
   fi
@@ -91,12 +91,12 @@ semver::compare_lte() {
   local v1=$1
   local v2=$2
 
-  if [ "$(semver::compare_lt $v1 $v2)" == "true" ]; then
+  if [ "$(semver::compare_lt $v1 $v2)" = "true" ]; then
     echo "true"
     return
   fi
 
-  if [ "$(semver::compare_equals $v1 $v2)" == "true" ]; then
+  if [ "$(semver::compare_equals $v1 $v2)" = "true" ]; then
     echo "true"
     return
   fi

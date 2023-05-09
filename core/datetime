@@ -1,0 +1,12 @@
+#!/bin/bash
+
+datetime::current_seconds() {
+  date +"%Y%m%d%H%M%S"
+}
+
+datetime::current_milliseconds() {
+  date +"%Y%m%d%H%M%S%3N"
+}
+
+export -f datetime::current_seconds
+export -f datetime::current_milliseconds

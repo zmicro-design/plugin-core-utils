@@ -1655,6 +1655,38 @@ os::gzfetch() {
   gzfetch "$@"
 }
 
+os::gztimeout() {
+  net::using_smart_proxy
+
+  if [ "$(os::is_command_exist gztimeout)" != "true" ]; then
+    local tmp_error_file=$(os::tmp_file)
+    zmicro package install gztimeout >> /dev/null 2>$tmp_error_file
+    if [ "$?" != "0" ]; then
+      log::error "[os::gztimeout] failed to install gztimeout"
+      log::error "[os::gztimeout] error detail: $(cat $tmp_error_file)"
+      return 1
+    fi
+  fi
+
+  gztimeout "$@"
+}
+
+os::ossutil() {
+  net::using_smart_proxy
+
+  if [ "$(os::is_command_exist ossutil)" != "true" ]; then
+    local tmp_error_file=$(os::tmp_file)
+    zmicro package install ossutil >> /dev/null 2>$tmp_error_file
+    if [ "$?" != "0" ]; then
+      log::error "[os::ossutil] failed to install ossutil"
+      log::error "[os::ossutil] error detail: $(cat $tmp_error_file)"
+      return 1
+    fi
+  fi
+
+  ossutil "$@"
+}
+
 os::copy() {
   local text=$1
   if [ -z "$text" ]; then
@@ -2308,6 +2340,8 @@ export -f os::ssh
 export -f os::git
 
 export -f os::gzfetch
+export -f os::gztimeout
+export -f os::ossutil
 
 export -f os::usr_bin_dir
 export -f os::usr_lib_dir

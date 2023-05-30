@@ -1672,9 +1672,9 @@ os::gztimeout() {
 }
 
 os::ossutil() {
-  net::using_smart_proxy
-
   if [ "$(os::is_command_exist ossutil)" != "true" ]; then
+    net::using_smart_proxy
+
     local tmp_error_file=$(os::tmp_file)
     zmicro package install ossutil >> /dev/null 2>$tmp_error_file
     if [ "$?" != "0" ]; then
@@ -1769,6 +1769,22 @@ os::timeout() {
   fi
 
   gztimeout "$@"
+}
+
+os::jq() {
+  if [ "$(os::is_command_exist jq)" != "true" ]; then
+    net::using_smart_proxy
+
+    local tmp_error_file=$(os::tmp_file)
+    pm install -y jq >> /dev/null 2>$tmp_error_file
+    if [ "$?" != "0" ]; then
+      log::error "[os::jq] failed to install jq"
+      log::error "[os::jq] error detail: $(cat $tmp_error_file)"
+      return 1
+    fi
+  fi
+
+  jq "$@"
 }
 
 os::unzip() {
@@ -2351,6 +2367,7 @@ export -f os::which
 export -f os::create_large_file
 
 export -f os::timeout
+export -f os::jq
 
 export -f os::unzip
 export -f os::tar
@@ -2384,6 +2401,7 @@ export -f os::gzfly
 export -f os::gzssh
 export -f os::gzlighthouse
 export -f os::gztemplate
+
 
 export -f os::os_name
 

@@ -1060,6 +1060,10 @@ plugin::run_zx() {
   # @TODO end
 
   run::zx $final_filepath
+  if [ "$?" != "0" ]; then
+    rm $tmp_file
+    return 1
+  fi
 
   rm $tmp_file
 }

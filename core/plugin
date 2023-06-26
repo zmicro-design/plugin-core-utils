@@ -679,6 +679,101 @@ plugin::run() {
   fi
 }
 
+plugin::shell() {
+  log::debug "[$(timestamp)][plugin::shell] in plugin: $@"
+
+  local plugin_name=$1
+  local plugin_command=${@:2}
+
+  if [ -z "$plugin_name" ]; then
+    log::error "[$(timestamp)][plugin::shell] plugin name is required"
+    exit 1
+  fi
+
+  if [ "$(plugin::exist $plugin_name)" != "true" ]; then
+    log::error "[$(timestamp)][plugin::shell] plugin ($plugin_name) not found"
+    exit 1
+  fi
+
+  # @TODO
+  export ZMICRO_PLUGIN_GLOBAL_PARENT=$ZMICRO_PLUGIN_GLOBAL_CURRENT
+  export ZMICRO_PLUGIN_GLOBAL_CURRENT=$plugin_name
+
+  # Set Env
+  export PLUGIN_NAME=$plugin_name
+  export PLUGIN_VERSION=$(plugin::get_version $plugin_name)
+  export PLUGIN_DESCRIPTION=$(plugin::get_description $plugin_name)
+  #
+  export PLUGIN_DIR=$(plugin::get_path $plugin_name)
+  export PLUGIN_CORE_DIR=$PLUGIN_DIR/core
+  export PLUGIN_CONFIG_DIR=$PLUGIN_DIR/config
+  export PLUGIN_CONFIG_FILE=$PLUGIN_CONFIG_DIR/config
+  export PLUGIN_DATA=$(plugin::get_app_data_path $plugin_name)
+  export PLUGIN_LOGS=$(plugin::get_app_logs_path $plugin_name)
+  export PLUGIN_CONFIGS=$(plugin::get_app_configs_path $plugin_name)
+  #
+  export PLUGIN_CONFIG=$PLUGIN_CONFIGS/config
+  #
+  export PLUGIN_PKGS=$PLUGIN_DIR/${PLUGIN_NAME}s
+  #
+  if [ ! -d "$PLUGIN_DATA" ]; then
+    mkdir -p $PLUGIN_DATA
+  fi
+  if [ ! -d "$PLUGIN_LOGS" ]; then
+    mkdir -p $PLUGIN_LOGS
+  fi
+  if [ ! -d "$PLUGIN_CONFIGS" ]; then
+    mkdir -p $PLUGIN_CONFIGS
+  fi
+
+  log::debug "[$(timestamp)][plugin::shell] PARENT: $ZMICRO_PLUGIN_GLOBAL_PARENT, CURRENT: $ZMICRO_PLUGIN_GLOBAL_CURRENT"
+
+  # 插件配置加载顺序非常重要，相对于 core 配置加载，增加了插件配置
+  #   1. core config (默认已加载，不需要重新加载)
+  #
+  #   2. plugin config (加载插件配置)
+  #     global configuration
+  if [ -f "$PLUGIN_CONFIG" ]; then
+    config::load_file $PLUGIN_CONFIG
+  fi
+  #     local configuration
+  plugin::load_config $plugin_name
+  #   3. user config (加载用户配置，可能会覆盖插件配置和核心配置)
+  config::load_user_config
+  #   4. override user config @TODO 这一步是为了应对需要强制使用插件自身配置的情况
+  #       比如，定制的插件有自己的 services 目录
+  plugin::load_override_config $plugin_name
+  #   5. mod 加载插件 mod
+  plugin::load_mod $plugin_name
+  #   6. parent override 覆盖变量
+  #     不是已经有 plugin::load_override_config，为什么还需要这个？
+  #       因为有可能一个插件使用 zmicro 命令调用了另一个插件的时候，加载第二个插件，
+  #         根据配置加载顺序，会加载 user_config，覆盖了第一个插件的 override 配置
+  #         也就是使得第一个配置的 override 配置失效
+  #         这时候的补救措施的就是：
+  #           父插件的 override 配置优先级 > 子配置
+  #             也就是要子配置重新加载父配置的 override 配置
+  #       可以打开 load_file_config 日志看看配置加载的顺序，会发现
+  plugin::load_parent_override_config $ZMICRO_PLUGIN_GLOBAL_PARENT
+  #   7. load app(user custom) config
+  plugin::load_app_configs $plugin_name
+  #  8. load core
+  plugin::load_core $plugin_name
+
+  # help
+  if [ "$plugin_command" = "" ] || [ "$plugin_command" = "help" ]; then
+    plugin_command="--help"
+  fi
+
+  echo "$plugin_command" | grep "^/" >/dev/null
+  if [ "$?" != "0" ]; then
+    log::error "[$(timestamp)][plugin::shell] plugin command must be absolute path"
+    exit 1
+  fi
+
+  bash $plugin_command
+}
+
 plugin::postinstall() {
   local name=$1
   local postinstall_file=$(plugin::get_path $name)/postinstall
@@ -1150,6 +1245,8 @@ export -f plugin::get_description
 export -f plugin::get_dependencies
 
 export -f plugin::run
+
+export -f plugin::shell
 
 export -f plugin::postinstall
 

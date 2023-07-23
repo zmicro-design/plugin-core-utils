@@ -17,6 +17,15 @@ git::commit_hash_full() {
 }
 
 git::commit_author() {
+  git::commit_author_name
+}
+
+git::commit_author_name() {
+  # git log -1 --pretty=format:'%an'
+  git show -s --format='%an'
+}
+
+git::commit_author_email() {
   git show -s --format='%ae'
 }
 
@@ -768,6 +777,8 @@ export -f git::commit_message_full
 export -f git::commit_hash
 export -f git::commit_hash_full
 export -f git::commit_author
+export -f git::commit_author_name
+export -f git::commit_author_email
 export -f git::commit_timestamp
 export -f git::commit_timestamp_date
 export -f git::commit_timestamp_ms

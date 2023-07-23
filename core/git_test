@@ -34,8 +34,19 @@ function test_git::commit_hash() {
 }
 
 function test_git::commit_author() {
-  local expected=$(git show -s --format='%ae')
+  local expected=$(git show -s --format='%an')
   local received=$(git::commit_author)
+
+  testing::expect \
+    "${FUNCNAME[0]}" \
+    "to_equal" \
+    "$expected" \
+    "$received"
+}
+
+function test_git::commit_author_email() {
+  local expected=$(git show -s --format='%ae')
+  local received=$(git::commit_author_email)
 
   testing::expect \
     "${FUNCNAME[0]}" \

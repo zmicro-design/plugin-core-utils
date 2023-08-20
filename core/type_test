@@ -184,3 +184,30 @@ function test_string::to_upper() {
     "ABC" \
     "$(string::to_upper abc)"
 }
+
+function test_string::starts_with() {
+  testing::expect \
+    "${FUNCNAME[0]}" \
+    "to_equal" \
+    "true" \
+    "$(string::starts_with abc a)"
+
+  testing::expect \
+    "${FUNCNAME[0]}" \
+    "to_equal" \
+    "false" \
+    "$(string::starts_with abc b)"
+
+
+  testing::expect \
+    "${FUNCNAME[0]}" \
+    "to_equal" \
+    "true" \
+    "$(string::starts_with abc ab)"
+
+  testing::expect \
+    "${FUNCNAME[0]}" \
+    "to_equal" \
+    "true" \
+    "$(string::starts_with $PWD $ZMICRO_HOME)"
+}

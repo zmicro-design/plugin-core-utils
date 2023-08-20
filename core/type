@@ -211,11 +211,18 @@ string::first_char() {
 
 string::starts_with() {
   local str=$1
-  local char=$2
-  if [ "$(string::first_char '${str}')" = "$char" ]; then
-    echo "true"
-  else
+  local sub=$2
+  # if [ "$(string::first_char '${str}')" = "$char" ]; then
+  #   echo "true"
+  # else
+  #   echo "false"
+  # fi
+  
+  local rest=${str#$sub}
+  if [ "$rest" = "$str" ]; then
     echo "false"
+  else
+    echo "true"
   fi
 }
 

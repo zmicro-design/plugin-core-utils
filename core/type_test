@@ -209,5 +209,5 @@ function test_string::starts_with() {
     "${FUNCNAME[0]}" \
     "to_equal" \
     "true" \
-    "$(string::starts_with $PWD $ZMICRO_HOME)"
+    "$(string::starts_with /usr/local/lib/zmicro/plugins/core-utils /usr/local/lib/zmicro)"
 }

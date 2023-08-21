@@ -56,7 +56,7 @@ function test_git::commit_author_email() {
 }
 
 function test_git::commit_timestamp() {
-  local expected=$(git show -s --format=%cd --date="format:%Y-%m-%d")
+  local expected=$(git show -s --format=%cd --date="format:%Y-%m-%d_%H:%M:%S")
   local received=$(git::commit_timestamp)
 
   testing::expect \

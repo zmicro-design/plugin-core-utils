@@ -30,7 +30,15 @@ git::commit_author_email() {
 }
 
 git::commit_timestamp() {
-  git::commit_timestamp_date
+  local gitMainVersion=$(git --version | awk '{print $3}' | awk -F '.' '{print $1}')
+  local gitSubVersion=$(git --version | awk '{print $3}' | awk -F '.' '{print $2}')
+
+  if [ "$gitMainVersion" -ge "2" ] && [ "$gitSubVersion" -ge "7" ]; then
+    git show -s --format=%cd --date="format:%Y-%m-%d_%H:%M:%S"
+  else
+    local datetime_str=$(git show -s --format=%cd --date=local)
+    timestamp::to_date "$datetime_str"
+  fi
 }
 
 git::commit_timestamp_date() {

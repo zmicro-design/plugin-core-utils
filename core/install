@@ -50,6 +50,10 @@ install::dmg() {
   cp -rf "$app_path" /Applications/
   if [ "$?" != "0" ]; then
     log::error "[install::dmg] failed to copy app to /Applications/ ."
+    log::error "[install::dmg] if Operation not permitted, "
+    log::error "try:"
+    log::error " method 1: sudo spctl --master-disable"
+    log::error " method 2: System Preferences => Security & Privacy => Privacy => Full Disk Access => add Your App, offen: Terminal / iTerm2"
     return 1
   fi
 

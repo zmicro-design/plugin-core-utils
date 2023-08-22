@@ -47,6 +47,7 @@ install::dmg() {
     return 1
   fi
 
+  log::info "[install::dmg] \"$app_path\" => /Applications/"
   cp -rf "$app_path" /Applications/
   if [ "$?" != "0" ]; then
     log::error "[install::dmg] failed to copy app to /Applications/ ."
@@ -118,11 +119,11 @@ install::zip() {
     return 1
   fi
 
-  local system_app_path=/Applications/$app_name
-  if [ -d "$system_app_path" ]; then
-    log::error "[install::zip] system application ${app_name} already exists"
-    return 1
-  fi
+  local system_app_path="/Applications/$app_name"
+  # if [ -d "$system_app_path" ]; then
+  #   log::error "[install::zip] system application ${app_name} already exists"
+  #   return 1
+  # fi
 
   local tmp_dir=$(os::tmp_dir)
   local tmp_error_file=$(os::tmp_file)
@@ -134,7 +135,7 @@ install::zip() {
   cd $tmp_dir
 
   log::info "[install::zip] extract zip $zip_path ..."
-  os::unzip -xo $zip_path >>/dev/null 2>$tmp_error_file
+  os::unzip -xo "$zip_path" >>/dev/null 2>$tmp_error_file
   if [ "$?" != "0" ]; then
     log::error "[install::zip] failed to extract file type(zip): $zip_path."
     log::error "[install::zip] error detail: $(cat $tmp_error_file)"
@@ -142,7 +143,7 @@ install::zip() {
   fi
 
   # os::install $source_bin_file $target_bin_dir $target_bin_name >>/dev/null 2>$tmp_error_file
-  cp -rf $app_name /Applications
+  cp -rf "$app_name" /Applications
   if [ "$?" != "0" ]; then
     log::error "[install::zip] failed to install $target_bin_name."
     log::error "[install::zip] error detail: $(cat $tmp_error_file)"

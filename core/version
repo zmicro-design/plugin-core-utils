@@ -348,6 +348,16 @@ version::java() {
   java -version 2>&1 | head -n 2 | awk -v d=" - " '{s=(NR==1?s:s d)$0}END{print s}'
 }
 
+version::gzcaas() {
+  local name="gzcaas"
+  if [ "$(os::has_command $name)" != "true" ]; then
+    echo "-"
+    return
+  fi
+
+  gzcaas --version
+}
+
 export -f version::get
 export -f version::git_hash
 export -f version::timestamp
@@ -400,3 +410,5 @@ export -f version::python
 export -f version::deno
 export -f version::rust
 export -f version::java
+
+export -f version::gzcaas

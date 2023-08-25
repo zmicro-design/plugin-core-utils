@@ -205,7 +205,7 @@ version::curl() {
     return
   fi
 
-  curl --version | head -n 1
+  curl --version 2>/dev/null | head -n 1
 }
 
 version::wget() {
@@ -215,7 +215,7 @@ version::wget() {
     return
   fi
 
-  wget --version | head -n 1
+  wget --version 2>/dev/null | head -n 1
 }
 
 version::git() {
@@ -225,7 +225,7 @@ version::git() {
     return
   fi
 
-  git --version
+  git --version 2>/dev/null
 }
 
 version::code() {
@@ -235,7 +235,7 @@ version::code() {
     return
   fi
 
-  code --version | head -n 1
+  code --version 2>/dev/null | head -n 1
 }
 
 version::ssh() {
@@ -255,7 +255,7 @@ version::docker() {
     return
   fi
 
-  docker --version | head -n 1
+  docker --version 2>/dev/null | head -n 1
 }
 
 version::lima() {
@@ -265,7 +265,7 @@ version::lima() {
     return
   fi
 
-  lima --version | head -n 1
+  lima --version 2>/dev/null | head -n 1
 }
 
 version::colima() {
@@ -275,7 +275,7 @@ version::colima() {
     return
   fi
 
-  colima version | head -n 1
+  colima version 2>/dev/null | head -n 1
 }
 
 version::multipass() {
@@ -285,7 +285,7 @@ version::multipass() {
     return
   fi
 
-  multipass version | awk -v d=" - " '{s=(NR==1?s:s d)$0}END{print s}'
+  multipass version 2>/dev/null | awk -v d=" - " '{s=(NR==1?s:s d)$0}END{print s}'
 }
 
 version::node() {
@@ -295,7 +295,7 @@ version::node() {
     return
   fi
 
-  node --version
+  node --version 2>/dev/null
 }
 
 version::go() {
@@ -305,7 +305,7 @@ version::go() {
     return
   fi
 
-  go version
+  go version 2>/dev/null
 }
 
 version::python() {
@@ -315,7 +315,7 @@ version::python() {
     return
   fi
 
-  python3 --version
+  python3 --version 2>/dev/null
 }
 
 version::deno() {
@@ -325,7 +325,7 @@ version::deno() {
     return
   fi
 
-  deno --version | awk -v d=" - " '{s=(NR==1?s:s d)$0}END{print s}'
+  deno --version 2>/dev/null | awk -v d=" - " '{s=(NR==1?s:s d)$0}END{print s}'
 }
 
 version::rust() {
@@ -335,7 +335,7 @@ version::rust() {
     return
   fi
 
-  rustc --version
+  rustc --version 2>/dev/null
 }
 
 version::java() {
@@ -355,7 +355,7 @@ version::gzcaas() {
     return
   fi
 
-  gzcaas --version
+  gzcaas --version 2>/dev/null
 }
 
 export -f version::get

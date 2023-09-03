@@ -41,7 +41,9 @@ path::dirname() {
     exit 1
   fi
 
-  echo "/$(string::split_slice '/' $path 0 -1)"
+  # echo "/$(string::split_slice '/' $path 0 -1)"
+
+  dirname $path
 }
 
 path::join() {

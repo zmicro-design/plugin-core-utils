@@ -2228,6 +2228,15 @@ os::code() {
   code "$@"
 }
 
+os::cursor() {
+  if [ "$(os::has_command cursor)" != "true" ]; then
+    log::error "[os::cursor] cursor not found, please install cursor with https://github.com/getcursor/cursor."
+    return 1
+  fi
+
+  cursor "$@"
+}
+
 export -f os::arch
 export -f os::platform
 export -f os::release
@@ -2430,3 +2439,4 @@ export -f os::is_in_iterm2
 export -f os::nc
 
 export -f os::code
+export -f os::cursor

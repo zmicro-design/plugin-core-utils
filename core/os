@@ -2219,6 +2219,15 @@ os::nc() {
   nc "$@"
 }
 
+os::code() {
+  if [ "$(os::has_command code)" != "true" ]; then
+    log::error "[os::code] code not found, please install vscode first and add to PATH"
+    return 1
+  fi
+
+  code "$@"
+}
+
 export -f os::arch
 export -f os::platform
 export -f os::release
@@ -2419,3 +2428,5 @@ export -f os::is_in_vscode
 export -f os::is_in_iterm2
 
 export -f os::nc
+
+export -f os::code

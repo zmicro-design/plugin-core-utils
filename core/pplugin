@@ -339,7 +339,7 @@ pplugin::release() {
     fi
   done
 
-  echo "fff: ${origin_version} => $new_version"
+  log::info "[pplugin::release] ${origin_version} => $new_version ..."
 
   local mod_path_tmp=${mod_path}.tmp
   cp $mod_path $mod_path_tmp
@@ -357,7 +357,7 @@ pplugin::release() {
 
   log::success "[pplugin::release] ${name} bumped version from $(color::red ${origin_version}) to $(color::green ${new_version}) ..."
 
-  log::success "[pplugin::release] succeed to release plugin $name"
+  log::success "[pplugin::release] succeed to release plugin $name ($(color::green ${new_version}))"
 }
 
 # pplugin::version - show a plugin version

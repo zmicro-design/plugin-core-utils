@@ -305,8 +305,18 @@ config::export() {
       continue
     fi
 
-    # @2 # start @TODO bug not fix, cause by others
+    # @2 # start @TODO bug not fix, cause by others (bash)
     if [ "$(string::starts_with '$line' '#')" = "0" ]; then
+      continue
+    fi
+
+    # @3 ; start ignore (ini)
+    if [ "$(string::starts_with '$line' ';')" = "0" ]; then
+      continue
+    fi
+
+    # @4 // start ignore (js)
+    if [ "$(string::starts_with '$line' '//')" = "0" ]; then
       continue
     fi
 

@@ -259,6 +259,11 @@ os::is_centos() {
 }
 
 os::is_ubuntu() {
+  if [ "$(os::is_linux)" != "true" ]; then
+    echo false
+    return
+  fi
+  
   if [ "$(os::has_command apt)" = "true" ]; then
     echo true
   else

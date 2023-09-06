@@ -3,7 +3,7 @@
 pm() {
   # apply proxy
   net::using_smart_proxy
-  
+
   # MacOS
   if [ "$(os::is_macos)" = "true" ]; then
     if [ "$(os::has_command brew)" != "true" ]; then
@@ -151,14 +151,79 @@ pm() {
   exit 1
 }
 
+# homebrew
+pm::brew() {
+  if [ "$(os::has_command brew)" != "true" ]; then
+    if [ "$GITHUB_ACTIONS" = "true" ]; then
+      echo "in GitHub Actions, not necessary to change homebrew mirror"
+    else
+      # mirror: https://github.com/eryajf/Thanks-Mirror#homebrew
+      export HOMEBREW_BREW_GIT_REMOTE="https://mirrors.tuna.tsinghua.edu.cn/git/homebrew/brew.git"
+      export HOMEBREW_CORE_GIT_REMOTE="https://mirrors.tuna.tsinghua.edu.cn/git/homebrew/homebrew-core.git"
+      export HOMEBREW_BOTTLE_DOMAIN="https://mirrors.tuna.tsinghua.edu.cn/homebrew-bottles"
+    fi
+
+    sudo curl -o- https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh | bash
+  fi
+
+  brew $@
+}
+
+# ubuntu apt
+pm::apt() {
+  if [ "$(os::is_ubuntu)" != "true" ]; then
+    log::error "[pm::apt] only support ubuntu"
+    return 1
+  fi
+
+  sudo apt $@
+}
+
+# centos
+pm::yum() {
+  if [ "$(os::is_centos)" != "true" ]; then
+    log::error "[pm::yum] only support centos"
+    return 1
+  fi
+
+  sudo yum $@
+}
+
+# alpine
+pm::apk() {
+  if [ "$(os::is_alpine)" != "true" ]; then
+    log::error "[pm::apk] only support alpine"
+    return 1
+  fi
+
+  # sudo apk $@
+  apk $@
+}
+
+# archlinux
+pm::pacman() {
+  if [ "$(os::is_archlinux)" != "true" ]; then
+    log::error "[pm::pacman] only support archlinux"
+    return 1
+  fi
+
+  sudo pacman $@
+}
+
+# fedora
+pm::dnf() {
+  if [ "$(os::is_fedora)" != "true" ]; then
+    log::error "[pm::dnf] only support fedora"
+    return 1
+  fi
+
+  sudo dnf $@
+}
+
 # node npm
 pm::npm() {
   # ZMICRO_NVM
-  if [ -z "$NODE_HOME" ]; then
-    export NODE_HOME=/usr/local/node
-    export NODE_USER_HOME=$HOME/.node
-    export PATH=$NODE_USER_HOME/bin:$NODE_HOME/bin:$PATH
-  fi
+  [ -s "/usr/local/lib/zmicro/plugins/nvm/source" ] && \. /usr/local/lib/zmicro/plugins/nvm/source
 
   if [ "$(os::is_nodejs_installed)" = "false" ]; then
     zpackage install nodejs
@@ -172,5 +237,80 @@ pm::npm() {
   npm $@
 }
 
+# node cnpm
+pm::cnpm() {
+  # ZMICRO_NVM
+  [ -s "/usr/local/lib/zmicro/plugins/nvm/source" ] && \. /usr/local/lib/zmicro/plugins/nvm/source
+
+  if [ "$(os::is_nodejs_installed)" = "false" ]; then
+    zpackage install nodejs
+  fi
+
+  # @TODO
+  if [ "$(net::is_google_visitable)" = "false" ]; then
+    export NPM_CONFIG_REGISTRY=https://registry.npmmirror.com
+  fi
+
+  if [ "$(os::has_command cnpm)" != "true" ]; then
+    npm install -g cnpm --registry=https://registry.npmmirror.com
+  fi
+
+  cnpm $@
+}
+
+# node yarn
+pm::yarn() {
+  # ZMICRO_NVM
+  [ -s "/usr/local/lib/zmicro/plugins/nvm/source" ] && \. /usr/local/lib/zmicro/plugins/nvm/source
+
+  if [ "$(os::is_nodejs_installed)" = "false" ]; then
+    zpackage install nodejs
+  fi
+
+  # @TODO
+  if [ "$(net::is_google_visitable)" = "false" ]; then
+    export NPM_CONFIG_REGISTRY=https://registry.npmmirror.com
+  fi
+
+  if [ "$(os::has_command yarn)" != "true" ]; then
+    npm install -g yarn --registry=https://registry.npmmirror.com
+  fi
+
+  yarn $@
+}
+
+# node pnpm
+pm::pnpm() {
+  # ZMICRO_NVM
+  [ -s "/usr/local/lib/zmicro/plugins/nvm/source" ] && \. /usr/local/lib/zmicro/plugins/nvm/source
+
+  if [ "$(os::is_nodejs_installed)" = "false" ]; then
+    zpackage install nodejs
+  fi
+
+  # @TODO
+  if [ "$(net::is_google_visitable)" = "false" ]; then
+    export NPM_CONFIG_REGISTRY=https://registry.npmmirror.com
+  fi
+
+  if [ "$(os::has_command pnpm)" != "true" ]; then
+    npm install -g pnpm --registry=https://registry.npmmirror.com
+  fi
+
+  pnpm $@
+}
+
 export -f pm
+
+export -f pm::brew
+
+export -f pm::apt
+export -f pm::yum
+export -f pm::apk
+export -f pm::pacman
+export -f pm::dnf
+
 export -f pm::npm
+export -f pm::cnpm
+export -f pm::yarn
+export -f pm::pnpm

@@ -1,0 +1,19 @@
+#!/bin/bash
+
+wait::port_visitable() {
+  local ip=$1
+  local port=$2
+
+  while true; do
+    log::info "[$(timestamp)] checking port ($ip:$port) ..."
+    ok=$(net::is_port_visitable $ip $port)
+    if [ "$ok" = "true" ]; then
+      log::info "[$(timestamp)] port ($ip:$port) is visitable"
+      break
+    fi
+
+    sleep 1
+  done
+}
+
+export -f wait::port_visitable

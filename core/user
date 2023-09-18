@@ -1,13 +1,35 @@
 #!/bin/bash
 
 users::all() {
+  local _users=""
+  local _base_dir=""
   if [ "$(os::is_macos)" = "true" ]; then
     # echo "-"
-    ls /Users/
-    return
+    _base_dir="/Users"
+    _users=$(ls $_base_dir)
+  elif [ "$(os::is_linux)" = "true" ]; then
+    # echo "-"
+    _base_dir="/home"
+    _users=$(ls $_base_dir)
   fi
 
-  ls /home
+  local users="root"
+  for _user in $_users; do
+    if [ "$_user" = "Shared" ]; then
+      continue
+    fi
+
+    if [ "$_user" = "Guest" ]; then
+      continue
+    fi
+
+    if [ -d "$_base_dir/$_user" ]; then
+      users="$users $_user"
+      continue
+    fi
+  done
+
+  echo $users
 }
 
 users::online() {

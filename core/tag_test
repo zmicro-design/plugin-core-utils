@@ -18,4 +18,10 @@ function test_tag::docker() {
     "to_equal" \
     "whatwewant/zmicro:latest,whatwewant/zmicro:v4-1,whatwewant/zmicro:v4-1.2,whatwewant/zmicro:v4-1.2.3" \
     "$(tag::docker whatwewant/zmicro v4-1.2.3)"
+
+  testing::expect \
+    "${FUNCNAME[0]} - whatwewant/zmicro v1.2.3 v dind => whatwewant/zmicro:v1-dind,whatwewant/zmicro:v1.2-dind,whatwewant/zmicro:v1.2.3-dind" \
+    "to_equal" \
+    "whatwewant/zmicro:latest-dind,whatwewant/zmicro:v1-dind,whatwewant/zmicro:v1.2-dind,whatwewant/zmicro:v1.2.3-dind" \
+    "$(tag::docker whatwewant/zmicro v1.2.3 v dind)"
 }

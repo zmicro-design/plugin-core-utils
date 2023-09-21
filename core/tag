@@ -4,6 +4,7 @@ tag::docker() {
   local name=$1
   local version=$2
   local prefix=$3
+  local suffix=$4
   
   if [ -z "$name" ]; then
     log::error "[tag::docker] name is required"
@@ -19,18 +20,30 @@ tag::docker() {
     prefix="v"
   fi
 
+  local latest="latest"
+  #
   local major=$(version::get_major $version $prefix)
   local minor=$(version::get_minor $version $prefix)
   local patch=$(version::get_patch $version $prefix)
+  if [ -n "$suffix" ]; then
+    latest="${latest}-${suffix}"
+    major="${major}-${suffix}"
+    minor="${minor}-${suffix}"
+    patch="${patch}-${suffix}"
+  fi
 
   # @TODO v16-
   if [ -n "$prefix" ] && [ "$prefix" != "v" ]; then
     local base_tag=$(echo $prefix | awk -F '-' '{print $1}')
-    echo "$name:latest,$name:$base_tag,$name:$major,$name:$minor,$name:$patch"
+    if [ -n "$suffix" ]; then
+      base_tag="${base_tag}-${suffix}"
+    fi
+
+    echo "$name:$latest,$name:$base_tag,$name:$major,$name:$minor,$name:$patch"
     return
   fi
 
-  echo "$name:latest,$name:$major,$name:$minor,$name:$patch"
+  echo "$name:$latest,$name:$major,$name:$minor,$name:$patch"
 }
 
 export -f tag::docker

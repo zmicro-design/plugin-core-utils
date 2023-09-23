@@ -693,7 +693,12 @@ plugin::run() {
       # echo "EUNOMIA_DESCRIPTION: $EUNOMIA_DESCRIPTION"
     fi
 
-    run $plugin_commands_path "-" $plugin_command
+    if [ "$2" = "-c" ]; then
+      eval "$3"
+      exit $?
+    fi
+
+    run $plugin_commands_path "$plugin_command"
   fi
 }
 

@@ -784,6 +784,13 @@ plugin::shell() {
     plugin_command="--help"
   fi
 
+  # -c command
+  if [ -n "$PLUGIN_SHELL_COMMAND" ]; then
+    eval "$PLUGIN_SHELL_COMMAND"
+    # bash -c "$3"
+    exit $?
+  fi
+
   echo "$plugin_command" | grep "^/" >/dev/null
   if [ "$?" != "0" ]; then
     log::error "[$(timestamp)][plugin::shell] plugin command must be absolute path"

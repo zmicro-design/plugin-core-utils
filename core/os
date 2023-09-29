@@ -1459,6 +1459,99 @@ os::md5() {
   fi
 }
 
+# os::sha256 gets the sha256 sume of string or file.
+# os::sha256@usage 
+# os::sha256@example helloworld
+# os::sha256@example $ZMICRO_HOME/mod
+os::sha256() {
+  local string="$1"
+  if [ -z "$string" ]; then
+    log::error "[os::sha256] string or path is required"
+    return 1
+  fi
+
+  # file
+  if [ -f "$string" ]; then
+    local filepath=$string
+    # mac
+    if [ "$(os::is_macos)" = "true" ]; then
+      shasum -a 256 $filepath | awk '{print $1}'
+    else
+      # linux
+      sha256sum $filepath | awk '{print $1}'
+    fi
+    return
+  fi
+  
+  if [ "$(os::has_command sha256sum)" = "true" ]; then
+    echo -n "$string" | sha256sum | awk '{print $1}'
+  else
+    echo -n "$string" | openssl sha256
+  fi
+}
+
+# os::sha512 gets the sha512 sume of string or file.
+# os::sha512@usage 
+# os::sha512@example helloworld
+# os::sha512@example $ZMICRO_HOME/mod
+os::sha512() {
+  local string="$1"
+  if [ -z "$string" ]; then
+    log::error "[os::sha512] string or path is required"
+    return 1
+  fi
+
+  # file
+  if [ -f "$string" ]; then
+    local filepath=$string
+    # mac
+    if [ "$(os::is_macos)" = "true" ]; then
+      shasum -a 256 $filepath | awk '{print $1}'
+    else
+      # linux
+      sha512sum $filepath | awk '{print $1}'
+    fi
+    return
+  fi
+  
+  if [ "$(os::has_command sha512sum)" = "true" ]; then
+    echo -n "$string" | sha512sum | awk '{print $1}'
+  else
+    echo -n "$string" | openssl sha512
+  fi
+}
+
+# os::sha384 gets the sha384 sume of string or file.
+# os::sha384@usage 
+# os::sha384@example helloworld
+# os::sha384@example $ZMICRO_HOME/mod
+os::sha384() {
+  local string="$1"
+  if [ -z "$string" ]; then
+    log::error "[os::sha384] string or path is required"
+    return 1
+  fi
+
+  # file
+  if [ -f "$string" ]; then
+    local filepath=$string
+    # mac
+    if [ "$(os::is_macos)" = "true" ]; then
+      shasum -a 256 $filepath | awk '{print $1}'
+    else
+      # linux
+      sha384sum $filepath | awk '{print $1}'
+    fi
+    return
+  fi
+  
+  if [ "$(os::has_command sha384sum)" = "true" ]; then
+    echo -n "$string" | sha384sum | awk '{print $1}'
+  else
+    echo -n "$string" | openssl sha384
+  fi
+}
+
 os::wget() {
   if [ "$(os::has_command wget)" != "true" ]; then
     pm install -y wget
@@ -2358,6 +2451,9 @@ export -f os::base64_encode
 export -f os::base64_decode
 
 export -f os::md5
+export -f os::sha256
+export -f os::sha512
+export -f os::sha384
 
 export -f os::wget
 export -f os::curl

@@ -1,0 +1,131 @@
+#!/bin/bash
+
+# checksum::md5 gets the md5 sume of string or file.
+# checksum::md5@usage 
+# checksum::md5@example helloworld
+# checksum::md5@example $ZMICRO_HOME/mod
+checksum::md5() {
+  local string="$1"
+  if [ -z "$string" ]; then
+    log::error "[checksum::md5] string or path is required"
+    return 1
+  fi
+
+  # file
+  if [ -f "$string" ]; then
+    local filepath=$string
+    # mac
+    if [ "$(os::is_macos)" = "true" ]; then
+      md5 -q $filepath
+    else
+      # linux
+      md5sum $filepath | awk '{print $1}'
+    fi
+    return
+  fi
+  
+  if [ "$(os::has_command md5sum)" = "true" ]; then
+    echo -n "$string" | md5sum | awk '{print $1}'
+  else
+    echo -n "$string" | openssl md5
+  fi
+}
+
+# checksum::sha256 gets the sha256 sume of string or file.
+# checksum::sha256@usage 
+# checksum::sha256@example helloworld
+# checksum::sha256@example $ZMICRO_HOME/mod
+checksum::sha256() {
+  local string="$1"
+  if [ -z "$string" ]; then
+    log::error "[checksum::sha256] string or path is required"
+    return 1
+  fi
+
+  # file
+  if [ -f "$string" ]; then
+    local filepath=$string
+    # mac
+    if [ "$(os::is_macos)" = "true" ]; then
+      shasum -a 256 $filepath | awk '{print $1}'
+    else
+      # linux
+      sha256sum $filepath | awk '{print $1}'
+    fi
+    return
+  fi
+  
+  if [ "$(os::has_command sha256sum)" = "true" ]; then
+    echo -n "$string" | sha256sum | awk '{print $1}'
+  else
+    echo -n "$string" | openssl sha256
+  fi
+}
+
+# checksum::sha512 gets the sha512 sume of string or file.
+# checksum::sha512@usage 
+# checksum::sha512@example helloworld
+# checksum::sha512@example $ZMICRO_HOME/mod
+checksum::sha512() {
+  local string="$1"
+  if [ -z "$string" ]; then
+    log::error "[checksum::sha512] string or path is required"
+    return 1
+  fi
+
+  # file
+  if [ -f "$string" ]; then
+    local filepath=$string
+    # mac
+    if [ "$(os::is_macos)" = "true" ]; then
+      shasum -a 256 $filepath | awk '{print $1}'
+    else
+      # linux
+      sha512sum $filepath | awk '{print $1}'
+    fi
+    return
+  fi
+  
+  if [ "$(os::has_command sha512sum)" = "true" ]; then
+    echo -n "$string" | sha512sum | awk '{print $1}'
+  else
+    echo -n "$string" | openssl sha512
+  fi
+}
+
+# checksum::sha384 gets the sha384 sume of string or file.
+# checksum::sha384@usage 
+# checksum::sha384@example helloworld
+# checksum::sha384@example $ZMICRO_HOME/mod
+checksum::sha384() {
+  local string="$1"
+  if [ -z "$string" ]; then
+    log::error "[checksum::sha384] string or path is required"
+    return 1
+  fi
+
+  # file
+  if [ -f "$string" ]; then
+    local filepath=$string
+    # mac
+    if [ "$(os::is_macos)" = "true" ]; then
+      shasum -a 256 $filepath | awk '{print $1}'
+    else
+      # linux
+      sha384sum $filepath | awk '{print $1}'
+    fi
+    return
+  fi
+  
+  if [ "$(os::has_command sha384sum)" = "true" ]; then
+    echo -n "$string" | sha384sum | awk '{print $1}'
+  else
+    echo -n "$string" | openssl sha384
+  fi
+}
+
+export -f checksum::md5
+
+export -f checksum::sha256
+export -f checksum::sha512
+export -f checksum::sha384

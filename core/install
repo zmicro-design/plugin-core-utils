@@ -111,6 +111,7 @@ install::zip() {
   local zip_path=$1
   local package_name=$2
   local app_name=$3
+  local base_path=$4
 
   if [ -z "$zip_path" ]; then
     log::error "[install::zip] zip path is required"
@@ -151,7 +152,7 @@ install::zip() {
   fi
 
   # os::install $source_bin_file $target_bin_dir $target_bin_name >>/dev/null 2>$tmp_error_file
-  cp -rf "$app_name" /Applications
+  cp -rf "${base_path}${app_name}" /Applications
   if [ "$?" != "0" ]; then
     log::error "[install::zip] failed to install $target_bin_name."
     log::error "[install::zip] error detail: $(cat $tmp_error_file)"

@@ -103,10 +103,11 @@ install::pkg() {
 }
 
 # install::zip installs the zip format package.
-# install::zip@usage <zip_path> <package_name>
+# install::zip@usage <zip_path> <package_name> [base_path]
 # install::zip@example:
 #    install::zip $PWD/tmp/iTerm2-3_4_19.zip iTerm2 iTerm.app
 #    install::zip $PWD/tmp/VSCode-darwin-universal.zip VSCode "Visual\ Studio\ Code.app"
+#    install::zip $cache_file oss-browser oss-browser.app "oss-browser-darwin-x64/"
 install::zip() {
   local zip_path=$1
   local package_name=$2

@@ -10,6 +10,7 @@ install::dmg() {
   local app_name=$3
   #
   local mount_path=$4
+  local mount_app_name=$5
   if [ -z "$mount_path" ]; then
     mount_path="/Volumes/$package_name"
   fi
@@ -53,6 +54,10 @@ install::dmg() {
   fi
 
   local app_path="$mount_path/$app_name"
+  if [ -n "$mount_app_name" ]; then
+    app_path="$mount_path/$mount_app_name"
+  fi
+
   if [ ! -d "$app_path" ]; then
     log::error "[install::dmg] invalid app name (${app_name})"
     return 1

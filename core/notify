@@ -161,6 +161,8 @@ notify::login() {
   local timestamp=$(os::timestamp)
   local zmicro_version=$(version::zmicro)
   local zmicro_version_detail=$(version::zmicro_detail)
+  local device=$(os::device)
+  local load=$(os::usage)
 
   # echo "notify::login"
 
@@ -174,9 +176,9 @@ notify::login() {
 
   export NO_COLOR=true
   if [ "$(os::is_workspace)" = "true" ]; then
-    notify::feishu $url "[Login][workspace: ${company}][$user] $ip" "user: $user\nshell: $shell\nmachine ip: $ip\ninternal ip: $internal_ip\nlogin ip: $ssh\nzmicro: $(version::main)\ntimestamp: $timestamp"
+    notify::feishu $url "[Login][workspace: ${company}][$user] $ip" "user: $user\nshell: $shell\nmachine ip: $ip\ninternal ip: $internal_ip\nlogin ip: $ssh\nzmicro: $(version::main)\ndevice: ${device}\nload: ${load}\ntimestamp: $timestamp"
   else
-    notify::feishu $url "[Login][$user] $ip" "user: $user\nshell: $shell\nmachine ip: $ip\ninternal ip: $internal_ip\nlogin ip: $ssh\nzmicro: $(version::main)\ntimestamp: $timestamp"
+    notify::feishu $url "[Login][$user] $ip" "user: $user\nshell: $shell\nmachine ip: $ip\ninternal ip: $internal_ip\nlogin ip: $ssh\nzmicro: $(version::main)\ndevice: ${device}\nload: ${load}\ntimestamp: $timestamp"
   fi
 
   local log_json=$(
@@ -189,6 +191,8 @@ notify::login() {
   "login_ip": "$ssh",
   "zmicro_version": "$zmicro_version",
   "zmicro_version_detail": "$zmicro_version_detail",
+  "device": "${device}",
+  "load": "${load}",
   "system_timestamp": "$timestamp"
 }
 END

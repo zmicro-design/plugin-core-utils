@@ -167,6 +167,10 @@ notify::login() {
   # echo "notify::login"
 
   echo $(date +%s) >$log_path
+  if [ "$?" != "0" ]; then
+    log::error "[notify::login] failed to write log, maybe disk is full, skip."
+    return
+  fi
 
   local key=/${user}
 

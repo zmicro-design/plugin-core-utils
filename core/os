@@ -189,6 +189,26 @@ os::release() {
   echo $res
 }
 
+os::version() {
+  if [ "$(os::is_ubuntu)" = "true" ]; then
+    if [ -f "/etc/os-release" ]; then
+      cat /etc/os-release | grep VERSION_ID | awk -F '"' '{print $2}'
+    else
+      echo ""
+    fi
+    return
+  fi
+
+  if [ "$(os::is_centos)" = "true" ]; then
+    if [ -f "/etc/os-release" ]; then
+      cat /etc/os-release | grep VERSION_ID | awk -F '"' '{print $2}'
+    else
+      echo ""
+    fi
+    return
+  fi
+}
+
 os::kernel() {
   echo $(uname -s)
 }
@@ -2341,6 +2361,7 @@ export -f os::release
 export -f os::kernel
 export -f os::distribution
 export -f os::shell
+export -f os::version
 
 export -f os::homedir
 export -f os::username

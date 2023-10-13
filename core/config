@@ -157,14 +157,19 @@ config::set() {
     set -e
   fi
 
+  # Old Key
+  local newLine="${key}=${value}"
+  # check value exist whitespace
+  if [ "$(echo \"$newLine\" | awk -F '{print $1}')" != "$newLine" ]; then
+    newLine="${key}=\"${value}\""
+  fi
+
   # New Key
   if [ "$line" = "" ]; then
-    echo "${key}=${value}" >>$filepath
+    echo "${newLine}" >>$filepath
     return
   fi
 
-  # Old Key
-  local newLine="${key}=${value}"
   # echo "old: $line"
   # echo "new: $newLine"
   sed -i -e "s%${line}%${newLine}%g" $filepath
@@ -224,6 +229,7 @@ config::check_or_set() {
     exit 1
   fi
 
+  log::info "[$(timestamp)] config file path: $filepath"
   if [ -z "$filepath" ]; then
     log::error "[config::check_or_set] filepath is required"
     exit 1
@@ -272,11 +278,11 @@ config::check_or_set() {
     fi
   fi
 
-  # echo "key: $key, value: $value"
-  config::set $key $value $filepath
+  # echo "key: $key, value: $value => $filepath"
+  config::set "$key" "$value" $filepath
 
   # apply env
-  os::set_env $key $value
+  os::set_env $key "$value"
 }
 
 # bug:
@@ -381,7 +387,7 @@ config::global:set() {
     sudo chown $USER $filepath
   fi
 
-  config::set $key $value $filepath
+  config::set $key "$value" $filepath
 }
 
 config::global:get() {
@@ -471,7 +477,7 @@ config::inquirer() {
 
   local value=$(env::get $key)
   local filepath=$CONFIG_FILEPATH
-  config::set $key $value $filepath
+  config::set $key "$value" $filepath
 }
 
 config::set_filepath() {

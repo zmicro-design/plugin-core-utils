@@ -218,6 +218,7 @@ config::check_or_set() {
   local filepath=$3
   local message=$4
   local default_value=$5
+  local required=$6
 
   if [ -z "$key" ]; then
     log::error "[config::check_or_set] key is required"
@@ -240,6 +241,14 @@ config::check_or_set() {
     exit 1
   fi
 
+  if [ -z "$required" ] && [ "$default_value" = "false" ]; then
+    required=$default_value
+  fi
+
+  if [ -z "$required" ]; then
+    required=true
+  fi
+
   # local value=$(env::get $key)
   local value=$(config::get $key $filepath)
 
@@ -255,7 +264,7 @@ config::check_or_set() {
       fi
 
       # inquirer::text "$message" value
-      os::inquirer value "text" "$message" true "$default_value"
+      os::inquirer value "text" "$message" $required "$default_value"
     elif [ "$type" = "yesno" ]; then
       if [ -z "$message" ]; then
         message="是否启用 $key?"
@@ -268,10 +277,10 @@ config::check_or_set() {
       # else
       #   value="false"
       # fi
-      os::inquirer value "yesno" "$message" true "$default_value"
+      os::inquirer value "yesno" "$message" $required "$default_value"
     elif [ "$type" = "select" ]; then
       local choices=$4
-      os::inquirer value "select" $choices "$message" true
+      os::inquirer value "select" $choices "$message" $required
     else
       log::error "[config::check_or_set] invalid type($type), options: text, yesno"
       exit 1

@@ -229,7 +229,7 @@ config::check_or_set() {
     exit 1
   fi
 
-  log::info "[$(timestamp)] config file path: $filepath"
+  log::debug "[$(timestamp)] config file path: $filepath"
   if [ -z "$filepath" ]; then
     log::error "[config::check_or_set] filepath is required"
     exit 1

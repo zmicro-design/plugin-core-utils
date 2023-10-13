@@ -159,8 +159,9 @@ config::set() {
 
   # Old Key
   local newLine="${key}=${value}"
+  local first_part=$(echo "$newLine" | awk '{print $1}')
   # check value exist whitespace
-  if [ "$(echo \"$newLine\" | awk -F '{print $1}')" != "$newLine" ]; then
+  if [ "$first_part" != "$newLine" ]; then
     newLine="${key}=\"${value}\""
   fi
 
@@ -243,8 +244,9 @@ config::check_or_set() {
 
   if [ -z "$required" ] && [ "$default_value" = "false" ]; then
     required=$default_value
+    default_value=""
   fi
-
+  
   if [ -z "$required" ]; then
     required=true
   fi

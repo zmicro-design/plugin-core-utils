@@ -499,6 +499,14 @@ git::clone() {
   local tmp_error_log=$(os::tmp_file)
 
   if [ ! -d "$path" ]; then
+    local parent_dir=$(dirname $path)
+    if [ ! -d "$parent_dir" ]; then
+      mkdir -p $parent_dir
+    fi
+    if [ ! -w "$parent_dir" ]; then
+      sudo chown -R $USER $parent_dir
+    fi
+
     # clone
     log::debug "[git::clone] clone repo($repository_url) to $path ..."
     os::git clone --depth=1 -b $branch $repository_url $path >>/dev/null 2>$tmp_error_log

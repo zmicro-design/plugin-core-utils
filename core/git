@@ -423,6 +423,9 @@ git::global_setup() {
     git_email=$(git::global_email)
   fi
 
+  # unset macos system credential helper osxkeychain
+  git config --system --unset credential.helper
+  
   # credential
   git config --global credential.helper store
   # git config --global credential.helper 'cache --timeout=604800'

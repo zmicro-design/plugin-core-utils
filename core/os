@@ -2178,18 +2178,6 @@ os::install() {
   fi
 }
 
-# os::hostnamectl safe hostnamectl
-# os::hostnamectl@usage ...
-os::hostnamectl() {
-  # @TODO
-  # if [ "$(os::has_command hostnamectl)" = "false" ]; then
-  #   # reference: https://commandnotfound.cn/linux/1/347/hostname-%E5%91%BD%E4%BB%A4
-  #   pm install -y hostnamectl >>/dev/null 2>&1
-  # fi
-  
-  hostnamectl "$@"
-}
-
 os::gpm() {
   if [ "$(os::has_command gpm)" != "true" ]; then
     pm::npm install -g @cliz/gpm
@@ -2353,6 +2341,37 @@ os::cursor() {
   fi
 
   cursor "$@"
+}
+
+# os::lscpu gets cpu info
+os::lscpu() {
+  if [ "$(os::has_command lscpu)" != "true" ]; then
+    pm install -y lscpu
+  fi
+
+  sudo lscpu "$@"
+}
+
+# os::hostnamectl manages hostname
+# os::hostnamectl@usage
+# os::hostnamectl@example set-hostname Zero
+os::hostnamectl() {
+  if [ "$(os::has_command hostnamectl)" != "true" ]; then
+    pm install -y hostnamectl
+  fi
+
+  sudo hostnamectl "$@"
+}
+
+# os::timedatectl manages date and time
+# os::timedatectl@usage
+# os::timedatectl@example set-timezone Asia/Shanghai
+os::timedatectl() {
+  if [ "$(os::has_command timedatectl)" != "true" ]; then
+    pm install -y timedatectl
+  fi
+
+  sudo timedatectl "$@"
 }
 
 export -f os::arch
@@ -2540,8 +2559,6 @@ export -f os::set_system_network_proxy
 export -f os::make_executable
 export -f os::install
 
-export -f os::hostnamectl
-
 export -f os::gpm
 
 export -f os::gzfly
@@ -2562,3 +2579,7 @@ export -f os::nc
 
 export -f os::code
 export -f os::cursor
+
+export -f os::lscpu
+export -f os::hostnamectl
+export -f os::timedatectl

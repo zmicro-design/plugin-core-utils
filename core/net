@@ -279,6 +279,51 @@ net::is_not_found() {
   fi
 }
 
+# net::iftop monitors the realtime traffic of every tcp and udp.
+net::iftop() {
+  if [ "$(os::has_command iftop)" != "true" ]; then
+    pm install -y iftop
+  fi
+
+  sudo iftop "$@"
+}
+
+# net::nethogs monitors the realtime traffic of every process.
+net::nethogs() {
+  if [ "$(os::has_command nethogs)" != "true" ]; then
+    pm install -y nethogs
+  fi
+
+  sudo nethogs "$@"
+}
+
+# net::nload monitors the realtime traffic of every network card.
+net::nload() {
+  if [ "$(os::has_command nload)" != "true" ]; then
+    pm install -y nload
+  fi
+
+  sudo nload "$@"
+}
+
+# net::mtr is used to comprehensively diagnose the quality of the network reaching the destination address.
+net::mtr() {
+  if [ "$(os::has_command mtr)" != "true" ]; then
+    pm install -y mtr
+  fi
+
+  sudo mtr "$@"
+}
+
+# net::nmcli is used to manage network.
+net::nmcli() {
+  if [ "$(os::has_command nmcli)" != "true" ]; then
+    pm install -y network-manager
+  fi
+
+  sudo nmcli "$@"
+}
+
 export -f net::is_in_china
 export -f net::is_github_visitable
 export -f net::is_google_visitable
@@ -299,3 +344,10 @@ export -f net::try_to_get_proxy_port
 
 export -f net::status_code
 export -f net::is_not_found
+
+export -f net::iftop
+export -f net::nethogs
+export -f net::nload
+
+export -f net::mtr
+export -f net::nmcli

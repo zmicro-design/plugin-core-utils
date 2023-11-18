@@ -1,0 +1,17 @@
+#!/bin/bash
+
+screen::clear() {
+  if [ "$(os::has_command clear)" = "true" ]; then
+    clear
+    return
+  fi
+
+  if [ "$(os::has_command prinf)" = "true" ]; then
+    printf "\033c" 
+    return
+  fi
+
+  echo -n "\033c"
+}
+
+export -f screen::clear

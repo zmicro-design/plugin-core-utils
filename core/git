@@ -435,6 +435,8 @@ git::global_setup() {
   git config --global init.defaultbranch master
   # pull reabse
   git config --global pull.rebase false
+  # disable case
+  git config --global core.ignorecase false
 
   # if [ "$git_user" = "" ] || [ "$git_email" = "" ]; then
   #   log::warn "Config Git: git_user and git_email is required"

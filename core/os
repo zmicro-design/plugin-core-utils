@@ -2276,18 +2276,81 @@ os::os_name() {
   echo "unknown"
 }
 
+# os::forever runs command forever
+# os::forever@usage [options ...] -- <command...>
+# os::forever@example -- npm run prod
+# os::forever@example --delay 1 -- npm run prod
 os::forever() {
-  if [ -z "$1" ]; then
-    log::error "[os::forever] command is required"
+  local command=""
+  local delay=0
+  local interval=1
+
+  while [[ $# -gt 0 ]]; do
+    local key=$1
+    local value=$2
+    case $key in
+    -d | --delay)
+      # os::set_var is_require_mod_update true
+      delay=$value
+      shift
+      shift
+      ;;
+    -i | --interval)
+      interval=$value
+      shift
+      shift
+      ;;
+    --)
+      shift
+      command="$@"
+      break
+      ;;
+    *)
+      log::error "ERROR: unknown parameter \"$key\""
+      echo ""
+      # echo help info
+      echo "Usage:"
+      echo "  os::forever [options ...] -- <command...>"
+      echo ""
+      echo "Options:"
+      echo "  -d, --delay <seconds>  delay seconds"
+      echo "  -i, --interval <seconds>  interval seconds"
+      echo ""
+      echo "Example:"
+      echo "  os::forever -- npm run prod"
+      echo "  os::forever --delay 1 -- npm run prod"
+      exit 1
+      ;;
+    esac
+  done
+
+  if [ -z "$command" ]; then
+    log::error "[os::forever] command is required, please use -- <command...> to specify command"
     return 1
   fi
 
-  echo "[$(timestamp)] forever command: $@ ..."
-  local count=1
+  # check is delay is number
+  if ! [[ $delay =~ ^[0-9]+$ ]]; then
+    log::error "[os::forever] delay must be a number"
+    return 1
+  fi
+
+  # check is interval is number
+  if ! [[ $interval =~ ^[0-9]+$ ]]; then
+    log::error "[os::forever] interval must be a number"
+    return 1
+  fi
+
+  if [ "$delay" -gt 0 ]; then
+    sleep $delay
+  fi
+
+  echo "[$(timestamp)] forever command: $command ..."
+  local count=0
   while true; do
-    echo "[$(timestamp)][time: $count] run: $@..."
-    "$@"
-    sleep 1
+    echo "[$(timestamp)][restarts: $count] run: $command..."
+    $command
+    sleep $interval
     count=$((count + 1))
   done
 }

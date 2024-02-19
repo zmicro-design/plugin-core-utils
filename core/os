@@ -1948,6 +1948,19 @@ os::is_file_type_tar_gz() {
   echo "false"
 }
 
+os::is_file_type_tar_xz() {
+  local name=$1
+
+  # .tar.gz
+  echo "${name##*/}" | grep ".tar.xz" >> /dev/null 2>&1
+  if [ "$?" = "0" ]; then
+    echo "true"
+    return
+  fi
+
+  echo "false"
+}
+
 os::is_file_type_zip() {
   local name=$1
   if [ "${name##*.}" = "zip" ]; then
@@ -1970,6 +1983,13 @@ os::extract() {
     os::tar -zxvf $filepath >> /dev/null 2>$tmp_error_file
     if [ "$?" != "0" ]; then
       log::error "[os::extract] failed to extract file type(tar.gz): $filepath."
+      log::error "[os::extract] error detail: $(cat $tmp_error_file)"
+      return 1
+    fi
+  elif [ "$(os::is_file_type_tar_xz $filepath)" = "true" ]; then
+    os::tar -Jxvf $filepath >> /dev/null 2>$tmp_error_file
+    if [ "$?" != "0" ]; then
+      log::error "[os::extract] failed to extract file type(tar.xz): $filepath."
       log::error "[os::extract] error detail: $(cat $tmp_error_file)"
       return 1
     fi
@@ -2539,6 +2559,7 @@ export -f os::unzip
 export -f os::tar
 
 export -f os::is_file_type_tar_gz
+export -f os::is_file_type_tar_xz
 export -f os::is_file_type_zip
 
 export -f os::extract

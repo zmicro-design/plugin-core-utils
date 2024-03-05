@@ -656,6 +656,8 @@ os::machine_id() {
     fi
   elif [ "$(os::is_macos)" = "true" ]; then
     echo $(ioreg -rd1 -c IOPlatformExpertDevice | grep "IOPlatformUUID" | awk -F '"' '{print $4}')
+  elif [ -f "/proc/sys/kernel/random/boot_id" ]; then
+    cat /proc/sys/kernel/random/boot_id
   else
     log::error "Cannot get machine id by unknown system"
     exit 1

@@ -1604,6 +1604,70 @@ os::curl() {
     "$@"
 }
 
+os::ping() {
+  if [ "$(os::has_command curl)" != "true" ]; then
+    pm install -y iputils-ping
+  fi
+
+  ping "$@"
+}
+
+os::nslookup() {
+  if [ "$(os::has_command nslookup)" != "true" ]; then
+    pm install -y dnsutils
+  fi
+
+  nslookup "$@"
+}
+
+os::ifconfig() {
+  if [ "$(os::has_command ifconfig)" != "true" ]; then
+    pm install -y net-tools
+  fi
+
+  ifconfig "$@"
+}
+
+os::netstat() {
+  if [ "$(os::has_command netstat)" != "true" ]; then
+    pm install -y net-tools
+  fi
+
+  netstat "$@"
+}
+
+os::nc() {
+  if [ "$(os::has_command nc)" != "true" ]; then
+    pm install -y netcat
+  fi
+
+  nc "$@"
+}
+
+os::telnet() {
+  if [ "$(os::has_command telnet)" != "true" ]; then
+    pm install -y telnet
+  fi
+
+  telnet "$@"
+}
+
+os::traceroute() {
+  if [ "$(os::has_command traceroute)" != "true" ]; then
+    pm install -y traceroute
+  fi
+
+  traceroute "$@"
+}
+
+os::dig() {
+  if [ "$(os::has_command dig)" != "true" ]; then
+    pm install -y dnsutils
+  fi
+
+  dig "$@"
+}
+
 os::brew() {
   if [ "$(os::has_command brew)" != "true" ]; then
     if [ "$GITHUB_ACTIONS" = "true" ]; then
@@ -2582,6 +2646,16 @@ export -f os::sha384
 
 export -f os::wget
 export -f os::curl
+
+export -f os::ping
+export -f os::nslookup
+export -f os::ifconfig
+export -f os::netstat
+export -f os::nc
+export -f os::telnet
+export -f os::traceroute
+export -f os::dig
+
 export -f os::download
 
 export -f os::brew

@@ -270,6 +270,27 @@ fs::list() {
   find "${@:-.}" -print0 | sort -z | xargs -0 ls --color=auto -dlha;
 }
 
+
+# fs::find_size lists files which is more the size
+# fs::find_size@usage <size> [path]
+# fs::find_size@example 10M
+# fs::find_size@example 1G
+# fs::find_size@example 2G   /data
+fs::find_size() {
+  local size=$1
+  if [ -z "$size" ]; then
+    log::error "[fs::find_size] size is required"
+    return 1
+  fi
+
+  local path=$2
+  if [ -z "$path" ]; then
+    path=$PWD
+  fi
+
+  find $path -xdev -size +"$size" -type f -print0 | xargs -0 ls -Ssh1 --color
+}
+
 export -f fs::write
 export -f fs::read
 
@@ -284,3 +305,4 @@ export -f fs::watch
 export -f fs::has_flag
 
 export -f fs::list
+export -f fs::find_size

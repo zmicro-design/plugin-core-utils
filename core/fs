@@ -256,6 +256,20 @@ fs::has_flag() {
   fi
 }
 
+# fs::list list files deep recursive like 'tree' or 'ls -R'
+# fs::list@usage [dir_path]
+# fs::list@example .
+# fs::list@example /etc
+# fs::list@example dist
+fs::list() {
+  local path="$1"
+  if [ -n "$path" ]; then
+      cd $path
+  fi
+
+  find "${@:-.}" -print0 | sort -z | xargs -0 ls --color=auto -dlha;
+}
+
 export -f fs::write
 export -f fs::read
 
@@ -268,3 +282,5 @@ export -f fs::remove_empty_line
 export -f fs::watch
 
 export -f fs::has_flag
+
+export -f fs::list

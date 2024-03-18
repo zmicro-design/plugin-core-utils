@@ -324,6 +324,29 @@ net::nmcli() {
   sudo nmcli "$@"
 }
 
+# net::monitor_speed_of_interface monitors the speed of the specify interface
+# net::monitor_speed_of_interface@usage <interface>
+# net::monitor_speed_of_interface@example eth0
+# net::monitor_speed_of_interface@example ens33
+# net::monitor_speed_of_interface@example wlo1
+net::monitor_speed_of_interface() {
+  local intf=$1
+  if [ -z "$intf" ]; then
+    log::error "[$(timestamp)] interface is required"
+    return 1
+  fi
+  
+  if [ "$(os::has_command tcpdump)" != "true" ]; then
+    pm install -y tcpdump
+  fi
+
+  if [ "$(os::has_command pv)" != "true" ]; then
+    pm install -y pv
+  fi
+
+  sudo tcpdump -i $intf -w - | pv -bert > /dev/null
+}
+
 export -f net::is_in_china
 export -f net::is_github_visitable
 export -f net::is_google_visitable
@@ -351,3 +374,5 @@ export -f net::nload
 
 export -f net::mtr
 export -f net::nmcli
+
+export -f net::monitor_speed_of_interface

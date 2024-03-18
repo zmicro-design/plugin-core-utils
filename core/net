@@ -347,6 +347,13 @@ net::monitor_speed_of_interface() {
   sudo tcpdump -i $intf -w - | pv -bert > /dev/null
 }
 
+# net::top monitors the network like monitor process with top (os::top)
+# net::top@usage
+# net::top@example
+net::top() {
+  net::iftop "$@"
+}
+
 export -f net::is_in_china
 export -f net::is_github_visitable
 export -f net::is_google_visitable
@@ -376,3 +383,5 @@ export -f net::mtr
 export -f net::nmcli
 
 export -f net::monitor_speed_of_interface
+
+export -f net::top

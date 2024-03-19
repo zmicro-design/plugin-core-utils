@@ -8,6 +8,26 @@ git::commit_message_full() {
   git log -1 --pretty=%B
 }
 
+# git::commit_messages_between_commits gets commit messages between two commits.
+# git::commit_messages_between_commits@usage
+# git::commit_messages_between_commits@example
+git::commit_messages_between_commits() {
+  local from=$1
+  local to=$2
+
+  if [ -z "$from" ]; then
+    log::error "[git::commit_messages_between_commits] from commit hash is required"
+    return 1
+  fi
+
+  if [ -z "$to" ]; then
+    log::error "[git::commit_messages_between_commits] to commit hash is required"
+    return 1
+  fi
+
+  git log --oneline --ancestry-path ${from}..${to} | awk '{$1=""; sub(/^ /, "", $0); print $0}'
+}
+
 git::commit_hash() {
   git rev-parse --short=9 HEAD
 }
@@ -795,6 +815,9 @@ git::version() {
 
 export -f git::commit_message
 export -f git::commit_message_full
+
+export -f git::commit_messages_between_commits
+
 export -f git::commit_hash
 export -f git::commit_hash_full
 export -f git::commit_author
@@ -855,3 +878,4 @@ export -f git::get_remote_latest_tag
 export -f git::remote_has_branch
 
 export -f git::version
+

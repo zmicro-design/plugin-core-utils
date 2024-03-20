@@ -2523,6 +2523,17 @@ os::timedatectl() {
   sudo timedatectl "$@"
 }
 
+# os::shellcheck runs shellcheck
+# os::shellcheck@usage </path/to/script>
+# os::shellcheck@example os::shellcheck ./script.sh
+os::shellcheck() {
+  if [ "$(os::has_command shellcheck)" != "true" ]; then
+    zmicro package install shellcheck
+  fi
+
+  shellcheck "$@"
+}
+
 export -f os::arch
 export -f os::platform
 export -f os::release
@@ -2743,3 +2754,5 @@ export -f os::cursor
 export -f os::lscpu
 export -f os::hostnamectl
 export -f os::timedatectl
+
+export -f os::shellcheck

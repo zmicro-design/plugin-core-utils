@@ -2534,6 +2534,18 @@ os::shellcheck() {
   shellcheck "$@"
 }
 
+# os::cheatsheet opens cheatsheet
+# os::cheatsheet@usage [<cheatsheet>]
+# os::cheatsheet@example curl
+# os::cheatsheet@example jq
+os::cheatsheet() {
+  if [ "$(os::has_command cheat)" != "true" ]; then
+    zmicro package install cheat
+  fi
+
+  cheat "$@"
+}
+
 export -f os::arch
 export -f os::platform
 export -f os::release
@@ -2756,3 +2768,5 @@ export -f os::hostnamectl
 export -f os::timedatectl
 
 export -f os::shellcheck
+
+export -f os::cheatsheet

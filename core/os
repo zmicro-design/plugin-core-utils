@@ -1056,6 +1056,12 @@ os::set_env() {
 }
 
 # os::inquirer interacts with users.
+# os::inquirer@usage => os::inquirer key type question required default
+# os::inquirer@example
+#   os::inquirer value "text" "请输入 ？" "默认值"
+#   os::inquirer value "yesno" "是否启用 ？" "true"
+#   os::inquirer value "select" ("选项1" "选项2") "请选择 ？" "true"
+#   os::inquirer value "radio" "请选择 ？" "true" "1"
 os::inquirer() {
   # load inquirer
   . $ZMICRO_PLUGINS_PATH/core-utils/core/inquirer/export

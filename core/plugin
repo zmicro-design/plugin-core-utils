@@ -177,7 +177,9 @@ plugin::get_app_data_path() {
   fi
 
   local path=$ZMICRO_PLUGINS_DATA_PATH/$plugin_name
-  if [ ! -d $path ]; then
+  if [ -L "$path" ]; then
+    echo "path is link, ignore" >>/dev/null 2>&1
+  elif [ ! -d $path ]; then
     sudo mkdir -p $path
     sudo chown $USER $path
   fi
@@ -193,7 +195,9 @@ plugin::get_app_logs_path() {
   fi
 
   local path=$ZMICRO_PLUGINS_LOGS_PATH/$plugin_name
-  if [ ! -d $path ]; then
+  if [ -L "$path" ]; then
+    echo "path is link, ignore" >>/dev/null 2>&1
+  elif [ ! -d $path ]; then
     sudo mkdir -p $path
     sudo chown $USER $path
   fi
@@ -209,7 +213,9 @@ plugin::get_app_configs_path() {
   fi
 
   local path=$ZMICRO_PLUGINS_CONFIGS_PATH/$plugin_name
-  if [ ! -d $path ]; then
+  if [ -L "$path" ]; then
+    echo "path is link, ignore" >>/dev/null 2>&1
+  elif [ ! -d $path ]; then
     sudo mkdir -p $path
     sudo chown $USER $path
   fi
@@ -225,7 +231,9 @@ plugin::get_app_cache_path() {
   fi
 
   local path=$ZMICRO_PLUGINS_CACHE_PATH/$plugin_name
-  if [ ! -d $path ]; then
+  if [ -L "$path" ]; then
+    echo "path is link, ignore" >>/dev/null 2>&1
+  elif [ ! -d $path ]; then
     sudo mkdir -p $path
     sudo chown $USER $path
   fi

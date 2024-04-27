@@ -1,3 +1,3 @@
 PLUGIN_NAME=core-utils
 PLUGIN_DESCRIPTION="core-utils plugin - store core-utils"
-PLUGIN_VERSION=v1.3.278
+PLUGIN_VERSION=v1.3.279

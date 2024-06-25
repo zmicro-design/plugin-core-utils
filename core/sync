@@ -132,5 +132,22 @@ sync::docker_image_to_registry() {
   log::info "[sync::docker_image_to_registry][image: $image_name] succeed to sync $source_registry => $target_registry."
 }
 
+# sync::docker_image_to_registry_from_dockerio syncs docker images from docker.io to another registry
+# sync::docker_image_to_registry_from_dockerio@usage <image_name> <target_registry> [new_image_name]
+#   principle:
+#     docker hub => thirdparty docker registry => pull from the docker registry
+#     official => private => pull from private
+# sync::docker_image_to_registry_from_dockerio@example sync::docker_image_to_registry_from_dockerio whatwewant/zmicro:v1 your_registry.com
+# sync::docker_image_to_registry_from_dockerio@example whatwewant/zmicro:v1 your_registry.com new_org/zmicro:v1
+sync::docker_image_to_registry_from_dockerio() {
+  local image_name=$1
+  local target_registry=$2
+  local new_image_name=${3:-"$image_name"}
+
+  sync::docker_image_to_registry $image_name "docker.io" $target_registry $new_image_name
+}
+
 export -f sync::docker_image_with_ssh
 export -f sync::docker_image_to_registry
+
+export -f sync::docker_image_to_registry_from_dockerio

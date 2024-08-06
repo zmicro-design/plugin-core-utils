@@ -794,22 +794,25 @@ plugin::shell() {
 
   # -c command
   if [ -n "$PLUGIN_SHELL_COMMAND" ]; then
+    # @S1 
+    #   issue: will should zmicro path, like /usr/local/lib/zmicro/commands/plugin/shell: line 50: asdasd: command not found
     # eval "$PLUGIN_SHELL_COMMAND"
     # exit $?
 
+    # @S2
+    #   issue: will create tmp file
     # local tmp_file="$(os::tmp_file)"
     # echo "$PLUGIN_SHELL_COMMAND" >$tmp_file
     # bash "$tmp_file"
     # local exit_code=$?
-
     # # clean
     # if [ "$exit_code" = "0" ]; then
     #   rm -f $tmp_file
     # fi
-
     # # exit
     # exit $exit_code
 
+    # @S3
     bash -c "$PLUGIN_SHELL_COMMAND"
     exit $?
   fi

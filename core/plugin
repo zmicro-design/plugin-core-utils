@@ -797,18 +797,21 @@ plugin::shell() {
     # eval "$PLUGIN_SHELL_COMMAND"
     # exit $?
 
-    local tmp_file="$(os::tmp_file)"
-    echo "$PLUGIN_SHELL_COMMAND" >$tmp_file
-    bash "$tmp_file"
-    local exit_code=$?
+    # local tmp_file="$(os::tmp_file)"
+    # echo "$PLUGIN_SHELL_COMMAND" >$tmp_file
+    # bash "$tmp_file"
+    # local exit_code=$?
 
-    # clean
-    if [ "$exit_code" = "0" ]; then
-      rm -f $tmp_file
-    fi
+    # # clean
+    # if [ "$exit_code" = "0" ]; then
+    #   rm -f $tmp_file
+    # fi
 
-    # exit
-    exit $exit_code
+    # # exit
+    # exit $exit_code
+
+    bash -c "$PLUGIN_SHELL_COMMAND"
+    exit $?
   fi
 
   echo "$plugin_command" | grep "^/" >/dev/null

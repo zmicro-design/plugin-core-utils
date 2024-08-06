@@ -794,8 +794,12 @@ plugin::shell() {
 
   # -c command
   if [ -n "$PLUGIN_SHELL_COMMAND" ]; then
-    eval "$PLUGIN_SHELL_COMMAND"
-    # bash -c "$3"
+    # eval "$PLUGIN_SHELL_COMMAND"
+    # exit $?
+
+    local tmp_file="$(os::tmp_file).sh"
+    echo "$PLUGIN_SHELL_COMMAND" >$tmp_file
+    bash $tmp_file
     exit $?
   fi
 

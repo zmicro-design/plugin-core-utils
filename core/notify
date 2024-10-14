@@ -27,6 +27,7 @@ notify::feishu() {
     log::debug "$(cat $tmp_file)"
     log::debug ""
     log::debug "tmp_file: $tmp_file"
+    log::debug ""
 
     curl \
       -X POST \
@@ -67,6 +68,7 @@ notify::logs() {
     log::debug "$(cat $tmp_file)"
     log::debug ""
     log::debug "tmp_file: $tmp_file"
+    log::debug ""
 
     curl \
       -X POST \

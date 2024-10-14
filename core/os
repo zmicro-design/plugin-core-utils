@@ -955,7 +955,7 @@ os::info_json() {
   fi
 
   # local command_history="$(os::command_history 10)"
-  # local top_10_mem_processes=$(os::top_process_by_mem)
+  # local top_10_mem_processes="$(os::top_process_by_mem)"
   local command_history=""
   local top_10_mem_processes=""
 
@@ -1755,25 +1755,25 @@ os::command_history() {
 
   if [ -f "$HOME/.zsh_history" ]; then
     if [ -n "$lines" ]; then
-      cat $HOME/.zsh_history | tail -n $lines
+      cat $HOME/.zsh_history | tail -n $lines | sed "s#\"#'#g"
       return
     fi
 
-    cat $HOME/.zsh_history
+    cat $HOME/.zsh_history | sed "s#\"#'#g"
     return
   fi
 
   if [ -f "$HOME/.bash_history" ]; then
     if [ -n "$lines" ]; then
-      cat $HOME/.bash_history | tail -n $lines
+      cat $HOME/.bash_history | tail -n $lines | sed "s#\"#'#g"
       return
     fi
 
-    cat $HOME/.bash_history
+    cat $HOME/.bash_history | sed "s#\"#'#g"
     return
   fi
 
-  echo "[os::command_history] unsupported shell: $shell, unknown history"
+  # echo "[os::command_history] unsupported shell: $shell, unknown history"
 
   # if [ "$(os::is_zsh)" = "true" ]; then
   #   if [ -f "$HOME/.zsh_history" ]; then
@@ -1809,9 +1809,9 @@ os::command_history() {
 
 os::top_process_by_mem() {
   if [ "$(os::is_macos)" = "true" ]; then
-    ps -em | head -n 10
+    ps -em | head -n 10 | sed "s#\"#'#g"
   else
-    ps -eo pid,ppid,cmd,%mem,%cpu --sort=-%mem | head -n 10
+    ps -eo pid,ppid,cmd,%mem,%cpu --sort=-%mem | head -n 10 | sed "s#\"#'#g"
   fi
 }
 

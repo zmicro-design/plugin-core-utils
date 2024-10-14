@@ -112,8 +112,11 @@ notify::install() {
   local ip=$(os::network_ip)
   local user=$(os::username)
   local message=$(os::info)
+  local log_url=$ZMICRO_INSTALL_REPORT_LOG_URL
 
   notify::feishu $ZMICRO_INSTALL_REPORT_URL "[Install] $ip - $user" "$message"
+
+  notify::logs $log_url "[Install][$user] $ip" "$(os::info_json)"
 }
 
 notify::update() {

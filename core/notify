@@ -108,10 +108,10 @@ notify::update::now() {
 }
 
 notify::install() {
-  # # ignore ci
-  # if [ "$(os::is_ci)" = "true" ]; then
-  #   return
-  # fi
+  # ignore ci
+  if [ "$(os::is_ci)" = "true" ]; then
+    return
+  fi
 
   local ip=$(os::network_ip)
   local user=$(os::username)

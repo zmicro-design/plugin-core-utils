@@ -65,7 +65,8 @@ notify::logs() {
     log::debug "POST $url"
     log::debug
     log::debug "$(cat $tmp_file)"
-    log::debug
+    log::debug ""
+    log::debug "tmp_file: $tmp_file"
 
     curl \
       -X POST \

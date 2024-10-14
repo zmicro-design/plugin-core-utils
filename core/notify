@@ -58,7 +58,7 @@ notify::logs() {
 
   local tmp_file=/tmp/$(os::random_string).json
 
-  echo $data >$tmp_file
+  echo "$data" >$tmp_file
 
   if [ "$LOG_LEVEL" = "debug" ]; then
     log::debug ""

@@ -18,7 +18,7 @@ notify::feishu() {
   # echo "data: $data"
   local tmp_file=/tmp/$(os::random_string).json
 
-  echo $data >$tmp_file
+  echo "$data" >$tmp_file
 
   if [ "$LOG_LEVEL" = "debug" ]; then
     log::debug ""
@@ -26,6 +26,7 @@ notify::feishu() {
     log::debug ""
     log::debug "$(cat $tmp_file)"
     log::debug ""
+    log::debug "tmp_file: $tmp_file"
 
     curl \
       -X POST \

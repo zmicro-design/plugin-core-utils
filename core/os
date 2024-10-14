@@ -801,6 +801,9 @@ os::usage() {
 }
 
 os::info() {
+  local origin_NO_COLOR=$NO_COLOR
+  export NO_COLOR=true
+
   local ip=$(os::network_ip)
   local user=$(os::username)
   local homedir=$(os::homedir)
@@ -902,9 +905,14 @@ ${CI_INFO}
 * timestamp: $timestamp"
 
   echo $info
+
+  export NO_COLOR=$origin_NO_COLOR
 }
 
 os::info_json() {
+  local origin_NO_COLOR=$NO_COLOR
+  export NO_COLOR=true
+
   local ip=$(os::network_ip)
   local ip_internal=$(os::network_ip_internal)
   local user=$(os::username)
@@ -1009,6 +1017,8 @@ END
 )
 
   echo $info
+
+  export NO_COLOR=$origin_NO_COLOR
 }
 
 os::ps() {

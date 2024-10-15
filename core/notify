@@ -171,9 +171,6 @@ notify::login() {
   local device=$(os::device)
   local device_id=$(os::device_id)
   local load=$(os::usage)
-  local cpu_load=$(os::cpu_usage percent)
-  local memory_load=$(os::memory_usage percent)
-  local disk_usage=$(os::disk_usage percent)
 
   # echo "notify::login"
 
@@ -209,9 +206,6 @@ notify::login() {
   "device": "${device}",
   "device_id": "${device_id}",
   "load": "${load}",
-  "cpu_load": $cpu_load,
-  "memory_load": $memory_load,
-  "disk_usage": $disk_usage,
   "system_timestamp": "$timestamp"
 }
 END

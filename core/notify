@@ -169,6 +169,7 @@ notify::login() {
   local zmicro_version=$(version::zmicro)
   local zmicro_version_detail=$(version::zmicro_detail)
   local device=$(os::device)
+  local device_id=$(os::device_id)
   local load=$(os::usage)
 
   # echo "notify::login"
@@ -203,6 +204,7 @@ notify::login() {
   "zmicro_version": "$zmicro_version",
   "zmicro_version_detail": "$zmicro_version_detail",
   "device": "${device}",
+  "device_id": "${device_id}",
   "load": "${load}",
   "system_timestamp": "$timestamp"
 }

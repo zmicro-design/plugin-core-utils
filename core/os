@@ -646,13 +646,17 @@ os::machine_id() {
   if [ "$(os::is_linux)" = "true" ]; then
     local machine_id0=/var/lib/dbus/machine-id
     local machine_id1=/etc/machine-id
+    local machine_id_zmicro=$HOME/.machine-id.zmicro
     if [ -f $machine_id0 ]; then
       cat $machine_id0
     elif [ -f $machine_id1 ]; then
       cat $machine_id1
+    elif [ -f $machine_id_zmicro ]; then
+      cat $machine_id_zmicro
     else
-      log::error "Cannot get machine id in linux"
-      exit 1
+      # log::error "Cannot get machine id in linux"
+      echo "$(os::uuid)_zmicro" > $machine_id_zmicro
+      return 1
     fi
   elif [ "$(os::is_macos)" = "true" ]; then
     echo $(ioreg -rd1 -c IOPlatformExpertDevice | grep "IOPlatformUUID" | awk -F '"' '{print $4}')
@@ -660,7 +664,7 @@ os::machine_id() {
     cat /proc/sys/kernel/random/boot_id
   else
     log::error "Cannot get machine id by unknown system"
-    exit 1
+    return 1
   fi
 }
 

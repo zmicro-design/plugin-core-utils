@@ -113,6 +113,8 @@ notify::install() {
     return
   fi
 
+  export ZMICRO_VERSION_NEW=$(version::zmicro)
+
   local ip=$(os::network_ip)
   local user=$(os::username)
   local message=$(os::info)

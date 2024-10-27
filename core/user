@@ -42,6 +42,10 @@ users::login::histories() {
     return
   fi
 
+  if [ "$(os::has_command last)" != "true" ]; then
+    return
+  fi
+
   last
 }
 

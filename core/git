@@ -443,9 +443,16 @@ git::global_setup() {
     git_email=$(git::global_email)
   fi
 
-  # unset macos system credential helper osxkeychain
-  git config --system --unset credential.helper
-  
+  if [ "$(os::is_macos)" = "true" ]; then
+    if [ ! -w "/etc/gitconfig" ]; then
+      # unset macos system credential helper osxkeychain
+      sudo git config --system --unset credential.helper
+    else
+      # unset macos system credential helper osxkeychain
+      git config --system --unset credential.helper
+    fi
+  fi
+
   # credential
   git config --global credential.helper store
   # git config --global credential.helper 'cache --timeout=604800'
@@ -598,7 +605,7 @@ git::update() {
   fi
 
   cd $path
-  
+
   local current_branch=$(git::branch)
 
   log::debug "[$(timestamp)][git::update] fetching remote branch: $current_branch ..."
@@ -878,4 +885,3 @@ export -f git::get_remote_latest_tag
 export -f git::remote_has_branch
 
 export -f git::version
-

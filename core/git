@@ -98,6 +98,21 @@ git::origin_url() {
   git config --get remote.origin.url
 }
 
+git::remote_url() {
+  local context=$1
+  local remote=$2
+
+  if [ -n "$context" ]; then
+    cd $context
+  fi
+
+  if [ -z "$remote" ]; then
+    remote="origin"
+  fi
+
+  git config --get remote.$remote.url
+}
+
 git::namespace() {
   local context=$1
   if [ -n "$context" ]; then
@@ -648,6 +663,28 @@ git::has_branch() {
   fi
 }
 
+git::has_remote_branch() {
+  local name=$1
+  local remote=$2
+  local repo=$3
+
+  if [ -z "$name" ]; then
+    log::error "[git::has_remote_branch] name is required"
+    return 1
+  fi
+
+  if [ -z "$remote" ]; then
+    remote="origin"
+  fi
+
+  if [ -z "$repo" ]; then
+    repo=$(git::remote_url $remote)
+  fi
+
+  git::remote_has_branch $name $repo $remote
+}
+
+
 # git::check_token checks the git registry token exist.
 # git::check_token@usage <registry>
 # git::check_token@example git::check_token github.com
@@ -785,13 +822,15 @@ git::get_remote_latest_tag() {
 git::remote_has_branch() {
   local name=$1
   local repo=$2
+  local remote=$3
   if [ -z "$name" ]; then
     log::error "[git::remote_has_branch] name is required"
     return 1
   fi
 
   if [ -z "$repo" ]; then
-    repo=$(git::origin_url)
+    # repo=$(git::origin_url)
+    repo=$(git::remote_url $remote)
   fi
 
   local branch=$(os::git ls-remote --heads $repo $name)
@@ -838,6 +877,8 @@ export -f git::commit_timestamp_human
 export -f git::fix_permissions
 
 export -f git::origin_url
+export -f git::remote_url
+
 export -f git::namespace
 export -f git::basename
 export -f git::repo_name
@@ -872,6 +913,7 @@ export -f git::clone
 export -f git::update
 
 export -f git::has_branch
+export -f git::has_remote_branch
 
 export -f git::check_token
 export -f git::get_token
